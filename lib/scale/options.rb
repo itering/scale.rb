@@ -8,7 +8,12 @@ module Scale
 
     class OptionU32
       include Option
-      INNER_TYPE = Scale::Types::U32
+      INNER_TYPE = 'Scale::Types::U32'
+    end
+
+    class OptionStudent
+      include Option
+      INNER_TYPE = 'Scale::Types::Student'
     end
 
   end

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    scale (0.1.0)
+    parity_scale_codec.rb (0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -32,10 +32,10 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.17)
+  parity_scale_codec.rb!
   pry
   rake (~> 10.0)
   rspec (~> 3.2)
-  scale!
 
 BUNDLED WITH
    1.17.3

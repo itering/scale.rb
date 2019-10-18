@@ -4,10 +4,10 @@ require "scale/base"
 require "scale/fixed_width_integers"
 require "scale/compact_integers"
 require "scale/bool"
-require "scale/structs"
 require "scale/options"
 require "scale/enums"
 require "scale/vectors"
+require "scale/structs"
 
 class Array
   def to_hex_string
@@ -32,6 +32,12 @@ class Array
 
   def is_byte_array?
     self.all? {|e| e >= 0 and e <= 255 }
+  end
+end
+
+class String
+  def constantize
+    Object.const_get(self)
   end
 end
 

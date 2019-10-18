@@ -13,14 +13,6 @@ module Scale
       end
     end
 
-    module Primitive
-      include SingleValue
-
-      def self.encode(value)
-        raise NotImplementedError
-      end
-    end
-
     module Enum
       include SingleValue
 
@@ -29,7 +21,7 @@ module Scale
           index = scale_bytes.get_next_bytes(1)[0]
           member_type = self::MEMBER_TYPES[index]
           raise "There is no such member with index #{index} for enum #{self}" if member_type.nil?
-          value = member_type.decode(scale_bytes)
+          value = member_type.constantize.decode(scale_bytes)
           return self.new(value)
         end
       end
@@ -53,7 +45,7 @@ module Scale
               return self.new(false)
             else
               # big process
-              value = self::INNER_TYPE.decode(scale_bytes)
+              value = self::INNER_TYPE.constantize.decode(scale_bytes)
               return self.new(value)
             end
           elsif byte == [2]
@@ -104,7 +96,7 @@ module Scale
       module ClassMethods
         def decode(scale_bytes)
           items = self::ITEM_TYPES.map do |item_type|
-            item_type.decode(scale_bytes)
+            item_type.constantize.decode(scale_bytes)
           end
           return self.new(*items)
         end
@@ -137,7 +129,7 @@ module Scale
           number = Scale::Types::Compact.decode(scale_bytes).value
           items = []
           number.times do
-            item = self::INNER_TYPE.decode(scale_bytes)
+            item = self::INNER_TYPE.constantize.decode(scale_bytes)
             items << item
           end
           self.new(items)
