@@ -84,7 +84,7 @@ module Scale
     end
 
 
-    module StructBase
+    module Struct
       # new(1.to_u32, U32(69))
       def initialize(*args)
         raise ArgumentError, "Too many arguments" if args.size > self.class::ITEMS.size

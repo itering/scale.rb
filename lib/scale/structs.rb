@@ -2,7 +2,7 @@ module Scale
   module Types
 
     class Student
-      include StructBase
+      include Struct
       items(
         age: 'Scale::Types::U32',
         grade: 'Scale::Types::U8',
