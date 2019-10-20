@@ -4,6 +4,7 @@ require "scale/base"
 require "scale/fixed_width_integers"
 require "scale/compact_integers"
 require "scale/bool"
+require "scale/types"
 require "scale/options"
 require "scale/enums"
 require "scale/vectors"
@@ -79,11 +80,11 @@ module Scale
       result
     end
 
-    def to_hex
+    def to_hex_string
       @bytes.to_hex_string
     end
 
-    def to_bin
+    def to_bin_string
       @bytes.to_bin_string
     end
 
