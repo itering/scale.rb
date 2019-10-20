@@ -12,7 +12,7 @@ module Scale
         elsif bytes == [1]
           Bool.new(true)
         else
-          raise "bad data"
+          raise "Bad data"
         end
       end
     end
