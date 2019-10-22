@@ -1,5 +1,7 @@
 require "scale/version"
 
+require "substrate_common"
+
 require "scale/base"
 require "scale/fixed_width_integers"
 require "scale/compact_integers"
@@ -9,38 +11,6 @@ require "scale/options"
 require "scale/enums"
 require "scale/vectors"
 require "scale/structs"
-
-class Array
-  def to_hex_string
-    raise "Not a byte array" unless self.is_byte_array?
-    '0x' + self.map { |b| b.to_s(16).rjust(2, '0') }.join
-  end
-
-  def to_bin_string
-    raise "Not a byte array" unless self.is_byte_array?
-    '0b' + self.map { |b| b.to_s(2).rjust(8, '0') }.join
-  end
-
-  def to_hex_array
-    raise "Not a byte array" unless self.is_byte_array?
-    self.map { |b| b.to_s(16).rjust(2, '0') }
-  end
-
-  def to_bin_array
-    raise "Not a byte array" unless self.is_byte_array?
-    self.map { |b| b.to_s(2).rjust(8, '0') }
-  end
-
-  def is_byte_array?
-    self.all? {|e| e >= 0 and e <= 255 }
-  end
-end
-
-class String
-  def constantize
-    Object.const_get(self)
-  end
-end
 
 module Scale
   class Error < StandardError; end
