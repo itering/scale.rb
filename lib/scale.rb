@@ -51,11 +51,11 @@ module Scale
     end
 
     def to_hex_string
-      @bytes.to_hex_string
+      @bytes.bytes_to_hex
     end
 
     def to_bin_string
-      @bytes.to_bin_string
+      @bytes.bytes_to_bin
     end
 
     def ==(another_object)

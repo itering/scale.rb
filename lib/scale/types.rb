@@ -6,7 +6,7 @@ module Scale
 
       def self.decode(scale_bytes)
         length = Scale::Types::Compact.decode(scale_bytes).value
-        hex_string = scale_bytes.get_next_bytes(length).to_hex_string
+        hex_string = scale_bytes.get_next_bytes(length).bytes_to_hex
         Hex.new(hex_string)
       end
     end
@@ -24,7 +24,7 @@ module Scale
       include SingleValue
       def self.decode(scale_bytes)
         bytes = scale_bytes.get_next_bytes(32)
-        H256.new(bytes.to_hex_string)
+        H256.new(bytes.bytes_to_hex)
       end
     end
 
@@ -32,7 +32,7 @@ module Scale
       include SingleValue
       def self.decode(scale_bytes)
         bytes = scale_bytes.get_next_bytes(64)
-        H512.new(bytes.to_hex_string)
+        H512.new(bytes.bytes_to_hex)
       end
     end
 
