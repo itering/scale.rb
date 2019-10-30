@@ -15,5 +15,15 @@ module Scale
       include FixedWidthUInt
       BYTES_LENGTH = 4
     end
+
+    class U64
+      include FixedWidthUInt
+      BYTES_LENGTH = 8
+    end
+
+    class U128
+      include FixedWidthUInt
+      BYTES_LENGTH = 16
+    end
   end
 end
