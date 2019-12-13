@@ -13,24 +13,6 @@ module Scale
       end
     end
 
-    module Enum
-      include SingleValue
-
-      module ClassMethods
-        def decode(scale_bytes)
-          index = scale_bytes.get_next_bytes(1)[0]
-          member_type = self::MEMBER_TYPES[index]
-          raise "There is no such member with index #{index} for enum #{self}" if member_type.nil?
-          value = member_type.constantize.decode(scale_bytes)
-          return self.new(value)
-        end
-      end
-
-      def self.included(base)
-        base.extend(ClassMethods)
-      end
-    end
-
     # value: one of nil, false, true, scale object
     module Option
       include SingleValue
@@ -118,6 +100,46 @@ module Scale
 
       def self.included(base)
         base.extend ClassMethods
+      end
+    end
+
+    module Enum
+      include SingleValue
+
+      module ClassMethods
+        def decode(scale_bytes)
+          index = scale_bytes.get_next_bytes(1)[0]
+          if self.const_defined? "ITEMS"
+            item_type = self::ITEM_TYPES[index]
+            raise "There is no such member with index #{index} for enum #{self}" if item_type.nil?
+            value = item_type.constantize.decode(scale_bytes)
+            return self.new(value)
+          else
+            value = self::VALUES[index]
+            return self.new(value)
+          end
+        end
+
+        def items(**items)
+          attrs = []
+          attr_types = []
+
+          items.each_pair do |attr_name, attr_type|
+            attrs << attr_name
+            attr_types << attr_type
+          end
+
+          self.const_set(:ITEMS, attrs)
+          self.const_set(:ITEM_TYPES, attr_types)
+        end
+
+        def values(*values)
+          self.const_set(:VALUES, values)
+        end
+      end
+
+      def self.included(base)
+        base.extend(ClassMethods)
       end
     end
 

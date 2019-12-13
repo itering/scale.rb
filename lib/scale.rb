@@ -63,4 +63,47 @@ module Scale
     end
   end
 
+  class TypesLoader
+    def self.load(filename)
+      path = File.join File.dirname(__FILE__), "types", filename
+      content = File.open(path).read
+      result = JSON.parse content
+
+      types = result["default"]
+      types.each do |name, body|
+        if body.class == String
+          target_type  = "Scale::Types::#{body}"
+          klass = Class.new(target_type.constantize) do
+          end
+        elsif body.class == Hash
+          if body["type"] == "struct"
+            struct_params = {}
+            body['type_mapping'].each do |mapping|
+              struct_params[mapping[0].to_sym] = mapping[1]
+            end
+            klass = Class.new do
+            end
+            klass.send(:include, Scale::Types::Struct)
+            klass.send(:items, struct_params)
+            Scale::Types.const_set name, klass
+          elsif body["type"] = "enum"
+            klass = Class.new do
+            end
+            klass.send(:include, Scale::Types::Enum)
+            if body["type_mapping"]
+              struct_params = {}
+              body['type_mapping'].each do |mapping|
+                struct_params[mapping[0].to_sym] = mapping[1]
+              end
+              klass.send(:items, struct_params)
+            else
+              klass.send(:values, body["value_list"])
+            end
+            Scale::Types.const_set name, klass
+          end
+        end
+      end
+    end
+  end
+
 end

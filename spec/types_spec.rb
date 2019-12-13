@@ -86,3 +86,10 @@ describe Scale::Types::VectorU8 do
     expect(v.value[2].value).to eql(254)
   end
 end
+
+# name = "Person"
+# klass = Class.new do
+# end
+# klass.send(:include, Scale::Types::Struct)
+# klass.send(:items, proposal: 'Scale::Types::Hex')
+# Object.const_set name, klass
