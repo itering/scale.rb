@@ -4,14 +4,14 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "scale/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "parity_scale_codec.rb"
+  spec.name          = "scale.rb"
   spec.version       = Scale::VERSION
   spec.authors       = ["Wu Minzhe"]
   spec.email         = ["wuminzhe@gmail.com"]
 
   spec.summary       = %q{Ruby implementation of the parity SCALE data format}
   spec.description   = %q{SCALE - Simple Concatenating Aggregated Little Endians}
-  spec.homepage      = "https://github.com/wuminzhe/parity_scale_codec.rb"
+  spec.homepage      = "https://github.com/itering/scale.rb"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

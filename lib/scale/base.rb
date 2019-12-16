@@ -147,14 +147,20 @@ module Scale
       include SingleValue # value is an array
 
       module ClassMethods
-        def decode(scale_bytes)
+        def decode(scale_bytes, raw=false)
           number = Scale::Types::Compact.decode(scale_bytes).value
+          inner_type = self::INNER_TYPE.start_with?("Scale::Types::") ? self::INNER_TYPE : "Scale::Types::#{self::INNER_TYPE}"
           items = []
           number.times do
-            item = self::INNER_TYPE.constantize.decode(scale_bytes)
+            
+            item = inner_type.constantize.decode(scale_bytes)
             items << item
           end
-          self.new(items)
+          raw ? items : self.new(items)
+        end
+
+        def inner_type(type)
+          self.const_set(:INNER_TYPE, type)
         end
       end
 

@@ -12,6 +12,8 @@ require "scale/enums"
 require "scale/vectors"
 require "scale/structs"
 
+require "metadata/metadata"
+
 module Scale
   class Error < StandardError; end
   # TODO: == implement
@@ -106,4 +108,21 @@ module Scale
     end
   end
 
+end
+
+def type(type_string, values: nil)
+  klass = Class.new do; end
+  if type_string == 'Enum'
+    klass.send(:include, Scale::Types::Enum)
+    klass.send(:values, *values)
+  elsif type_string.end_with?(">")
+    splits = type_string.split("<")
+    if splits.first == "Vec"
+      inner_type = splits.last.split(">").first
+      klass.send(:include, Scale::Types::Vector)
+      klass.send(:inner_type, inner_type)
+    end
+  end
+
+  return klass
 end

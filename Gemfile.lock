@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parity_scale_codec.rb (0.1.0)
+    scale.rb (0.1.0)
       substrate_common.rb (~> 0.1.1)
 
 GEM
@@ -40,10 +40,10 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.17)
-  parity_scale_codec.rb!
   pry
   rake (~> 10.0)
   rspec (~> 3.2)
+  scale.rb!
 
 BUNDLED WITH
    1.17.3

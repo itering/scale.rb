@@ -3,7 +3,7 @@ module Scale
 
     class VectorU8
       include Vector
-      INNER_TYPE = 'Scale::Types::U8'
+      inner_type 'Scale::Types::U8'
     end
 
   end
