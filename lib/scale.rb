@@ -17,6 +17,7 @@ require "metadata/metadata_v3"
 require "metadata/metadata_v7"
 require "metadata/metadata_v8"
 require "metadata/metadata_v9"
+require "metadata/metadata_v10"
 
 module Scale
   class Error < StandardError; end
@@ -116,6 +117,7 @@ end
 
 def type(type_string, values: nil)
   klass = Class.new do; end
+
   if type_string == 'Enum'
     klass.send(:include, Scale::Types::Enum)
     klass.send(:values, *values)
@@ -129,4 +131,8 @@ def type(type_string, values: nil)
   end
 
   return klass
+end
+
+def adjust_type(type_string)
+  
 end
