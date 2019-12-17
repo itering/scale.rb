@@ -13,6 +13,10 @@ require "scale/vectors"
 require "scale/structs"
 
 require "metadata/metadata"
+require "metadata/metadata_v3"
+require "metadata/metadata_v7"
+require "metadata/metadata_v8"
+require "metadata/metadata_v9"
 
 module Scale
   class Error < StandardError; end

@@ -86,5 +86,10 @@ module Scale
         int_or_bool: 'Scale::Types::IntOrBool'
       )
     end
+
+    class StorageHasher
+      include Enum
+      values 'Blake2_128', 'Blake2_256', 'Twox128', 'Twox256', 'Twox128Concat'
+    end
   end
 end
