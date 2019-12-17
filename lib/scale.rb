@@ -116,23 +116,39 @@ module Scale
 end
 
 def type(type_string, values: nil)
-  klass = Class.new do; end
-
   if type_string == 'Enum'
+    klass = Class.new do; end
     klass.send(:include, Scale::Types::Enum)
     klass.send(:values, *values)
+    klass
   elsif type_string.end_with?(">")
+    klass = Class.new do; end
     splits = type_string.split("<")
     if splits.first == "Vec"
       inner_type = splits.last.split(">").first
       klass.send(:include, Scale::Types::Vector)
       klass.send(:inner_type, inner_type)
     end
+    klass
+  else
+    "Scale::Types::#{type_string}".constantize
   end
-
-  return klass
 end
 
-def adjust_type(type_string)
-  
+def adjust(type)
+  type = type.gsub("T::", "")
+             .gsub("<T>", "")
+             .gsub("<T as Trait>::", "")
+             .gsub("\n", "")
+             .gsub("EventRecord<Event, Hash>", "EventRecord")
+  return "Null" if type == "()"
+  return "String" if type == "Vec<u8>"
+  return "Address" if type == '<Lookup as StaticLookup>::Source'
+  return "Vec<Address>" if type == 'Vec<<Lookup as StaticLookup>::Source>'
+  return "CompactBalance" if type == '<Balance as HasCompact>::Type'
+  return 'CompactBlockNumber' if type == '<BlockNumber as HasCompact>::Type'
+  return 'CompactBalance' if type == '<Balance as HasCompact>::Type'
+  return 'CompactMoment' if type == '<Moment as HasCompact>::Type'
+  return 'InherentOfflineReport' if type == '<InherentOfflineReport as InherentOfflineReport>::Inherent'
+  return type
 end

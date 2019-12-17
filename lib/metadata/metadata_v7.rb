@@ -76,14 +76,14 @@ module Scale
         storage_function_type = type("Enum", values: ["Plain", "Map", "DoubleMap"]).decode(scale_bytes).value
         if storage_function_type == "Plain"
           result[:type] = {
-            Plain: String.decode(scale_bytes).value
+            Plain: adjust(String.decode(scale_bytes).value)
           }
         elsif storage_function_type == "Map"
           result[:type] = {
             Map: {
               hasher: StorageHasher.decode(scale_bytes).value,
-              key: String.decode(scale_bytes).value, # convert
-              value: String.decode(scale_bytes).value, # convert
+              key: adjust(String.decode(scale_bytes).value),
+              value: adjust(String.decode(scale_bytes).value),
               linked: Bool.decode(scale_bytes).value
             }
           }
@@ -91,10 +91,10 @@ module Scale
           result[:type] = {
             DoubleMap: {
               hasher: StorageHasher.decode(scale_bytes).value,
-              key1: String.decode(scale_bytes).value, # convert
-              key2: String.decode(scale_bytes).value, # convert
-              value: String.decode(scale_bytes).value, # convert
-              key2Hasher: StorageHasher.decode(scale_bytes).value # ?
+              key1: adjust(String.decode(scale_bytes).value),
+              key2: adjust(String.decode(scale_bytes).value),
+              value: adjust(String.decode(scale_bytes).value),
+              key2Hasher: StorageHasher.decode(scale_bytes).value
             }
           }
         end
