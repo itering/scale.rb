@@ -38,6 +38,27 @@ module Scale
 
         Compact.new(value)
       end
+
+      def encode
+        if self.value >= 0 and self.value <= 63
+          (value << 2).to_s(16).rjust(2, '0')
+        elsif self.value > 63 and self.value <= (2**14 - 1)
+          ((value << 2) + 1).to_s(16).rjust(4, '0').scan(/.{2}/).reverse.join
+        elsif self.value > (2**14 - 1) and self.value <= (2**30 - 1)
+          ((value << 2) + 2).to_s(16).rjust(8, '0').scan(/.{2}/).reverse.join
+        elsif self.value > (2**30 - 1)
+          value_in_hex = self.value.to_s(16)
+          length = if value_in_hex.length % 2 == 1
+            value_in_hex.length + 1
+          else
+            value_in_hex.length
+          end
+
+          puts length
+          hex = value_in_hex.rjust(length, '0').scan(/.{2}/).reverse.join
+          (((length/2 - 4) << 2) + 3).to_s(16).rjust(2, '0') + hex
+        end
+      end
     end
 
   end
