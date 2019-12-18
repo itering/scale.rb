@@ -63,6 +63,11 @@ module Scale
       def self.included(base)
         base.extend(ClassMethods)
       end
+
+      def encode
+        bytes = self.value.to_s(16).rjust(self.class::BYTES_LENGTH*2, '0').scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
+        bytes.bytes_to_hex[2..]
+      end
     end
 
 

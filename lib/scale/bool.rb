@@ -15,6 +15,10 @@ module Scale
           raise "Bad data"
         end
       end
+
+      def encode
+        self.value === true ? "00" : "01"
+      end
     end
   end
 end
