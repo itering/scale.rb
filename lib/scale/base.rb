@@ -72,20 +72,24 @@ module Scale
 
 
     module Struct
+      include SingleValue
       # new(1.to_u32, U32(69))
-      def initialize(*args)
-        raise ArgumentError, "Too many arguments" if args.size > self.class::ITEMS.size
-        self::class::ITEMS.zip(args) do |attr, val|
-          send "#{attr}=", val
-        end
-      end
-
       module ClassMethods
         def decode(scale_bytes)
-          items = self::ITEM_TYPES.map do |item_type|
+          item_values = self::ITEM_TYPES.map do |item_type|
             item_type.constantize.decode(scale_bytes)
           end
-          return self.new(*items)
+
+          value = {}
+          self::ITEMS.zip(item_values) do |attr, val|
+            value[attr] = val
+          end
+
+          result = self.new(value)
+          value.each_pair do |attr, val|
+            result.send "#{attr}=", val
+          end
+          return result
         end
 
         def items(**items)
@@ -94,7 +98,7 @@ module Scale
 
           items.each_pair do |attr_name, attr_type|
             attrs << attr_name
-            attr_types << attr_type
+            attr_types << (attr_type.start_with?("Scale::Types::") ? attr_type : "Scale::Types::#{attr_type}")
           end
 
           self.const_set(:ITEMS, attrs)
@@ -105,6 +109,9 @@ module Scale
 
       def self.included(base)
         base.extend ClassMethods
+      end
+
+      def encode
       end
     end
 
@@ -131,7 +138,7 @@ module Scale
 
           items.each_pair do |attr_name, attr_type|
             attrs << attr_name
-            attr_types << attr_type.start_with?("Scale::Types::") ? attr_type : "Scale::Types::#{attr_type}"
+            attr_types << (attr_type.start_with?("Scale::Types::") ? attr_type : "Scale::Types::#{attr_type}")
           end
 
           self.const_set(:ITEMS, attrs)
