@@ -146,6 +146,15 @@ module Scale
       def self.included(base)
         base.extend(ClassMethods)
       end
+
+      def encode
+        if self.class.const_defined? "ITEMS"
+          index = self::class::ITEM_TYPES.index(self.value.class.to_s).to_s(16).rjust(2, '0')
+          index + self.value.encode
+        else
+          self::class::VALUES.index(self.value).to_s(16).rjust(2, '0')
+        end
+      end
     end
 
     module Vector

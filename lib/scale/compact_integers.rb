@@ -54,7 +54,6 @@ module Scale
             value_in_hex.length
           end
 
-          puts length
           hex = value_in_hex.rjust(length, '0').scan(/.{2}/).reverse.join
           (((length/2 - 4) << 2) + 3).to_s(16).rjust(2, '0') + hex
         end

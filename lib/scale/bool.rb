@@ -17,7 +17,7 @@ module Scale
       end
 
       def encode
-        self.value === true ? "00" : "01"
+        self.value === true ? "01" : "00"
       end
     end
   end
