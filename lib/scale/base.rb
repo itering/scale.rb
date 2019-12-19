@@ -131,7 +131,7 @@ module Scale
 
           items.each_pair do |attr_name, attr_type|
             attrs << attr_name
-            attr_types << attr_type
+            attr_types << attr_type.start_with?("Scale::Types::") ? attr_type : "Scale::Types::#{attr_type}"
           end
 
           self.const_set(:ITEMS, attrs)
@@ -163,23 +163,31 @@ module Scale
       module ClassMethods
         def decode(scale_bytes, raw=false)
           number = Scale::Types::Compact.decode(scale_bytes).value
-          inner_type = self::INNER_TYPE.start_with?("Scale::Types::") ? self::INNER_TYPE : "Scale::Types::#{self::INNER_TYPE}"
           items = []
           number.times do
-            
-            item = inner_type.constantize.decode(scale_bytes)
+            item = self::INNER_TYPE.constantize.decode(scale_bytes)
             items << item
           end
           raw ? items : self.new(items)
         end
 
         def inner_type(type)
-          self.const_set(:INNER_TYPE, type)
+          inner_type = type.start_with?("Scale::Types::") ? type : "Scale::Types::#{type}"
+          self.const_set(:INNER_TYPE, inner_type)
         end
       end
 
       def self.included(base)
         base.extend ClassMethods
+      end
+
+      def encode
+        number = Scale::Types::Compact.new(self.value.length).encode
+        [number].tap do |result|
+          self.value.each do |element|
+            result << element.encode
+          end
+        end.join
       end
     end
 
