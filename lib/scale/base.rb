@@ -51,8 +51,8 @@ module Scale
         if self.value.nil?
           "00"
         else
-          return "02" if self.value === true
-          return "01" if self.value === false
+          return "02" if self.value.class == TrueClass && self.value === true
+          return "01" if self.value.class == FalseClass && self.value === false
           "01" + self.value.encode 
         end
       end
