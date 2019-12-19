@@ -45,6 +45,17 @@ module Scale
       def self.included(base)
         base.extend(ClassMethods)
       end
+
+      def encode
+        # TODO: add Null type
+        if self.value.nil?
+          "00"
+        else
+          return "02" if self.value === true
+          return "01" if self.value === false
+          "01" + self.value.encode 
+        end
+      end
     end
 
     module FixedWidthUInt
@@ -112,6 +123,11 @@ module Scale
       end
 
       def encode
+        [].tap do |result| 
+          self.value.each_pair do |attr_name, attr_value|
+            result << attr_value.encode
+          end
+        end.join
       end
     end
 
