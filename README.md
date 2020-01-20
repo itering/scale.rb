@@ -1,8 +1,16 @@
-# Scale
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/scale`. To experiment with that code, run `bin/console` for an interactive prompt.
 
-TODO: Delete this and the text above, and describe your gem
+# scale.rb
+
+**Ruby SCALE Codec Library and Substrate Json-rpc Api Client.**
+
+SCALE is a lightweight, efficient, binary serialization and deserialization codec used by substrate. Most of the input and output data of the substrate API are encoded in SCALE data format. 
+
+This is a SCALE codec library and substrate json-rpc api client implemented in ruby language for general use. It contains the implementation of low-level data formats, various substrate types, metadata support and json-rpc client.
+
+This work is the prerequisite of our subsequent series of projects. We hope to familiarize and quickly access Polkadot and Substrate through ruby. We plan to develop the back end of our applications in ruby language, and then interact with nodes or synchronize data through this library.
+
+Please refer to the [official doc](https://substrate.dev/docs/en/overview/low-level-data-format) for more details about SCALE low-level data format.
 
 ## Installation
 
@@ -22,7 +30,26 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+1. decode
+
+```ruby
+require "scale"
+
+# decode a compact integer
+scale_bytes = Scale::Bytes.new("0x1501") # create scale_bytes object from scale encoded hex string
+o = Scale::Types::Compact.decode scale_bytes # use scale type to decode scale_bytes object
+p o.value # 69
+```
+
+2. encode
+
+```ruby
+require "scale"
+
+o = Scale::Types::Compact.new(69)
+p o.encode # "1501"
+```
+Please go to spec dir for more examples.
 
 ## Development
 
@@ -32,7 +59,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/scale.
+Bug reports and pull requests are welcome on GitHub at https://github.com/itering/scale.rb.
 
 ## License
 
