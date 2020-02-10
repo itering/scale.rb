@@ -37,7 +37,7 @@ require "scale"
 
 # decode a compact integer
 scale_bytes = Scale::Bytes.new("0x1501") # create scale_bytes object from scale encoded hex string
-o = Scale::Types::Compact.decode scale_bytes # use scale type to decode scale_bytes object
+o = Scale::Types::Compact.decode(scale_bytes) # use scale type to decode scale_bytes object
 p o.value # 69
 ```
 
@@ -49,7 +49,24 @@ require "scale"
 o = Scale::Types::Compact.new(69)
 p o.encode # "1501"
 ```
-Please go to spec dir for more examples.
+Please go to `spec` dir for more examples.
+
+## Docker
+
+1. Run docker image:
+
+`docker run -it itering/scale`
+
+This cmd will open a console with scale.rb loaded. 
+
+2. Type any decode or encode ruby code in the console, for example:
+
+```ruby
+scale_bytes = Scale::Bytes.new("0x1501")
+o = Scale::Types::Compact.decode(scale_bytes)
+p o.value
+```
+
 
 ## Development
 
