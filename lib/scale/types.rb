@@ -52,7 +52,6 @@ module Scale
       include SingleValue
       def self.decode(scale_bytes)
         byte = scale_bytes.get_next_bytes(1).bytes_to_hex
-        puts byte.class
         if byte == '0x00'
           Era.new byte
         else
@@ -82,7 +81,7 @@ module Scale
       items(
         proposal: 'Scale::Types::Hex',
         registredBy: 'Scale::Types::AccountId',
-        deposit: 'Scale::Types::OptionU32', # 选修课数量, nil表示还没有选
+        deposit: 'Scale::Types::OptionU32',
         int_or_bool: 'Scale::Types::IntOrBool'
       )
     end

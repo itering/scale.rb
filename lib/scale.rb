@@ -24,7 +24,7 @@ module Scale
   # TODO: == implement
 
   class Bytes
-    attr_reader :bytes
+    attr_reader :data, :bytes
     attr_reader :offset
 
     def initialize(data)
@@ -37,6 +37,7 @@ module Scale
         raise "Provided data is not valid"
       end
 
+      @data   = data
       @offset = 0
     end
 
@@ -46,7 +47,11 @@ module Scale
 
     def get_next_bytes(length)
       result = @bytes[@offset ... @offset + length]
-      raise "No enough data: #{result.to_s}, expect length: #{length}, but #{result.length}" if result.length < length
+      if result.length < length
+        str = @data[(2 + @offset * 2)..]
+        str = str.length > 40 ? (str[0...40]).to_s + "..." : str
+        raise "No enough data: #{str}, expect length: #{length}, but #{result.length}" 
+      end
       @offset = @offset + length
       result
     end
