@@ -12,6 +12,8 @@ This work is the prerequisite of our subsequent series of projects. We hope to f
 
 Please refer to the [official doc](https://substrate.dev/docs/en/overview/low-level-data-format) for more details about SCALE low-level data format.
 
+Because the feature of ruby 2.6 is used, the ruby version is required to be >= 2.6. it will be compatible with older ruby versions when released.
+
 ## Installation
 
 Add this line to your application's Gemfile:
