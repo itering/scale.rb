@@ -51,6 +51,21 @@ p o.encode # "1501"
 ```
 Please go to `spec` dir for more examples.
 
+## Running tests
+
+1. Run all tests
+
+```
+rspec
+```
+
+2. Run low level format tests
+
+```
+rspec spec/low_level_spec.rb
+```
+
+
 ## Docker
 
 1. Run docker image:
