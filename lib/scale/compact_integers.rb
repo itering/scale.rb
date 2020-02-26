@@ -26,6 +26,8 @@ module Scale
               .map { |b| b.to_s(16).rjust(2, '0') }
               .join
               .to_i(16) >> 2
+            # or like this:
+            # ['02093d00'].pack('H*').unpack('l').first / 4
           elsif mode == '11'
             remaining_length = 4 + (first_byte >> 2)
             remaining_bytes = scale_bytes.get_next_bytes(remaining_length)

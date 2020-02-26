@@ -1,4 +1,4 @@
-FROM ruby:2.7-alpine3.11
+FROM ruby:2.6-alpine3.11
 
 ENV BUILD_PACKAGES curl-dev build-base
 
@@ -15,4 +15,4 @@ RUN gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org
     bundle config mirror.https://rubygems.org https://gems.ruby-china.com && \
     bundle install
 
-CMD ["./bin/console"]
+CMD ["sh"]

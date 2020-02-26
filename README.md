@@ -55,7 +55,8 @@ Please go to `spec` dir for more examples.
 
 ## Running tests
 
-1. Run all tests
+1. Download or clone the code to local, and enter the code root directory
+2. Run all tests
 
 ```
 rspec
@@ -70,19 +71,43 @@ rspec spec/low_level_spec.rb
 
 ## Docker
 
-1. Run docker image:
+1. update to latest image
 
-`docker run -it itering/scale`
+   `docker pull itering/scale`
 
-This cmd will open a console with scale.rb loaded. 
+2. Run image:
 
-2. Type any decode or encode ruby code in the console, for example:
+   `docker run -it itering/scale`
 
-```ruby
-scale_bytes = Scale::Bytes.new("0x1501")
-o = Scale::Types::Compact.decode(scale_bytes)
-p o.value
-```
+   This  will enter the container with a linux shell opened. 
+
+   ```shell
+   /usr/src/app # 
+   ```
+
+3. Type `rspec` to run all tests
+
+   ```shell
+   /usr/src/app # rspec
+   ...................
+   
+   Finished in 0.00883 seconds (files took 0.09656 seconds to load)
+   19 examples, 0 failures
+   ```
+
+4. Or type `./bin/console` to enter the ruby interactive environment and run any decode or encode code
+
+   ```shell
+   /usr/src/app # ./bin/console
+   [1] pry(main)> scale_bytes = Scale::Bytes.new("0x1501")
+   => #<Scale::Bytes:0x000055daa883ba70 @bytes=[21, 1], @data="0x1501", @offset=0>
+   [2] pry(main)> o = Scale::Types::Compact.decode(scale_bytes)
+   => #<Scale::Types::Compact:0x000055daa89b0db0 @value=69>
+   [3] pry(main)> p o.value
+   69
+   => 69
+   [4] pry(main)>
+   ```
 
 
 ## Development

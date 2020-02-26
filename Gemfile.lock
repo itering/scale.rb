@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     scale.rb (0.1.0)
-      substrate_common.rb (~> 0.1.1)
+      substrate_common.rb (~> 0.1.2)
 
 GEM
   remote: https://rubygems.org/
@@ -29,7 +29,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.0)
-    substrate_common.rb (0.1.1)
+    substrate_common.rb (0.1.2)
       base58
       blake2b
       xxhash
