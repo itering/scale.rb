@@ -1,35 +1,35 @@
 require "scale"
 
 describe Scale::Types::FixedWidthUInt do
-  it "shoud encode u8 right" do
+  it "should encode u8 right" do
     scale_bytes = Scale::Bytes.new("0x45")
     o = Scale::Types::U8.decode scale_bytes
     expect(o.value).to eql(69)
     expect(o.encode).to eql("45")
   end
 
-  it "shoud encode u16 right" do
+  it "should encode u16 right" do
     scale_bytes = Scale::Bytes.new("0x2a00")
     o = Scale::Types::U16.decode scale_bytes
     expect(o.value).to eql(42)
     expect(o.encode).to eql("2a00")
   end
 
-  it "shoud encode u32 right" do
+  it "should encode u32 right" do
     scale_bytes = Scale::Bytes.new("0xffffff00")
     o = Scale::Types::U32.decode scale_bytes
     expect(o.value).to eql(16777215)
     expect(o.encode).to eql("ffffff00")
   end
 
-  it "shoud encode u64 right" do
+  it "should encode u64 right" do
     scale_bytes = Scale::Bytes.new("0x00e40b5403000000")
     o = Scale::Types::U64.decode scale_bytes
     expect(o.value).to eql(14294967296)
     expect(o.encode).to eql("00e40b5403000000")
   end
 
-  it "shoud encode u128 right" do
+  it "should encode u128 right" do
     scale_bytes = Scale::Bytes.new("0x0bfeffffffffffff0000000000000000")
     o = Scale::Types::U128.decode scale_bytes
     expect(o.value).to eql(18446744073709551115)

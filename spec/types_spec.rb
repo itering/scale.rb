@@ -1,7 +1,7 @@
 require "scale"
 
 describe Scale::Types::Student do
-  it "shoud decode from a scale hex string" do
+  it "should decode from a scale hex string" do
     # 0x 01000000 45 00 0045
     scale_bytes = Scale::Bytes.new("0x0100000045000045")
     s1 = Scale::Types::Student.decode scale_bytes
