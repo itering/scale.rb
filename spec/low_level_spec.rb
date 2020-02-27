@@ -131,12 +131,14 @@ describe Scale::Types::Vector do
   it "should encode vector u8 right" do
     scale_bytes = Scale::Bytes.new("0x0c003afe")
     o = Scale::Types::VectorU8.decode scale_bytes
+    expect(o.value.map(&:value)).to eql([0, 58, 254])
     expect(o.encode).to eql("0c003afe")
   end
 
   it "should encode vector u8 right" do
     scale_bytes = Scale::Bytes.new("0x0c003afe")
     o = type("Vec<U8>").decode scale_bytes
+    expect(o.value.map(&:value)).to eql([0, 58, 254])
     expect(o.encode).to eql("0c003afe")
   end
 end
@@ -145,6 +147,23 @@ describe Scale::Types::Struct do
   it "should encode student right" do
     scale_bytes = Scale::Bytes.new("0x0100000045000045")
     o = Scale::Types::Student.decode scale_bytes
+
+    [
+      [o.age, Scale::Types::U32],
+      [o.grade, Scale::Types::U8],
+      [o.courses_number, Scale::Types::OptionU32],
+      [o.int_or_bool, Scale::Types::IntOrBool]
+    ]
+      .map { |(actual, expectation)| expect(actual.class).to eql(expectation) }
+
+    [
+      [o.age, 1],
+      [o.grade, 69],
+      [o.courses_number, nil],
+      [o.int_or_bool.value, 69]
+    ]
+      .map { |(actual, expectation)| expect(actual.value).to eql(expectation) }
+
     expect(o.encode).to eql("0100000045000045")
   end
 end
@@ -154,9 +173,11 @@ describe Scale::Types::Enum do
     scale_bytes = Scale::Bytes.new("0x0101")
     o = Scale::Types::IntOrBool.decode scale_bytes
     expect(o.encode).to eql("0101")
+    expect(o.value.value).to eql(true)
 
     scale_bytes = Scale::Bytes.new("0x002a")
     o = Scale::Types::IntOrBool.decode scale_bytes
     expect(o.encode).to eql("002a")
+    expect(o.value.value).to eql(42)
   end
 end
