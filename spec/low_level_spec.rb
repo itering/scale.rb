@@ -127,17 +127,17 @@ describe Scale::Types::Option do
   end
 end
 
-describe Scale::Types::Vector do
+describe Scale::Types::Vec do
   it "should encode vector u8 right" do
     scale_bytes = Scale::Bytes.new("0x0c003afe")
-    o = Scale::Types::VectorU8.decode scale_bytes
+    o = Scale::Types::VecU8.decode scale_bytes
     expect(o.value.map(&:value)).to eql([0, 58, 254])
     expect(o.encode).to eql("0c003afe")
   end
 
   it "should encode vector u8 right" do
     scale_bytes = Scale::Bytes.new("0x0c003afe")
-    o = type("Vec<U8>").decode scale_bytes
+    o = type_of("Vec<U8>").decode scale_bytes
     expect(o.value.map(&:value)).to eql([0, 58, 254])
     expect(o.encode).to eql("0c003afe")
   end

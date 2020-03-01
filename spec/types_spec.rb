@@ -76,10 +76,10 @@ describe Scale::Types::Compact do
   end
 end
 
-describe Scale::Types::VectorU8 do
+describe Scale::Types::VecU8 do
   it "should decode from a scale hex string" do
     scale_bytes = Scale::Bytes.new("0x0c003afe")
-    v = Scale::Types::VectorU8.decode scale_bytes
+    v = Scale::Types::VecU8.decode scale_bytes
     expect(v.value.length).to eql(3)
     expect(v.value[0].value).to eql(0)
     expect(v.value[1].value).to eql(58)

@@ -42,6 +42,11 @@ module Scale
         end
       end
 
+      def inner_type(type)
+        inner_type = type.start_with?("Scale::Types::") ? type : "Scale::Types::#{type}"
+        self.const_set(:INNER_TYPE, inner_type)
+      end
+
       def self.included(base)
         base.extend(ClassMethods)
       end
@@ -180,7 +185,7 @@ module Scale
       end
     end
 
-    module Vector
+    module Vec
       include SingleValue # value is an array
 
       module ClassMethods

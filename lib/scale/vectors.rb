@@ -1,8 +1,8 @@
 module Scale
   module Types
 
-    class VectorU8
-      include Vector
+    class VecU8
+      include Vec
       inner_type 'Scale::Types::U8'
     end
 

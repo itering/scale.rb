@@ -120,23 +120,28 @@ module Scale
 
 end
 
-def type(type_string, values: nil)
-  if type_string == 'Enum'
+def type_of(type_string, values: nil)
+  if type_string.end_with?(">")
+    types = type_string.scan(/^([^<]*)<(.+)>$/).first
+    inner_type = types.last
+
     klass = Class.new do; end
-    klass.send(:include, Scale::Types::Enum)
-    klass.send(:values, *values)
-    klass
-  elsif type_string.end_with?(">")
-    klass = Class.new do; end
-    splits = type_string.split("<")
-    if splits.first == "Vec"
-      inner_type = splits.last.split(">").first
-      klass.send(:include, Scale::Types::Vector)
-      klass.send(:inner_type, inner_type)
+    if types.first == "Vec" || types.first == "Option"
+      klass.send(:include, "Scale::Types::#{types.first}".constantize)
+    else
+      raise "#{types.first} not support inner type"
     end
+    klass.send(:inner_type, inner_type)
     klass
   else
-    "Scale::Types::#{type_string}".constantize
+    if type_string == 'Enum'
+      klass = Class.new do; end
+      klass.send(:include, Scale::Types::Enum)
+      klass.send(:values, *values)
+      klass
+    else
+      "Scale::Types::#{type_string}".constantize
+    end
   end
 end
 

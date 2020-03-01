@@ -20,6 +20,19 @@ module Scale
       end
     end
 
+    class H160
+      include SingleValue
+      def self.decode(scale_bytes)
+        bytes = scale_bytes.get_next_bytes(20)
+        H160.new(bytes.bytes_to_hex)
+      end
+
+      def encode
+        raise "Format error" if self.value[0 .. 1] != '0x' || self.value.length != 42
+        self.value
+      end
+    end
+
     class H256
       include SingleValue
       def self.decode(scale_bytes)
