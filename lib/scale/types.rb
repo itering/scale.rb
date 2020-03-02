@@ -92,10 +92,9 @@ module Scale
     class ProposalPreimage
       include Struct
       items(
-        proposal: 'Scale::Types::Hex',
-        registredBy: 'Scale::Types::AccountId',
-        deposit: 'Scale::Types::OptionU32',
-        int_or_bool: 'Scale::Types::IntOrBool'
+        proposal: 'Hex',
+        registredBy: 'AccountId',
+        deposit: 'BalanceOf'
       )
     end
 

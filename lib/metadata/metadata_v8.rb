@@ -4,7 +4,7 @@ module Scale
     class MetadataV8
       include SingleValue
       def self.decode(scale_bytes)
-        modules = type("Vec<MetadataV8Module>").decode(scale_bytes).value;
+        modules = type_of("Vec<MetadataV8Module>").decode(scale_bytes).value;
         result = {
           magicNumber: 1635018093,
           metadata: {
@@ -36,18 +36,18 @@ module Scale
 
         has_calls = Bool.decode(scale_bytes).value
         if has_calls
-          calls = type("Vec<MetadataModuleCall>").decode(scale_bytes).value
+          calls = type_of("Vec<MetadataModuleCall>").decode(scale_bytes).value
           result[:calls] = calls.map(&:value)
         end
 
         has_events = Bool.decode(scale_bytes).value
         if has_events
-          events = type("Vec<MetadataModuleEvent>").decode(scale_bytes).value
+          events = type_of("Vec<MetadataModuleEvent>").decode(scale_bytes).value
           result[:events] = events.map(&:value)
         end
 
-        result[:constants] = type("Vec<MetadataV7ModuleConstants>").decode(scale_bytes).value.map(&:value)
-        result[:errors] = type("Vec<MetadataModuleError>").decode(scale_bytes).value.map(&:value)
+        result[:constants] = type_of("Vec<MetadataV7ModuleConstants>").decode(scale_bytes).value.map(&:value)
+        result[:errors] = type_of("Vec<MetadataModuleError>").decode(scale_bytes).value.map(&:value)
 
         MetadataV8Module.new(result)
       end
@@ -58,7 +58,7 @@ module Scale
       def self.decode(scale_bytes)
         result = {
           name: String.decode(scale_bytes).value,
-          docs: type("Vec<String>").decode(scale_bytes).value.map(&:value)
+          docs: type_of("Vec<String>").decode(scale_bytes).value.map(&:value)
         }
 
         MetadataModuleError.new(result)

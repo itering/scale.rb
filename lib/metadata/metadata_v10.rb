@@ -4,7 +4,7 @@ module Scale
     class MetadataV10
       include SingleValue
       def self.decode(scale_bytes)
-        modules = type("Vec<MetadataV8Module>").decode(scale_bytes).value;
+        modules = type_of("Vec<MetadataV8Module>").decode(scale_bytes).value;
         result = {
           magicNumber: 1635018093,
           metadata: {

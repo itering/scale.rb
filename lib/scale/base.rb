@@ -91,12 +91,12 @@ module Scale
       # new(1.to_u32, U32(69))
       module ClassMethods
         def decode(scale_bytes)
-          item_values = self::ITEM_TYPES.map do |item_type|
-            item_type.constantize.decode(scale_bytes)
+          item_values = self::ITEM_TYPE_STRS.map do |item_type_str|
+            type_of(item_type_str).decode(scale_bytes)
           end
 
           value = {}
-          self::ITEMS.zip(item_values) do |attr, val|
+          self::ITEM_NAMES.zip(item_values) do |attr, val|
             value[attr] = val
           end
 
@@ -108,17 +108,17 @@ module Scale
         end
 
         def items(**items)
-          attrs = []
-          attr_types = []
+          attr_names = []
+          attr_type_strs = []
 
-          items.each_pair do |attr_name, attr_type|
-            attrs << attr_name
-            attr_types << (attr_type.start_with?("Scale::Types::") ? attr_type : "Scale::Types::#{attr_type}")
+          items.each_pair do |attr_name, attr_type_str|
+            attr_names << attr_name
+            attr_type_strs << attr_type_str
           end
 
-          self.const_set(:ITEMS, attrs)
-          self.const_set(:ITEM_TYPES, attr_types)
-          self.attr_accessor *attrs
+          self.const_set(:ITEM_NAMES, attr_names)
+          self.const_set(:ITEM_TYPE_STRS, attr_type_strs)
+          self.attr_accessor *attr_names
         end
       end
 
@@ -141,10 +141,10 @@ module Scale
       module ClassMethods
         def decode(scale_bytes)
           index = scale_bytes.get_next_bytes(1)[0]
-          if self.const_defined? "ITEMS"
-            item_type = self::ITEM_TYPES[index]
-            raise "There is no such member with index #{index} for enum #{self}" if item_type.nil?
-            value = item_type.constantize.decode(scale_bytes)
+          if self.const_defined? "ITEM_NAMES"
+            item_type_str = self::ITEM_TYPE_STRS[index]
+            raise "There is no such member with index #{index} for enum #{self}" if item_type_str.nil?
+            value = type_of(item_type_str).decode(scale_bytes)
             return self.new(value)
           else
             value = self::VALUES[index]
@@ -153,16 +153,16 @@ module Scale
         end
 
         def items(**items)
-          attrs = []
-          attr_types = []
+          attr_names = []
+          attr_type_strs = []
 
-          items.each_pair do |attr_name, attr_type|
-            attrs << attr_name
-            attr_types << (attr_type.start_with?("Scale::Types::") ? attr_type : "Scale::Types::#{attr_type}")
+          items.each_pair do |attr_name, attr_type_str|
+            attr_names << attr_name
+            attr_type_strs << attr_type_str
           end
 
-          self.const_set(:ITEMS, attrs)
-          self.const_set(:ITEM_TYPES, attr_types)
+          self.const_set(:ITEM_NAMES, attr_names)
+          self.const_set(:ITEM_TYPE_STRS, attr_type_strs)
         end
 
         def values(*values)
@@ -175,8 +175,8 @@ module Scale
       end
 
       def encode
-        if self.class.const_defined? "ITEMS"
-          index = self::class::ITEM_TYPES.index(self.value.class.to_s).to_s(16).rjust(2, '0')
+        if self.class.const_defined? "ITEM_NAMES"
+          index = self::class::ITEM_TYPE_STRS.index(self.value.class.to_s).to_s(16).rjust(2, '0')
           index + self.value.encode
         else
           self::class::VALUES.index(self.value).to_s(16).rjust(2, '0')

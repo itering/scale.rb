@@ -128,7 +128,7 @@ def type_of(type_string, values: nil)
 
     if type_str == "Vec" || type_str == "Option"
       klass = Class.new do; end
-      klass.send(:include, "Scale::Types::#{type_str}".constantize)
+      klass.send(:include, type_of(type_str))
       klass.send(:inner_type, inner_type_str)
       klass
     else
@@ -141,7 +141,8 @@ def type_of(type_string, values: nil)
       klass.send(:values, *values)
       klass
     else
-      "Scale::Types::#{type_string}".constantize
+      type_string = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
+      type_string.constantize
     end
   end
 end
