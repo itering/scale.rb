@@ -135,6 +135,31 @@ module Scale
       end
     end
 
+    module Tuple
+      include SingleValue
+      
+      module ClassMethods
+        def decode(scale_bytes)
+          values = self::TYPE_STRS.map do |type_str|
+            type_of(type_str).decode(scale_bytes)
+          end
+          return self.new(values)
+        end
+
+        def types(*type_strs)
+          self.const_set(:TYPE_STRS, type_strs)
+        end
+      end
+
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
+
+      def encode
+        self.value.map(&:encode).join
+      end
+    end
+
     module Enum
       include SingleValue
 
