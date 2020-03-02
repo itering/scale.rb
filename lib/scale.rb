@@ -127,19 +127,47 @@ def type_of(type_string, values: nil)
     inner_type_str = type_strs.last
 
     if type_str == "Vec" || type_str == "Option"
-      klass = Class.new do; end
-      klass.send(:include, type_of(type_str))
-      klass.send(:inner_type, inner_type_str)
-      klass
+      klass = Class.new do
+        include type_of(type_str)
+        inner_type inner_type_str
+      end
+      name = "#{type_str}#{klass.object_id}"
+      Object.const_set name, klass
+      return name.constantize
     else
       raise "#{type_str} not support inner type"
     end
+  elsif type_string.start_with?("(") && type_string.end_with?(")") # tuple
+    # TODO: add nested tuple support
+    types_with_inner_type = type_string[1...-1].scan(/([A-Za-z]+<[^>]*>)/).first
+
+    if not types_with_inner_type.nil?
+      types_with_inner_type.each do |type_str|
+        new_type_str = type_str.gsub(",", ";")
+        type_string = type_string.gsub(type_str, new_type_str)
+      end
+    end
+
+    type_strs = type_string[1...-1].split(",").map do |type_str|
+      type_str.strip.gsub(";", ",")
+    end
+
+    klass = Class.new do
+      include Scale::Types::Tuple
+      types *type_strs
+    end
+    name = "Tuple#{klass.object_id}"
+    Object.const_set name, klass
+    return name.constantize
   else
     if type_string == 'Enum'
-      klass = Class.new do; end
-      klass.send(:include, Scale::Types::Enum)
-      klass.send(:values, *values)
-      klass
+      klass = Class.new do
+        include Scale::Types::Enum
+        values *values
+      end
+      name = "Enum#{klass.object_id}"
+      Object.const_set name, klass
+      return name.constantize
     else
       type_string = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
       type_string.constantize
