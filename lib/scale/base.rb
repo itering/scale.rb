@@ -23,15 +23,15 @@ module Scale
           if byte == [0]
             return self.new(nil)
           elsif byte == [1]
-            if self::INNER_TYPE == 'boolean'
+            if self::INNER_TYPE_STR == 'boolean'
               return self.new(false)
             else
               # big process
-              value = self::INNER_TYPE.constantize.decode(scale_bytes)
+              value = type_of(self::INNER_TYPE_STR).decode(scale_bytes)
               return self.new(value)
             end
           elsif byte == [2]
-            if self::INNER_TYPE == 'boolean'
+            if self::INNER_TYPE_STR == 'boolean'
               return self.new(true)
             else
               raise "bad data"
@@ -40,11 +40,10 @@ module Scale
             raise "bad data"
           end
         end
-      end
 
-      def inner_type(type)
-        inner_type = type.start_with?("Scale::Types::") ? type : "Scale::Types::#{type}"
-        self.const_set(:INNER_TYPE, inner_type)
+        def inner_type(type_str)
+          self.const_set(:INNER_TYPE_STR, type_str)
+        end
       end
 
       def self.included(base)
@@ -193,15 +192,14 @@ module Scale
           number = Scale::Types::Compact.decode(scale_bytes).value
           items = []
           number.times do
-            item = self::INNER_TYPE.constantize.decode(scale_bytes)
+            item = type_of(self::INNER_TYPE_STR).decode(scale_bytes)
             items << item
           end
           raw ? items : self.new(items)
         end
 
-        def inner_type(type)
-          inner_type = type.start_with?("Scale::Types::") ? type : "Scale::Types::#{type}"
-          self.const_set(:INNER_TYPE, inner_type)
+        def inner_type(type_str)
+          self.const_set(:INNER_TYPE_STR, type_str)
         end
       end
 

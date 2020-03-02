@@ -3,7 +3,7 @@ module Scale
 
     class VecU8
       include Vec
-      inner_type 'Scale::Types::U8'
+      inner_type 'U8'
     end
 
   end

@@ -122,17 +122,18 @@ end
 
 def type_of(type_string, values: nil)
   if type_string.end_with?(">")
-    types = type_string.scan(/^([^<]*)<(.+)>$/).first
-    inner_type = types.last
+    type_strs = type_string.scan(/^([^<]*)<(.+)>$/).first
+    type_str       = type_strs.first
+    inner_type_str = type_strs.last
 
-    klass = Class.new do; end
-    if types.first == "Vec" || types.first == "Option"
-      klass.send(:include, "Scale::Types::#{types.first}".constantize)
+    if type_str == "Vec" || type_str == "Option"
+      klass = Class.new do; end
+      klass.send(:include, "Scale::Types::#{type_str}".constantize)
+      klass.send(:inner_type, inner_type_str)
+      klass
     else
-      raise "#{types.first} not support inner type"
+      raise "#{type_str} not support inner type"
     end
-    klass.send(:inner_type, inner_type)
-    klass
   else
     if type_string == 'Enum'
       klass = Class.new do; end

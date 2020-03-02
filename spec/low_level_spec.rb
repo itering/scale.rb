@@ -1,35 +1,43 @@
 require "scale"
 
-describe Scale::Types::FixedWidthUInt do
-  it "should encode u8 right" do
+describe Scale::Types::U8 do
+  it "should work right" do
     scale_bytes = Scale::Bytes.new("0x45")
     o = Scale::Types::U8.decode scale_bytes
     expect(o.value).to eql(69)
     expect(o.encode).to eql("45")
   end
+end
 
-  it "should encode u16 right" do
+describe Scale::Types::U16 do
+  it "should work right" do
     scale_bytes = Scale::Bytes.new("0x2a00")
     o = Scale::Types::U16.decode scale_bytes
     expect(o.value).to eql(42)
     expect(o.encode).to eql("2a00")
   end
+end
 
-  it "should encode u32 right" do
+describe Scale::Types::U32 do
+  it "should work right" do
     scale_bytes = Scale::Bytes.new("0xffffff00")
     o = Scale::Types::U32.decode scale_bytes
     expect(o.value).to eql(16777215)
     expect(o.encode).to eql("ffffff00")
   end
+end
 
-  it "should encode u64 right" do
+describe Scale::Types::U64 do
+  it "should work right" do
     scale_bytes = Scale::Bytes.new("0x00e40b5403000000")
     o = Scale::Types::U64.decode scale_bytes
     expect(o.value).to eql(14294967296)
     expect(o.encode).to eql("00e40b5403000000")
   end
+end
 
-  it "should encode u128 right" do
+describe Scale::Types::U128 do
+  it "should work right" do
     scale_bytes = Scale::Bytes.new("0x0bfeffffffffffff0000000000000000")
     o = Scale::Types::U128.decode scale_bytes
     expect(o.value).to eql(18446744073709551115)
@@ -38,7 +46,7 @@ describe Scale::Types::FixedWidthUInt do
 end
 
 describe Scale::Types::Bool do
-  it "should encode bool right" do
+  it "should work right" do
     scale_bytes = Scale::Bytes.new("0x00")
     o = Scale::Types::Bool.decode scale_bytes
     expect(o.value).to eql(false)
@@ -52,7 +60,7 @@ describe Scale::Types::Bool do
 end
 
 describe Scale::Types::Compact do
-  it "should encode single-byte mode compact right" do
+  it "single-byte mode compact should work right" do
     scale_bytes = Scale::Bytes.new("0x00")
     o = Scale::Types::Compact.decode scale_bytes
     expect(o.value).to eql(0)
@@ -74,21 +82,21 @@ describe Scale::Types::Compact do
     expect(o.encode).to eql("fc")
   end
 
-  it "should encode two-byte mode compact right" do
+  it "two-byte mode compact should work right" do
     scale_bytes = Scale::Bytes.new("0x1501")
     o = Scale::Types::Compact.decode scale_bytes
     expect(o.value).to eql(69)
     expect(o.encode).to eql("1501")
   end
 
-  it "should encode four-byte mode compact right" do
+  it "four-byte mode compact should work right" do
     scale_bytes = Scale::Bytes.new("0xfeffffff")
     o = Scale::Types::Compact.decode scale_bytes
     expect(o.value).to eql(1073741823)
     expect(o.encode).to eql("feffffff")
   end
 
-  it "should encode big-integer mode compact right" do
+  it "big-integer mode compact should work right" do
     scale_bytes = Scale::Bytes.new("0x0300000040")
     o = Scale::Types::Compact.decode scale_bytes
     expect(o.value).to eql(1073741824)
@@ -97,7 +105,7 @@ describe Scale::Types::Compact do
 end
 
 describe Scale::Types::Option do
-  it "should encode option bool right" do
+  it "option bool should work right" do
     scale_bytes = Scale::Bytes.new("0x00")
     o = Scale::Types::OptionBool.decode scale_bytes
     expect(o.value).to eql(nil)
@@ -114,7 +122,7 @@ describe Scale::Types::Option do
     expect(o.encode).to eql("02")
   end
 
-  it "should encode option u32 right" do
+  it "option u32 should work right" do
     scale_bytes = Scale::Bytes.new("0x00")
     o = Scale::Types::OptionU32.decode scale_bytes
     expect(o.value).to eql(nil)
@@ -125,17 +133,37 @@ describe Scale::Types::Option do
     expect(o.value.value).to eql(16777215)
     expect(o.encode).to eql("01ffffff00")
   end
+
+  it "can be construct form type string" do
+    scale_bytes = Scale::Bytes.new("0x01ffffff00")
+    type = type_of("Option<U32>")
+    o = type.decode scale_bytes
+    expect(o.value.value).to eql(16777215)
+    expect(o.encode).to eql("01ffffff00")
+
+    scale_bytes = Scale::Bytes.new("0x010c003afe")
+    type = type_of("Option<Vec<U8>>")
+    o = type.decode scale_bytes
+    expect(o.value.value.map(&:value)).to eql([0, 58, 254])
+    expect(o.encode).to eql("010c003afe")
+
+    scale_bytes = Scale::Bytes.new("0x0c0100013a01fe")
+    type = type_of("Vec<Option<U8>>")
+    o = type.decode scale_bytes
+    expect(o.value.map do |e| e.value.value end).to eql([0, 58, 254])
+    expect(o.encode).to eql("0c0100013a01fe")
+  end
 end
 
 describe Scale::Types::Vec do
-  it "should encode vector u8 right" do
+  it "vector u8 should work right" do
     scale_bytes = Scale::Bytes.new("0x0c003afe")
     o = Scale::Types::VecU8.decode scale_bytes
     expect(o.value.map(&:value)).to eql([0, 58, 254])
     expect(o.encode).to eql("0c003afe")
   end
 
-  it "should encode vector u8 right" do
+  it "vector u8 should work right" do
     scale_bytes = Scale::Bytes.new("0x0c003afe")
     o = type_of("Vec<U8>").decode scale_bytes
     expect(o.value.map(&:value)).to eql([0, 58, 254])
@@ -144,7 +172,7 @@ describe Scale::Types::Vec do
 end
 
 describe Scale::Types::Struct do
-  it "should encode student right" do
+  it "student should work right" do
     scale_bytes = Scale::Bytes.new("0x0100000045000045")
     o = Scale::Types::Student.decode scale_bytes
 
@@ -169,7 +197,7 @@ describe Scale::Types::Struct do
 end
 
 describe Scale::Types::Enum do
-  it "should encode IntOrBool right" do
+  it "IntOrBool should work right" do
     scale_bytes = Scale::Bytes.new("0x0101")
     o = Scale::Types::IntOrBool.decode scale_bytes
     expect(o.encode).to eql("0101")
