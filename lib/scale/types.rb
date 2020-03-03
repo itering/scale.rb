@@ -102,5 +102,11 @@ module Scale
       include Enum
       values 'Blake2_128', 'Blake2_256', 'Twox128', 'Twox256', 'Twox128Concat'
     end
+
+    class RewardDestination
+      include Enum
+      values "Staked", "Stash", "Controller"
+    end
+
   end
 end

@@ -7,10 +7,6 @@ require "scale/fixed_width_integers"
 require "scale/compact_integers"
 require "scale/bool"
 require "scale/types"
-require "scale/options"
-require "scale/enums"
-require "scale/vectors"
-require "scale/structs"
 
 require "metadata/metadata"
 require "metadata/metadata_v3"
@@ -154,7 +150,7 @@ def type_of(type_string, values: nil)
 
     klass = Class.new do
       include Scale::Types::Tuple
-      types *type_strs
+      inner_types *type_strs
     end
     name = "Tuple#{klass.object_id}"
     Object.const_set name, klass

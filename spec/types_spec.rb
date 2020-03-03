@@ -1,4 +1,5 @@
 require "scale"
+require_relative "./types_for_test.rb"
 
 module Scale
   module Types
@@ -174,7 +175,7 @@ module Scale
     end
 
     describe Struct do
-      it "student should work right" do
+      it "Student should work right" do
         scale_bytes = Scale::Bytes.new("0x0100000045000045")
         o = Student.decode scale_bytes
 
@@ -200,11 +201,6 @@ module Scale
 
     describe Tuple do
       it "should work right" do
-        class TupleDoubleU8
-          include Tuple
-          types "U8", "U8"
-        end
-
         scale_bytes = Scale::Bytes.new("0x4545")
         o = TupleDoubleU8.decode scale_bytes
         expect(o.value.map(&:value)).to eql([69, 69])

@@ -146,7 +146,7 @@ module Scale
           return self.new(values)
         end
 
-        def types(*type_strs)
+        def inner_types(*type_strs)
           self.const_set(:TYPE_STRS, type_strs)
         end
       end
@@ -201,7 +201,8 @@ module Scale
 
       def encode
         if self.class.const_defined? "ITEM_NAMES"
-          index = self::class::ITEM_TYPE_STRS.index(self.value.class.to_s).to_s(16).rjust(2, '0')
+          value_type_str = self.value.class.to_s.split("::").last.to_s
+          index = self::class::ITEM_TYPE_STRS.index(value_type_str).to_s(16).rjust(2, '0')
           index + self.value.encode
         else
           self::class::VALUES.index(self.value).to_s(16).rjust(2, '0')
