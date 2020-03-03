@@ -16,7 +16,7 @@ module Scale
       def self.decode(scale_bytes)
         length = Scale::Types::Compact.decode(scale_bytes).value
         bytes = scale_bytes.get_next_bytes(length)
-        String.new bytes.pack('C*').force_encoding('utf-8')
+        String.new bytes.pack("C*").force_encoding("utf-8")
       end
     end
 
@@ -28,7 +28,7 @@ module Scale
       end
 
       def encode
-        raise "Format error" if self.value[0 .. 1] != '0x' || self.value.length != 42
+        raise "Format error" if self.value[0 .. 1] != "0x" || self.value.length != 42
         self.value
       end
     end
@@ -65,7 +65,7 @@ module Scale
       include SingleValue
       def self.decode(scale_bytes)
         byte = scale_bytes.get_next_bytes(1).bytes_to_hex
-        if byte == '0x00'
+        if byte == "0x00"
           Era.new byte
         else
           Era.new byte + scale_bytes.get_next_bytes(1).bytes_to_hex()[2..]
@@ -92,15 +92,16 @@ module Scale
     class ProposalPreimage
       include Struct
       items(
-        proposal: 'Hex',
-        registredBy: 'AccountId',
-        deposit: 'BalanceOf'
+        proposal: "Hex",
+        registredBy: "AccountId",
+        deposit: "BalanceOf",
+        blockNumber: "BlockNumber"
       )
     end
 
     class StorageHasher
       include Enum
-      values 'Blake2_128', 'Blake2_256', 'Twox128', 'Twox256', 'Twox128Concat'
+      values "Blake2_128", "Blake2_256", "Twox128", "Twox256", "Twox128Concat"
     end
 
     class RewardDestination

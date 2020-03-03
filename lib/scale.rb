@@ -116,7 +116,7 @@ module Scale
 
 end
 
-def type_of(type_string, values: nil)
+def type_of(type_string, enum_values: nil)
   if type_string.end_with?(">")
     type_strs = type_string.scan(/^([^<]*)<(.+)>$/).first
     type_str       = type_strs.first
@@ -159,7 +159,7 @@ def type_of(type_string, values: nil)
     if type_string == 'Enum'
       klass = Class.new do
         include Scale::Types::Enum
-        values *values
+        values *enum_values
       end
       name = "Enum#{klass.object_id}"
       Object.const_set name, klass

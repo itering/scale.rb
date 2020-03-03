@@ -71,9 +71,9 @@ module Scale
       def self.decode(scale_bytes)
         result = {
           name: String.decode(scale_bytes).value,
-          modifier: type_of("Enum", values: ["Optional", "Default"]).decode(scale_bytes).value
+          modifier: type_of("Enum", enum_values: ["Optional", "Default"]).decode(scale_bytes).value
         }
-        storage_function_type = type_of("Enum", values: ["Plain", "Map", "DoubleMap"]).decode(scale_bytes).value
+        storage_function_type = type_of("Enum", enum_values: ["Plain", "Map", "DoubleMap"]).decode(scale_bytes).value
         if storage_function_type == "Plain"
           result[:type] = {
             Plain: adjust(String.decode(scale_bytes).value)

@@ -6,7 +6,7 @@ module Scale
       def self.decode(scale_bytes)
         bytes = scale_bytes.get_next_bytes(4)
         if bytes.bytes_to_utf8 == 'meta'
-          metadata_v_name = type_of("Enum", values: [
+          metadata_v_name = type_of("Enum", enum_values: [
             "Scale::Types::MetadataV0", 
             "Scale::Types::MetadataV1", 
             "Scale::Types::MetadataV2", 
@@ -64,7 +64,7 @@ module Scale
 
         result = {
           name: String.decode(scale_bytes).value,
-          modifier: type_of("Enum", values: ["Optional", "Default"]).decode(scale_bytes).value
+          modifier: type_of("Enum", enum_values: ["Optional", "Default"]).decode(scale_bytes).value
         }
 
         is_key_value = Bool.decode(scale_bytes).value
