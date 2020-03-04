@@ -28,8 +28,8 @@ module Scale
       end
 
       def encode
-        raise "Format error" if self.value[0 .. 1] != "0x" || self.value.length != 42
-        self.value
+        raise "Format error" if not self.value.start_with?("0x") || self.value.length != 42
+        ScaleBytes.new self.value
       end
     end
 
@@ -39,6 +39,11 @@ module Scale
         bytes = scale_bytes.get_next_bytes(32)
         H256.new(bytes.bytes_to_hex)
       end
+
+      def encode
+        raise "Format error" if not self.value.start_with?("0x") || self.value.length != 66
+        ScaleBytes.new self.value
+      end
     end
 
     class H512
@@ -47,19 +52,22 @@ module Scale
         bytes = scale_bytes.get_next_bytes(64)
         H512.new(bytes.bytes_to_hex)
       end
+
+      def encode
+        raise "Format error" if not self.value.start_with?("0x") || self.value.length != 130
+        ScaleBytes.new self.value
+      end
     end
 
-    class AccountId < H256
-    end
+    class AccountId < H256; end
 
-    class Balance < U128
-    end
+    class Balance < U128; end
 
-    class BalanceOf < Balance
-    end
+    class BalanceOf < Balance; end
 
-    class BlockNumber < U32
-    end
+    class BlockNumber < U32; end
+
+    class AccountIndex < U32; end
 
     class Era
       include SingleValue

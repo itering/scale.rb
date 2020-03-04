@@ -3,10 +3,8 @@ require "scale/version"
 require "substrate_common"
 
 require "scale/base"
-require "scale/fixed_width_integers"
-require "scale/compact_integers"
-require "scale/bool"
-require "scale/types"
+require "scale/codec"
+require "scale/primitive"
 
 require "metadata/metadata"
 require "metadata/metadata_v3"
