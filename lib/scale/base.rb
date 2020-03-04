@@ -243,5 +243,39 @@ module Scale
       end
     end
 
+    module Set
+      include SingleValue
+
+      module ClassMethods
+        def decode(scale_bytes)
+          value = U64.decode(scale_bytes).value
+          return self.new [] if not value || value <= 0
+
+          result = self::VALUES.select{ |_, mask| value & mask > 0 }.keys
+          return self.new result
+        end
+
+        # values is a hash:
+        #   {
+        #     "TransactionPayment" => 0b00000001,
+        #     "Transfer" => 0b00000010,
+        #     "Reserve" => 0b00000100,
+        #     ...
+        #   }
+        def values(values)
+          self.const_set(:VALUES, values)
+        end
+      end
+
+      def self.included(base)
+        base.extend ClassMethods
+      end
+
+      def encode
+        value = self.class::VALUES.select{ |str, _| self.value.include?(str) }.values.sum
+        U64.new(value).encode
+      end
+    end
+
   end
 end

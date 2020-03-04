@@ -117,5 +117,14 @@ module Scale
       values "Staked", "Stash", "Controller"
     end
 
+    class WithdrawReasons
+      include Set
+      values "TransactionPayment" => 1, \
+        "Transfer" => 2, \
+        "Reserve" => 4, \
+        "Fee" => 8, \
+        "Tip" => 16
+    end
+
   end
 end

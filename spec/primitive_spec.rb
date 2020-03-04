@@ -3,12 +3,19 @@ require "scale"
 module Scale
   module Types
 
-    describe Address do
-      it "" do
-        scale_bytes = Scale::Bytes.new("0x45")
-        o = U8.decode scale_bytes
-        expect(o.value).to eql(69)
-        expect(o.encode).to eql("45")
+    describe Set do
+      it "should work right" do
+        o = WithdrawReasons.decode Scale::Bytes.new("0x0100000000000000")
+        expect(o.value).to eql(["TransactionPayment"])
+        expect(o.encode).to eql("0100000000000000")
+
+        o = WithdrawReasons.decode Scale::Bytes.new("0x0300000000000000")
+        expect(o.value).to eql(["TransactionPayment", "Transfer"])
+        expect(o.encode).to eql("0300000000000000")
+
+        o = WithdrawReasons.decode Scale::Bytes.new("0x1600000000000000")
+        expect(o.value).to eql(["Transfer", "Reserve", "Tip"])
+        expect(o.encode).to eql("1600000000000000")
       end
     end
 
