@@ -113,14 +113,15 @@ module Scale
       def self.decode(scale_bytes)
         length = Scale::Types::Compact.decode(scale_bytes).value
         bytes = scale_bytes.get_next_bytes(length)
-          # [67, 97, 102, 195, 169].pack('C*').force_encoding('utf-8')
-          # => "Café"
-          str = bytes.pack("C*").force_encoding("utf-8")
-          if str.valid_encoding?
-            Bytes.new str
-          else
-            Bytes.new bytes.bytes_to_hex
-          end
+
+        # [67, 97, 102, 195, 169].pack('C*').force_encoding('utf-8')
+        # => "Café"
+        str = bytes.pack("C*").force_encoding("utf-8")
+        if str.valid_encoding?
+          Bytes.new str
+        else
+          Bytes.new bytes.bytes_to_hex
+        end
       end
 
       def encode
@@ -242,11 +243,6 @@ module Scale
       )
     end
 
-    class StorageHasher
-      include Enum
-      values "Blake2_128", "Blake2_256", "Twox128", "Twox256", "Twox128Concat"
-    end
-
     class RewardDestination
       include Enum
       values "Staked", "Stash", "Controller"
@@ -280,23 +276,197 @@ module Scale
 
     class NewAccountOutcome < Compact; end
 
-    class Data
-      include Enum
+    class StakingLedger
+      include Struct
       items(
-        None: "Null",
-        Raw: "Bytes",
-        BlakeTwo256: "H256",
-        Sha256: "H256",
-        Keccak256: "H256",
-        ShaThree256: "H256"
+        stash: "AccountId",
+        total: "Compact",
+        active: "Compact",
+        unlocking: "Vec<UnlockChunk>"
       )
+    end
 
+    class UnlockChunk
+      include Struct
+      items(
+        value: "Compact",
+        era: "Compact"
+      )
+    end
+
+    class Exposure
+      include Struct
+      items(
+        total: "Compact",
+        own: "Compact",
+        others: "Vec<IndividualExposure>"
+      )
+    end
+
+    class IndividualExposure
+      include Struct
+      items(
+        who: "AccountId",
+        value: "Compact"
+      )
+    end
+
+    class BabeAuthorityWeight < U64; end
+
+    class Points < U32; end
+
+    class EraPoints
+      include Struct
+      items(
+        total: "Points",
+        individual: "Vec<Points>"
+      )
+    end
+
+    class VoteThreshold
+      include Enum
+      values 'SuperMajorityApprove', 'SuperMajorityAgainst', 'SimpleMajority'
+    end
+
+    class Null
+      include SingleValue
       def self.decode(scale_bytes)
+        Null.new nil
+      end
 
+      def encode
+        ""
       end
     end
 
+    class InherentOfflineReport < Null; end
 
+    class LockPeriods < U8; end
+
+    class Hash < H256; end
     
+    class VoteIndex < U32; end
+
+    class ProposalIndex < U32; end
+
+    class Permill < U32; end
+
+    class Perbill < U32; end
+
+    class ApprovalFlag < U32; end
+
+    class SetIndex < U32; end
+
+    class AuthorityId < AccountId; end
+
+    class ValidatorId < AccountId; end
+
+    class AuthorityWeight < U64; end
+
+    class StoredPendingChange
+      include Struct
+      items(
+        scheduled_at: "U32",
+        forced: "U32"
+      )
+    end
+
+    class ReportIdOf < Hash; end
+
+    class StorageHasher
+      include Enum
+      values 'Blake2_128', 'Blake2_256', 'Blake2_128Concat', 'Twox128', 'Twox256', 'Twox64Concat'
+    end
+
+    class VoterInfo
+      include Struct
+      items(
+        last_active: "VoteIndex",
+        last_win: "VoteIndex",
+        pot: "Balance",
+        stake: "Balance"
+      )
+    end
+
+    class Gas < U64; end
+
+    class CodeHash < Hash; end
+
+    class PrefabWasmModule
+      include Struct
+      items(
+        scheduleVersion: "Compact",
+        initial: "Compact",
+        maximum: "Compact",
+        _reserved: "Option<Null>",
+        code: "Bytes"
+      )
+    end
+
+    class OpaqueNetworkState
+      include Struct
+      items(
+        peerId: "OpaquePeerId",
+        externalAddresses: "Vec<OpaqueMultiaddr>"
+      )
+    end
+
+    class OpaquePeerId < Bytes; end
+    
+    class OpaqueMultiaddr < Bytes; end
+
+    class SessionKeysSubstrate
+      include Struct
+      items(
+        grandpa: "AccountId",
+        babe: "AccountId",
+        im_online: "AccountId"
+      )
+    end
+
+    class LegacyKeys
+      include Struct
+      items(
+        grandpa: "AccountId",
+        babe: "AccountId"
+      )
+    end
+    
+    class EdgewareKeys
+      include Struct
+      items(
+        grandpa: "AccountId"
+      )
+    end
+
+    class QueuedKeys
+      include Struct
+      items(
+        validator: "ValidatorId",
+        keys: "Keys"
+      )
+    end
+
+    class LegacyQueuedKeys
+      include Struct
+      items(
+        validator: "ValidatorId",
+        keys: "LegacyKeys"
+      )
+    end
+
+    class EdgewareQueuedKeys
+      include Struct
+      items(
+        validator: "ValidatorId",
+        keys: "EdgewareKeys"
+      )
+    end
+
+    class VecQueuedKeys
+      include Vec
+      inner_type "QueuedKeys"
+    end
+
   end
 end
