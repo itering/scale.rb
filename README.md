@@ -53,6 +53,30 @@ p o.encode # "1501"
 ```
 Please go to `spec` dir for more examples.
 
+## Types supported
+
+scale.rb now support types:
+
+- [x] Compact
+- [x] Bool
+- [x] U8, U16, U32, U64, U128
+- [x] Enum
+- [x] Option
+- [x] Struct
+- [x] Tuple
+- [x] Vec
+- [x] Set
+- [x] Bytes
+- [x] Hex
+- [x] String
+- [x] H160, H256, H512
+- [x] AccountId
+- [x] Balance
+- [x] BalanceOf
+- [x] BlockNumber
+- [x] AccountIndex
+- [x] Era
+
 ## Running tests
 
 1. Download or clone the code to local, and enter the code root directory
