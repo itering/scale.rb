@@ -4,7 +4,7 @@ require_relative "./types_for_test.rb"
 module Scale
   module Types
     describe U8 do
-      it "should work right" do
+      it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0x45")
         o = U8.decode scale_bytes
         expect(o.value).to eql(69)
@@ -13,7 +13,7 @@ module Scale
     end
 
     describe U16 do
-      it "should work right" do
+      it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0x2a00")
         o = U16.decode scale_bytes
         expect(o.value).to eql(42)
@@ -22,7 +22,7 @@ module Scale
     end
 
     describe U32 do
-      it "should work right" do
+      it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0xffffff00")
         o = U32.decode scale_bytes
         expect(o.value).to eql(16777215)
@@ -31,7 +31,7 @@ module Scale
     end
 
     describe U64 do
-      it "should work right" do
+      it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0x00e40b5403000000")
         o = U64.decode scale_bytes
         expect(o.value).to eql(14294967296)
@@ -40,7 +40,7 @@ module Scale
     end
 
     describe U128 do
-      it "should work right" do
+      it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0x0bfeffffffffffff0000000000000000")
         o = U128.decode scale_bytes
         expect(o.value).to eql(18446744073709551115)
@@ -49,7 +49,7 @@ module Scale
     end
 
     describe Bool do
-      it "should work right" do
+      it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0x00")
         o = Bool.decode scale_bytes
         expect(o.value).to eql(false)
@@ -63,7 +63,7 @@ module Scale
     end
 
     describe Compact do
-      it "single-byte mode compact should work right" do
+      it "single-byte mode compact should work correctly" do
         scale_bytes = Scale::Bytes.new("0x00")
         o = Compact.decode scale_bytes
         expect(o.value).to eql(0)
@@ -85,21 +85,21 @@ module Scale
         expect(o.encode).to eql("fc")
       end
 
-      it "two-byte mode compact should work right" do
+      it "two-byte mode compact should work correctly" do
         scale_bytes = Scale::Bytes.new("0x1501")
         o = Compact.decode scale_bytes
         expect(o.value).to eql(69)
         expect(o.encode).to eql("1501")
       end
 
-      it "four-byte mode compact should work right" do
+      it "four-byte mode compact should work correctly" do
         scale_bytes = Scale::Bytes.new("0xfeffffff")
         o = Compact.decode scale_bytes
         expect(o.value).to eql(1073741823)
         expect(o.encode).to eql("feffffff")
       end
 
-      it "big-integer mode compact should work right" do
+      it "big-integer mode compact should work correctly" do
         scale_bytes = Scale::Bytes.new("0x0300000040")
         o = Compact.decode scale_bytes
         expect(o.value).to eql(1073741824)
@@ -108,7 +108,7 @@ module Scale
     end
 
     describe Option do
-      it "option bool should work right" do
+      it "option bool should work correctly" do
         scale_bytes = Scale::Bytes.new("0x00")
         o = OptionBool.decode scale_bytes
         expect(o.value).to eql(nil)
@@ -125,7 +125,7 @@ module Scale
         expect(o.encode).to eql("02")
       end
 
-      it "option u32 should work right" do
+      it "option u32 should work correctly" do
         scale_bytes = Scale::Bytes.new("0x00")
         o = OptionU32.decode scale_bytes
         expect(o.value).to eql(nil)
@@ -159,14 +159,14 @@ module Scale
     end
 
     describe Vec do
-      it "vector u8 should work right" do
+      it "vector u8 should work correctly" do
         scale_bytes = Scale::Bytes.new("0x0c003afe")
         o = VecU8.decode scale_bytes
         expect(o.value.map(&:value)).to eql([0, 58, 254])
         expect(o.encode).to eql("0c003afe")
       end
 
-      it "vector u8 should work right" do
+      it "vector u8 should work correctly" do
         scale_bytes = Scale::Bytes.new("0x0c003afe")
         o = type_of("Vec<U8>").decode scale_bytes
         expect(o.value.map(&:value)).to eql([0, 58, 254])
@@ -175,7 +175,7 @@ module Scale
     end
 
     describe Struct do
-      it "Student should work right" do
+      it "Student should work correctly" do
         scale_bytes = Scale::Bytes.new("0x0100000045000045")
         o = Student.decode scale_bytes
 
@@ -200,7 +200,7 @@ module Scale
     end
 
     describe Tuple do
-      it "should work right" do
+      it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0x4545")
         o = TupleDoubleU8.decode scale_bytes
         expect(o.value.map(&:value)).to eql([69, 69])
@@ -219,7 +219,7 @@ module Scale
     end
 
     describe Enum do
-      it "IntOrBool should work right" do
+      it "IntOrBool should work correctly" do
         scale_bytes = Scale::Bytes.new("0x0101")
         o = IntOrBool.decode scale_bytes
         expect(o.encode).to eql("0101")
@@ -229,6 +229,36 @@ module Scale
         o = IntOrBool.decode scale_bytes
         expect(o.encode).to eql("002a")
         expect(o.value.value).to eql(42)
+      end
+    end
+
+    describe Set do
+      it "should work correctly" do
+        o = WithdrawReasons.decode Scale::Bytes.new("0x0100000000000000")
+        expect(o.value).to eql(["TransactionPayment"])
+        expect(o.encode).to eql("0100000000000000")
+
+        o = WithdrawReasons.decode Scale::Bytes.new("0x0300000000000000")
+        expect(o.value).to eql(["TransactionPayment", "Transfer"])
+        expect(o.encode).to eql("0300000000000000")
+
+        o = WithdrawReasons.decode Scale::Bytes.new("0x1600000000000000")
+        expect(o.value).to eql(["Transfer", "Reserve", "Tip"])
+        expect(o.encode).to eql("1600000000000000")
+      end
+    end
+
+    describe Bytes do
+      it "should work correctly when bytes are utf-8" do
+        o = Bytes.decode Scale::Bytes.new("0x14436166c3a9")
+        expect(o.value).to eql("Café")
+        expect(o.encode).to eql("14436166c3a9")
+      end
+
+      it "should work correctly when bytes are not utf-8" do
+        o = Bytes.decode Scale::Bytes.new("0x2cf6e6365010130543a3a416")
+        expect(o.value).to eql("0xf6e6365010130543a3a416")
+        expect(o.encode).to eql("2cf6e6365010130543a3a416")
       end
     end
 

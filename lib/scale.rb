@@ -3,8 +3,7 @@ require "scale/version"
 require "substrate_common"
 
 require "scale/base"
-require "scale/codec"
-require "scale/primitive"
+require "scale/types"
 
 require "metadata/metadata"
 require "metadata/metadata_v3"
