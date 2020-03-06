@@ -195,6 +195,49 @@ module Scale
       end
     end
 
+    class Address
+      include SingleValue
+      def self.decode(scale_bytes)
+        prefix = scale_bytes.get_next_bytes(1).first
+        if prefix == 0xff
+          value = scale_bytes.get_next_bytes(32).bytes_to_hex
+        elsif prefix == 0xfc
+          value = scale_bytes.get_next_bytes(2).bytes_to_hex
+        elsif prefix == 0xfd
+          value = scale_bytes.get_next_bytes(4).bytes_to_hex
+        elsif prefix == 0xfe
+          value = scale_bytes.get_next_bytes(8).bytes_to_hex
+        else
+          value = [prefix].bytes_to_hex
+        end
+
+        Address.new(value)
+      end
+
+      def encode(ss58=false, addr_type=42)
+        if self.value.start_with?("0x")
+          if ss58 === true
+            ::Address.encode(self.value, addr_type)
+          else
+            prefix = if self.value.length == 66
+                      "ff"
+                    elsif self.value.length == 6
+                      "fc"
+                    elsif self.value.length == 10
+                      "fd"
+                    elsif self.value.length == 18
+                      "fe"
+                    else
+                      ""
+                    end
+            "#{prefix}#{self.value[2..]}"
+          end
+        else
+          raise "Format error"
+        end
+      end
+    end
+
     class AccountId < H256; end
 
     class Balance < U128; end
