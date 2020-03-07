@@ -1,0 +1,8 @@
+[package]
+name = "SCALE-testing-interface"
+version = "0.1.0"
+authors = ["Robert Hambrock <robert@web3.foundation>"]
+
+[lib]
+name = "scale_ffi"
+crate-type = ["dylib"]

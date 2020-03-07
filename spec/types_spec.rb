@@ -1,8 +1,24 @@
 # coding: utf-8
 require 'scale'
+require 'ffi'
 require_relative './types_for_test.rb'
 
 module Scale
+  module Rust
+    extend FFI::Library
+    ffi_lib 'target/debug/libvector_ffi.' + FFI::Platform::LIBSUFFIX
+    attach_function :vector_input, %i[pointer int], :int
+  end
+
+  vec = [7, 8, 9]
+  vec_c = FFI::MemoryPointer.new(:int, vec.size)
+  vec_c.write_array_of_int vec
+  describe do
+    it 'should return 1 regardless of input' do
+      expect(Rust.vector_input(vec_c, vec.size)).to eql(1)
+    end
+  end
+
   module Types
     describe U8 do
       it 'should work correctly' do
