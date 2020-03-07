@@ -287,7 +287,7 @@ module Scale
     end
 
     class RewardDestination
-      include Enum
+      include Enum 
       values "Staked", "Stash", "Controller"
     end
 
@@ -513,6 +513,11 @@ module Scale
     class VecQueuedKeys
       include Vec
       inner_type "QueuedKeys"
+    end
+
+    class VecU8Length8
+      include VecU8FixedLength 
+      set_length 8
     end
 
   end

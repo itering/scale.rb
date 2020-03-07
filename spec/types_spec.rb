@@ -288,5 +288,19 @@ module Scale
       end
     end
 
+    describe VecU8Length8 do
+      it "should work correctly with utf-8" do
+        o = VecU8Length8.decode Scale::Bytes.new("0x6162636465666768")
+        expect(o.value).to eql("abcdefgh")
+        expect(o.encode).to eql("6162636465666768")
+      end
+
+      it "should work correctly with no utf-8" do
+        o = VecU8Length8.decode Scale::Bytes.new("0x374656d343041636")
+        expect(o.value).to eql("0x374656d343041636")
+        expect(o.encode).to eql("374656d343041636")
+      end
+    end
+
   end
 end

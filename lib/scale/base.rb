@@ -279,5 +279,39 @@ module Scale
       end
     end
 
+    module VecU8FixedLength
+      include SingleValue
+
+      module ClassMethods
+        def decode(scale_bytes)
+          bytes = scale_bytes.get_next_bytes(self::LENGTH)
+          str = bytes.pack("C*").force_encoding("utf-8")
+          if str.valid_encoding?
+            VecU8Length8.new str
+          else
+            VecU8Length8.new bytes.bytes_to_hex
+          end
+        end
+
+        def set_length(length=8)
+          raise "length is wrong: #{length}" if not [2, 3, 4, 8, 16, 20, 32, 64].include?(length)
+          self.const_set(:LENGTH, length)
+        end
+      end
+
+      def self.included(base)
+        base.extend ClassMethods
+      end
+
+      def encode
+        if self.value.start_with?("0x") && self.value.length == (self.class::LENGTH*2+2) 
+          self.value[2..]
+        else
+          bytes = self.value.unpack("C*")
+          bytes.bytes_to_hex[2..]
+        end
+      end
+    end
+
   end
 end
