@@ -293,11 +293,15 @@ module Scale
 
     class WithdrawReasons
       include Set
-      values "TransactionPayment" => 1, \
-        "Transfer" => 2, \
-        "Reserve" => 4, \
-        "Fee" => 8, \
-        "Tip" => 16
+      values(
+        {
+          "TransactionPayment" => 1,
+          "Transfer" => 2,
+          "Reserve" => 4,
+          "Fee" => 8,
+          "Tip" => 16
+        }, 1
+      )
     end
 
     class ReferendumIndex < U32; end

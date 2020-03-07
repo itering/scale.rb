@@ -248,7 +248,7 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
-          value = U64.decode(scale_bytes).value
+          value = "Scale::Types::U#{self::BYTES_LENGTH*8}".constantize.decode(scale_bytes).value
           return self.new [] if not value || value <= 0
 
           result = self::VALUES.select{ |_, mask| value & mask > 0 }.keys
@@ -262,8 +262,10 @@ module Scale
         #     "Reserve" => 0b00000100,
         #     ...
         #   }
-        def values(values)
+        def values(values, bytes_length=1)
+          raise "byte length is wrong: #{bytes_length}" if not [1, 2, 4, 8, 16].include?(bytes_length)
           self.const_set(:VALUES, values)
+          self.const_set(:BYTES_LENGTH, bytes_length)
         end
       end
 
@@ -273,7 +275,7 @@ module Scale
 
       def encode
         value = self.class::VALUES.select{ |str, _| self.value.include?(str) }.values.sum
-        U64.new(value).encode
+        "Scale::Types::U#{self.class::BYTES_LENGTH*8}".constantize.new(value).encode
       end
     end
 
