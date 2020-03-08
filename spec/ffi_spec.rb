@@ -49,25 +49,35 @@ end
 def parse_via_ffi(value, encoding, ffi_function, expectation)
   encoded = encoding.new(value).encode
   check_against_specification(encoded, expectation)
-  puts encoded
+  puts "encoded: #{encoded} "
   vec = Scale::Bytes.new('0x' + encoded).bytes
-  puts vec
+  puts "vec: #{vec} "
 
   vec_c = FFI::MemoryPointer.new(:int8, vec.size)
   vec_c.write_array_of_int8 vec
   ffi_function.call(vec_c, value)
 end
 
+# U64
+puts "\nU64 tests"
 parse_via_ffi(14_294_967_296, Scale::Types::U64, parse_u64, '00e40b5403000000')
 
+# U32
+puts "\nU32 tests"
 parse_via_ffi(16_777_215, Scale::Types::U32, parse_u32, 'ffffff00')
 parse_via_ffi(4_294_967_041, Scale::Types::U32, parse_u32, '01ffffff')
 
+# U8
+puts "\nU8 tests"
 parse_via_ffi(69, Scale::Types::U8, parse_u8, '45')
 
+# Bool
+puts "\nBool tests"
 parse_via_ffi(true, Scale::Types::Bool, parse_bool, '01')
 parse_via_ffi(false, Scale::Types::Bool, parse_bool, '00')
 
+# Optional U32
+puts "\nOptional U32 tests"
 parse_via_ffi(nil, Scale::Types::OptionU32, parse_opt_u32, '00')
 parse_via_ffi(
   Scale::Types::U32.new(16_777_215),
