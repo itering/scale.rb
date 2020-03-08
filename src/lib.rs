@@ -18,6 +18,11 @@ pub extern fn parse_u64(v_pointer: *const u8, len: usize, expectation: u64) {
 }
 
 #[no_mangle]
+pub extern fn parse_u32(v_pointer: *const u8, len: usize, expectation: u32) {
+    assert_eq!(decode_from_raw_parts::<u32>(v_pointer, len), expectation);
+}
+
+#[no_mangle]
 pub extern fn parse_u8(v_pointer: *const u8, len: usize, expectation: u8) {
     assert_eq!(decode_from_raw_parts::<u8>(v_pointer, len), expectation);
 }
