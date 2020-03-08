@@ -9,6 +9,7 @@ module Rust
   ffi_lib 'target/debug/libvector_ffi.' + FFI::Platform::LIBSUFFIX
   attach_function :byte_string_literal_parse_u64, %i[pointer int uint64], :void
   attach_function :byte_string_literal_parse_u8, %i[pointer int uint8], :void
+  attach_function :byte_string_literal_parse_bool, %i[pointer int bool], :void
 end
 
 parse_u64 = proc { |vec_c, value|
@@ -17,6 +18,10 @@ parse_u64 = proc { |vec_c, value|
 
 parse_u8 = proc { |vec_c, value|
   Rust.byte_string_literal_parse_u8(vec_c, vec_c.size, value)
+}
+
+parse_bool = proc { |vec_c, value|
+  Rust.byte_string_literal_parse_bool(vec_c, vec_c.size, value)
 }
 
 def check_against_specification(encoded, expectation)
@@ -42,3 +47,6 @@ end
 parse_via_ffi(14_294_967_296, Scale::Types::U64, parse_u64, '00e40b5403000000')
 
 parse_via_ffi(69, Scale::Types::U8, parse_u8, '45')
+
+parse_via_ffi(true, Scale::Types::Bool, parse_bool, '01')
+parse_via_ffi(false, Scale::Types::Bool, parse_bool, '00')

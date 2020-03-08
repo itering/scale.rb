@@ -24,3 +24,8 @@ pub extern fn byte_string_literal_parse_u64(v_pointer: *const u8, len: usize, ex
 pub extern fn byte_string_literal_parse_u8(v_pointer: *const u8, len: usize, expectation: u8) {
     assert_eq!(byte_string_literal_internal::<u8>(v_pointer, len), expectation);
 }
+
+#[no_mangle]
+pub extern fn byte_string_literal_parse_bool(v_pointer: *const u8, len: usize, expectation: bool) {
+    assert_eq!(byte_string_literal_internal::<bool>(v_pointer, len), expectation);
+}
