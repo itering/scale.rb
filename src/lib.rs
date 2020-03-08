@@ -31,3 +31,20 @@ pub extern fn parse_u8(v_pointer: *const u8, len: usize, expectation: u8) {
 pub extern fn parse_bool(v_pointer: *const u8, len: usize, expectation: bool) {
     assert_eq!(decode_from_raw_parts::<bool>(v_pointer, len), expectation);
 }
+
+#[no_mangle]
+pub extern fn parse_opt_u32(v_pointer: *const u8, len: usize, inner_value: u32, option: bool) {
+    let expectation = match option {
+        true => Some(inner_value),
+        false => None,
+    };
+    println!("Expectation: {:?}", expectation);
+    assert_eq!(decode_from_raw_parts::<Option<u32>>(v_pointer, len), expectation);
+
+    let v = vec![1, 1];
+    println!("{:?}", <Option<bool>>::decode(&mut &v[..]));
+
+    // <Option<bool>>::encode
+    println!("{:?}", None::<Option<u64>>.encode());
+    println!("{:?}", Some(69u32).encode());
+}

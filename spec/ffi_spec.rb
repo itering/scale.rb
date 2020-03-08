@@ -11,6 +11,7 @@ module Rust
   attach_function :parse_u32, %i[pointer int uint32], :void
   attach_function :parse_u8, %i[pointer int uint8], :void
   attach_function :parse_bool, %i[pointer int bool], :void
+  attach_function :parse_opt_u32, %i[pointer int uint32 bool], :void
 end
 
 parse_u64 = proc { |vec_c, value|
@@ -27,6 +28,14 @@ parse_u8 = proc { |vec_c, value|
 
 parse_bool = proc { |vec_c, value|
   Rust.parse_bool(vec_c, vec_c.size, value)
+}
+
+parse_opt_u32 = proc { |vec_c, value|
+  if value.nil?
+    Rust.parse_opt_u32(vec_c, vec_c.size, 0, false)
+  else
+    Rust.parse_opt_u32(vec_c, vec_c.size, value.value, true)
+  end
 }
 
 def check_against_specification(encoded, expectation)
@@ -58,3 +67,11 @@ parse_via_ffi(69, Scale::Types::U8, parse_u8, '45')
 
 parse_via_ffi(true, Scale::Types::Bool, parse_bool, '01')
 parse_via_ffi(false, Scale::Types::Bool, parse_bool, '00')
+
+parse_via_ffi(nil, Scale::Types::OptionU32, parse_opt_u32, '00')
+parse_via_ffi(
+  Scale::Types::U32.new(16_777_215),
+  Scale::Types::OptionU32,
+  parse_opt_u32,
+  '01ffffff00'
+)
