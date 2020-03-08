@@ -7,7 +7,7 @@ require 'ffi'
 module Rust
   extend FFI::Library
   ffi_lib 'target/debug/libvector_ffi.' + FFI::Platform::LIBSUFFIX
-  attach_function :byte_string_literal_parse, %i[pointer int uint64], :bool
+  attach_function :byte_string_literal_parse_u64, %i[pointer int uint64], :bool
 end
 
 value = 14_294_967_296
@@ -23,7 +23,7 @@ puts vec
 FFI::MemoryPointer.new(:int8, vec.size) do |vec_c|
   vec_c.write_array_of_int8 vec
   puts "vec_c: #{vec_c}"
-  ffi_success = Rust.byte_string_literal_parse(vec_c, vec_c.size, value)
+  ffi_success = Rust.byte_string_literal_parse_u64(vec_c, vec_c.size, value)
   describe do
     it 'Rust implementation should decode to expected value' do
       expect(ffi_success).to eql(true)
