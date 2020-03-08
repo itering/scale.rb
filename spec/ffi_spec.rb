@@ -8,10 +8,15 @@ module Rust
   extend FFI::Library
   ffi_lib 'target/debug/libvector_ffi.' + FFI::Platform::LIBSUFFIX
   attach_function :byte_string_literal_parse_u64, %i[pointer int uint64], :bool
+  attach_function :byte_string_literal_parse_u8, %i[pointer int uint8], :bool
 end
 
 parse_u64 = proc { |vec_c, value|
   Rust.byte_string_literal_parse_u64(vec_c, vec_c.size, value)
+}
+
+parse_u8 = proc { |vec_c, value|
+  Rust.byte_string_literal_parse_u8(vec_c, vec_c.size, value)
 }
 
 def parse_via_ffi(value, encoding, ffi_function, expectation)
@@ -38,3 +43,5 @@ def parse_via_ffi(value, encoding, ffi_function, expectation)
 end
 
 parse_via_ffi(14_294_967_296, Scale::Types::U64, parse_u64, '00e40b5403000000')
+
+parse_via_ffi(69, Scale::Types::U8, parse_u8, '45')
