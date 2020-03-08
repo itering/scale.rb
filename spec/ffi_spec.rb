@@ -7,21 +7,21 @@ require 'ffi'
 module Rust
   extend FFI::Library
   ffi_lib 'target/debug/libvector_ffi.' + FFI::Platform::LIBSUFFIX
-  attach_function :byte_string_literal_parse_u64, %i[pointer int uint64], :void
-  attach_function :byte_string_literal_parse_u8, %i[pointer int uint8], :void
-  attach_function :byte_string_literal_parse_bool, %i[pointer int bool], :void
+  attach_function :parse_u64, %i[pointer int uint64], :void
+  attach_function :parse_u8, %i[pointer int uint8], :void
+  attach_function :parse_bool, %i[pointer int bool], :void
 end
 
 parse_u64 = proc { |vec_c, value|
-  Rust.byte_string_literal_parse_u64(vec_c, vec_c.size, value)
+  Rust.parse_u64(vec_c, vec_c.size, value)
 }
 
 parse_u8 = proc { |vec_c, value|
-  Rust.byte_string_literal_parse_u8(vec_c, vec_c.size, value)
+  Rust.parse_u8(vec_c, vec_c.size, value)
 }
 
 parse_bool = proc { |vec_c, value|
-  Rust.byte_string_literal_parse_bool(vec_c, vec_c.size, value)
+  Rust.parse_bool(vec_c, vec_c.size, value)
 }
 
 def check_against_specification(encoded, expectation)
