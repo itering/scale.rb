@@ -515,10 +515,36 @@ module Scale
       inner_type "QueuedKeys"
     end
 
-    class VecU8Length8
+    class VecU8Length2
       include VecU8FixedLength 
-      set_length 8
     end
 
+    class VecU8Length3
+      include VecU8FixedLength 
+    end
+
+    class VecU8Length4
+      include VecU8FixedLength 
+    end
+
+    class VecU8Length8
+      include VecU8FixedLength 
+    end
+
+    class VecU8Length16
+      include VecU8FixedLength 
+    end
+
+    class VecU8Length20
+      include VecU8FixedLength 
+    end
+
+    class VecU8Length32
+      include VecU8FixedLength 
+    end
+    
+    class VecU8Length64
+      include VecU8FixedLength 
+    end
   end
 end
