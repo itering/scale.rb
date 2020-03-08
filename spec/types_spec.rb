@@ -166,11 +166,49 @@ module Scale
         expect(o.encode).to eql("0c003afe")
       end
 
-      it "vector u8 should work correctly" do
+      it "Vec<U8> should work correctly" do
         scale_bytes = Scale::Bytes.new("0x0c003afe")
         o = type_of("Vec<U8>").decode scale_bytes
         expect(o.value.map(&:value)).to eql([0, 58, 254])
         expect(o.encode).to eql("0c003afe")
+      end
+
+      it "Vec<BalanceLock> should work correctly" do
+        # scale_bytes = Scale::Bytes.new("0x0876657374696e67207326160de7075e035823000000000000017374616b696e67208018179741946c6630a039000000000002")
+        scale_bytes = Scale::Bytes.new("0x0c7374616b696e6720a18161b5b58201000000000000000000ffffffff1f706872656c6563740030434cc42501000000000000000000ffffffff1e64656d6f63726163ffffffffffffffffffffffffffffffffc0c0150002")
+        o = type_of("Vec<BalanceLock>").decode scale_bytes
+        expect(o.value.length).to eql(3)
+
+        first_balance_lock = o.value[0]
+        second_balance_lock = o.value[1]
+        third_balance_lock = o.value[2]
+
+        [
+          [
+            [first_balance_lock.id, VecU8Length8, "staking "],
+            [first_balance_lock.amount, Balance, 425191920468385],
+            [first_balance_lock.until, U32, 4294967295],
+            [first_balance_lock.reasons, WithdrawReasons, ["TransactionPayment", "Transfer", "Reserve", "Fee", "Tip"]],
+          ],
+          [
+            [second_balance_lock.id, VecU8Length8, "phrelect"],
+            [second_balance_lock.amount, Balance, 323000000000000],
+            [second_balance_lock.until, U32, 4294967295],
+            [second_balance_lock.reasons, WithdrawReasons, ["Transfer", "Reserve", "Fee", "Tip"]],
+          ],
+          [
+            [third_balance_lock.id, VecU8Length8, "democrac"],
+            [third_balance_lock.amount, Balance, 340282366920938463463374607431768211455],
+            [third_balance_lock.until, U32, 1425600],
+            [third_balance_lock.reasons, WithdrawReasons, ["Transfer"]],
+          ]
+        ].each do |item|
+          item.each do |(actual_value, expectation_type, expectation_value)|
+            expect(actual_value.class).to eql(expectation_type)
+            expect(actual_value.value).to eql(expectation_value)
+          end
+        end
+        expect(o.encode).to eql("0c7374616b696e6720a18161b5b58201000000000000000000ffffffff1f706872656c6563740030434cc42501000000000000000000ffffffff1e64656d6f63726163ffffffffffffffffffffffffffffffffc0c0150002")
       end
     end
 
@@ -301,6 +339,5 @@ module Scale
         expect(o.encode).to eql("374656d343041636")
       end
     end
-
   end
 end

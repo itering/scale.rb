@@ -546,5 +546,16 @@ module Scale
     class VecU8Length64
       include VecU8FixedLength 
     end
+
+    class BalanceLock
+      include Struct
+      items(
+        id: "VecU8Length8",
+        amount: "Balance",
+        until: "U32",
+        reasons: "WithdrawReasons"
+      )
+    end
+
   end
 end
