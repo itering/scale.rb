@@ -16,13 +16,11 @@ fn byte_string_literal_internal<T: Decode + PartialEq + std::fmt::Debug>(v_point
 }
 
 #[no_mangle]
-pub extern fn byte_string_literal_parse_u64(v_pointer: *const u8, len: usize, expectation: u64) -> bool {
+pub extern fn byte_string_literal_parse_u64(v_pointer: *const u8, len: usize, expectation: u64) {
     assert_eq!(byte_string_literal_internal::<u64>(v_pointer, len), expectation);
-    true
 }
 
 #[no_mangle]
-pub extern fn byte_string_literal_parse_u8(v_pointer: *const u8, len: usize, expectation: u8) -> bool {
+pub extern fn byte_string_literal_parse_u8(v_pointer: *const u8, len: usize, expectation: u8) {
     assert_eq!(byte_string_literal_internal::<u8>(v_pointer, len), expectation);
-    true
 }

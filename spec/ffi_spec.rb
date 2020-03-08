@@ -7,8 +7,8 @@ require 'ffi'
 module Rust
   extend FFI::Library
   ffi_lib 'target/debug/libvector_ffi.' + FFI::Platform::LIBSUFFIX
-  attach_function :byte_string_literal_parse_u64, %i[pointer int uint64], :bool
-  attach_function :byte_string_literal_parse_u8, %i[pointer int uint8], :bool
+  attach_function :byte_string_literal_parse_u64, %i[pointer int uint64], :void
+  attach_function :byte_string_literal_parse_u8, %i[pointer int uint8], :void
 end
 
 parse_u64 = proc { |vec_c, value|
@@ -27,14 +27,6 @@ def check_against_specification(encoded, expectation)
   end
 end
 
-def check_against_value(ffi_success)
-  describe do
-    it 'Rust implementation should decode to expected value' do
-      expect(ffi_success).to eql(true)
-    end
-  end
-end
-
 def parse_via_ffi(value, encoding, ffi_function, expectation)
   encoded = encoding.new(value).encode
   check_against_specification(encoded, expectation)
@@ -44,8 +36,7 @@ def parse_via_ffi(value, encoding, ffi_function, expectation)
 
   vec_c = FFI::MemoryPointer.new(:int8, vec.size)
   vec_c.write_array_of_int8 vec
-  ffi_success = ffi_function.call(vec_c, value)
-  check_against_value(ffi_success)
+  ffi_function.call(vec_c, value)
 end
 
 parse_via_ffi(14_294_967_296, Scale::Types::U64, parse_u64, '00e40b5403000000')
