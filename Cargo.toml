@@ -3,6 +3,9 @@ name = "SCALE-testing-interface"
 version = "0.1.0"
 authors = ["Robert Hambrock <robert@web3.foundation>"]
 
+[dependencies]
+parity-scale-codec = { version = "1.2.0" }
+
 [lib]
 name = "scale_ffi"
 crate-type = ["dylib"]
