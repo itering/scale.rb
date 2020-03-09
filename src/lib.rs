@@ -8,7 +8,6 @@ fn decode_from_raw_parts<T: Decode + PartialEq + std::fmt::Debug>(v_pointer: *co
         slice::from_raw_parts(v_pointer, len)
     };
     let v = data_slice.to_vec();
-    println!("vector is {:?}", v);
     <T>::decode(&mut &v[..]).unwrap()
 }
 
@@ -38,13 +37,8 @@ pub extern fn parse_opt_u32(v_pointer: *const u8, len: usize, inner_value: u32, 
         true => Some(inner_value),
         false => None,
     };
-    println!("Expectation: {:?}", expectation);
     assert_eq!(decode_from_raw_parts::<Option<u32>>(v_pointer, len), expectation);
 
     let v = vec![1, 1];
-    println!("{:?}", <Option<bool>>::decode(&mut &v[..]));
 
-    // <Option<bool>>::encode
-    println!("{:?}", None::<Option<u64>>.encode());
-    println!("{:?}", Some(69u32).encode());
 }

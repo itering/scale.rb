@@ -45,9 +45,8 @@ end
 def parse_via_ffi(value, encoding)
   encoded = encoding.new(value).encode
   # check_against_specification(encoded, expectation)
-  puts "encoded: #{encoded} "
+  puts "\nencoded: #{encoded}, value: #{value}, type: #{encoding}"
   vec = Scale::Bytes.new('0x' + encoded).bytes
-  puts "vec: #{vec} "
 
   vec_c = FFI::MemoryPointer.new(:int8, vec.size)
   vec_c.write_array_of_int8 vec
