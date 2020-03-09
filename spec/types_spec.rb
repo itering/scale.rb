@@ -1,16 +1,17 @@
 # coding: utf-8
 require 'scale'
 require_relative './types_for_test.rb'
+require_relative './ffi_spec.rb'
 
 module Scale
   module Types
     describe U8 do
       it 'should work correctly' do
         scale_bytes = Scale::Bytes.new('0x45')
-        # puts scale_bytes
         o = U8.decode scale_bytes
         expect(o.value).to eql(69)
         expect(o.encode).to eql('45')
+        parse_via_ffi(o.value, U8)
       end
     end
 
