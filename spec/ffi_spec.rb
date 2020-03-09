@@ -12,6 +12,7 @@ module Rust
   attach_function :parse_u8, %i[pointer int uint8], :void
   attach_function :parse_bool, %i[pointer int bool], :void
   attach_function :parse_opt_u32, %i[pointer int uint32 bool], :void
+  attach_function :parse_opt_bool, %i[pointer int bool bool], :void
 end
 
 def parse_type(key)
@@ -29,6 +30,15 @@ def parse_type(key)
         Rust.parse_opt_u32(vec, vec.size, 0, false)
       else
         Rust.parse_opt_u32(vec, vec.size, val.value, true)
+      end
+    },
+
+    Scale::Types::OptionBool => proc { |vec, val|
+      if val.nil?
+        Rust.parse_opt_bool(vec, vec.size, false, false)
+      else
+        puts "value: #{val}"
+        Rust.parse_opt_bool(vec, vec.size, val, true)
       end
     }
   }[key]
@@ -52,6 +62,9 @@ def parse_via_ffi(value, encoding)
   vec_c.write_array_of_int8 vec
   parse_type(encoding).call(vec_c, value)
 end
+
+# everything beyond this point should ultimately be moved to types_spec.rb or
+# removed
 
 def parse_via_ffi_plus_spec(value, encoding, expecation)
   encoded = encoding.new(value).encode

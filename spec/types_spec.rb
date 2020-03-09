@@ -120,16 +120,23 @@ module Scale
         o = OptionBool.decode scale_bytes
         expect(o.value).to eql(nil)
         expect(o.encode).to eql('00')
+        parse_via_ffi(o.value, OptionBool)
 
         scale_bytes = Scale::Bytes.new('0x01')
         o = OptionBool.decode scale_bytes
         expect(o.value).to eql(false)
         expect(o.encode).to eql('01')
+        # Rust SCALE does not implement Optional Booleans conformant to
+        # specification yet, so this is commented for now
+        # parse_via_ffi(o.value, OptionBool)
 
         scale_bytes = Scale::Bytes.new('0x02')
         o = OptionBool.decode scale_bytes
         expect(o.value).to eql(true)
         expect(o.encode).to eql('02')
+        # Rust SCALE does not implement Optional Booleans conformant to
+        # specification yet, so this is commented for now
+        # parse_via_ffi(o.value, OptionBool)
       end
 
       it 'option u32 should work correctly' do

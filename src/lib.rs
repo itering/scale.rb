@@ -40,6 +40,15 @@ pub extern fn parse_opt_u32(v_pointer: *const u8, len: usize, inner_value: u32, 
     assert_eq!(decode_from_raw_parts::<Option<u32>>(v_pointer, len), expectation);
 }
 
+#[no_mangle]
+pub extern fn parse_opt_bool(v_pointer: *const u8, len: usize, inner_value: bool, option: bool) {
+    let expectation = match option {
+        true => Some(inner_value),
+        false => None,
+    };
+    assert_eq!(decode_from_raw_parts::<Option<bool>>(v_pointer, len), expectation);
+}
+
 #[test]
 fn opt_bool_is_broken()
 {
