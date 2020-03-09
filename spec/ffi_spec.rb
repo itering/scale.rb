@@ -16,27 +16,19 @@ end
 
 def parse_type(key)
   {
-    Scale::Types::U64 => proc { |vec_c, value|
-      Rust.parse_u64(vec_c, vec_c.size, value)
-    },
+    Scale::Types::U64 => proc { |vec, val| Rust.parse_u64(vec, vec.size, val) },
 
-    Scale::Types::U32 => proc { |vec_c, value|
-      Rust.parse_u32(vec_c, vec_c.size, value)
-    },
+    Scale::Types::U32 => proc { |vec, val| Rust.parse_u32(vec, vec.size, val) },
 
-    Scale::Types::U8 => proc { |vec_c, value|
-      Rust.parse_u8(vec_c, vec_c.size, value)
-    },
+    Scale::Types::U8 => proc { |vec, val| Rust.parse_u8(vec, vec.size, val) },
 
-    Scale::Types::Bool => proc { |vec_c, value|
-      Rust.parse_bool(vec_c, vec_c.size, value)
-    },
+    Scale::Types::Bool => proc { |vec, val| Rust.parse_bool(vec, vec.size, val) },
 
-    Scale::Types::OptionU32 => proc { |vec_c, value|
-      if value.nil?
-        Rust.parse_opt_u32(vec_c, vec_c.size, 0, false)
+    Scale::Types::OptionU32 => proc { |vec, val|
+      if val.nil?
+        Rust.parse_opt_u32(vec, vec.size, 0, false)
       else
-        Rust.parse_opt_u32(vec_c, vec_c.size, value.value, true)
+        Rust.parse_opt_u32(vec, vec.size, val.value, true)
       end
     }
   }[key]
