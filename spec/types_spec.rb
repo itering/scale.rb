@@ -30,6 +30,7 @@ module Scale
         o = U32.decode scale_bytes
         expect(o.value).to eql(16_777_215)
         expect(o.encode).to eql('ffffff00')
+        parse_via_ffi(o.value, U32)
       end
     end
 
@@ -39,6 +40,7 @@ module Scale
         o = U64.decode scale_bytes
         expect(o.value).to eql(14_294_967_296)
         expect(o.encode).to eql('00e40b5403000000')
+        parse_via_ffi(o.value, U64)
       end
     end
 
@@ -57,11 +59,13 @@ module Scale
         o = Bool.decode scale_bytes
         expect(o.value).to eql(false)
         expect(o.encode).to eql('00')
+        parse_via_ffi(o.value, Bool)
 
         scale_bytes = Scale::Bytes.new('0x01')
         o = Bool.decode scale_bytes
         expect(o.value).to eql(true)
         expect(o.encode).to eql('01')
+        parse_via_ffi(o.value, Bool)
       end
     end
 
@@ -133,11 +137,13 @@ module Scale
         o = OptionU32.decode scale_bytes
         expect(o.value).to eql(nil)
         expect(o.encode).to eql('00')
+        parse_via_ffi(o.value, OptionU32)
 
         scale_bytes = Scale::Bytes.new('0x01ffffff00')
         o = OptionU32.decode scale_bytes
         expect(o.value.value).to eql(16_777_215)
         expect(o.encode).to eql('01ffffff00')
+        parse_via_ffi(o.value, OptionU32)
       end
 
       it 'can be construct form type string' do
@@ -146,6 +152,7 @@ module Scale
         o = type.decode scale_bytes
         expect(o.value.value).to eql(16_777_215)
         expect(o.encode).to eql('01ffffff00')
+        parse_via_ffi(o.value, OptionU32)
 
         scale_bytes = Scale::Bytes.new('0x010c003afe')
         type = type_of('Option<Vec<U8>>')
