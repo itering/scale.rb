@@ -80,13 +80,14 @@ scale.rb now support types:
 ## Running tests
 
 1. Download or clone the code to local, and enter the code root directory
-2. Run all tests
+2. If rust is installed on your system (for instance, `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`), call `make` to build the FFI library
+3. Run all tests
 
 ```
 rspec
 ```
 
-2. Run low level format tests
+To run only low level format tests, call
 
 ```
 rspec spec/low_level_spec.rb
