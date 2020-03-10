@@ -1,6 +1,5 @@
 module Scale
   module Types
-
     class IntOrBool
       include Enum
       items Int: 'U8', Bool: 'Bool'
@@ -13,12 +12,12 @@ module Scale
 
     class OptionBool
       include Option
-      INNER_TYPE_STR = 'boolean'
+      INNER_TYPE_STR = 'boolean'.freeze
     end
 
     class OptionU32
       include Option
-      INNER_TYPE_STR = 'U32'
+      INNER_TYPE_STR = 'U32'.freeze
     end
 
     class Student
@@ -33,9 +32,7 @@ module Scale
 
     class TupleDoubleU8
       include Tuple
-      inner_types "U8", "U8"
+      inner_types 'U8', 'U8'
     end
-
   end
 end
-
