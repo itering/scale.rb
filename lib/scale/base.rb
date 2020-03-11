@@ -8,8 +8,8 @@ module Scale
         @value = value
       end
 
-      def ==(another)
-        self.value == another.value
+      def ==(other)
+        value == other.value
       end
     end
 
@@ -21,18 +21,18 @@ module Scale
         def decode(scale_bytes)
           byte = scale_bytes.get_next_bytes(1)
           if byte == [0]
-            return self.new(nil)
+            new(nil)
           elsif byte == [1]
-            if self::INNER_TYPE_STR == 'boolean'
-              return self.new(false)
+            if self::INNER_TYPE_STR == "boolean"
+              new(false)
             else
               # big process
               value = type_of(self::INNER_TYPE_STR).decode(scale_bytes)
-              return self.new(value)
+              new(value)
             end
           elsif byte == [2]
-            if self::INNER_TYPE_STR == 'boolean'
-              return self.new(true)
+            if self::INNER_TYPE_STR == "boolean"
+              new(true)
             else
               raise "bad data"
             end
@@ -42,7 +42,7 @@ module Scale
         end
 
         def inner_type(type_str)
-          self.const_set(:INNER_TYPE_STR, type_str)
+          const_set(:INNER_TYPE_STR, type_str)
         end
       end
 
@@ -52,12 +52,12 @@ module Scale
 
       def encode
         # TODO: add Null type
-        if self.value.nil?
+        if value.nil?
           "00"
         else
-          return "02" if self.value.class == TrueClass && self.value === true
-          return "01" if self.value.class == FalseClass && self.value === false
-          "01" + self.value.encode 
+          return "02" if value.class == TrueClass && value === true
+          return "01" if value.class == FalseClass && value === false
+          "01" + value.encode
         end
       end
     end
@@ -67,11 +67,11 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
-          class_name = self.to_s
+          class_name = to_s
           bytes = scale_bytes.get_next_bytes self::BYTES_LENGTH
           bytes_reversed = bytes.reverse
-          hex = bytes_reversed.reduce('0x') { |hex, byte| hex + byte.to_s(16).rjust(2, '0') }
-          self.new(hex.to_i(16))
+          hex = bytes_reversed.reduce("0x") { |hex, byte| hex + byte.to_s(16).rjust(2, "0") }
+          new(hex.to_i(16))
         end
       end
 
@@ -80,7 +80,7 @@ module Scale
       end
 
       def encode
-        bytes = self.value.to_s(16).rjust(self.class::BYTES_LENGTH*2, '0').scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
+        bytes = value.to_s(16).rjust(self.class::BYTES_LENGTH * 2, "0").scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
         bytes.bytes_to_hex[2..]
       end
     end
@@ -100,11 +100,11 @@ module Scale
             value[attr] = val
           end
 
-          result = self.new(value)
+          result = new(value)
           value.each_pair do |attr, val|
             result.send "#{attr}=", val
           end
-          return result
+          result
         end
 
         def items(**items)
@@ -116,9 +116,9 @@ module Scale
             attr_type_strs << attr_type_str
           end
 
-          self.const_set(:ITEM_NAMES, attr_names)
-          self.const_set(:ITEM_TYPE_STRS, attr_type_strs)
-          self.attr_accessor *attr_names
+          const_set(:ITEM_NAMES, attr_names)
+          const_set(:ITEM_TYPE_STRS, attr_type_strs)
+          attr_accessor *attr_names
         end
       end
 
@@ -127,8 +127,8 @@ module Scale
       end
 
       def encode
-        [].tap do |result| 
-          self.value.each_pair do |attr_name, attr_value|
+        [].tap do |result|
+          value.each_pair do |attr_name, attr_value|
             result << attr_value.encode
           end
         end.join
@@ -137,17 +137,17 @@ module Scale
 
     module Tuple
       include SingleValue
-      
+
       module ClassMethods
         def decode(scale_bytes)
           values = self::TYPE_STRS.map do |type_str|
             type_of(type_str).decode(scale_bytes)
           end
-          return self.new(values)
+          new(values)
         end
 
         def inner_types(*type_strs)
-          self.const_set(:TYPE_STRS, type_strs)
+          const_set(:TYPE_STRS, type_strs)
         end
       end
 
@@ -156,7 +156,7 @@ module Scale
       end
 
       def encode
-        self.value.map(&:encode).join
+        value.map(&:encode).join
       end
     end
 
@@ -166,15 +166,14 @@ module Scale
       module ClassMethods
         def decode(scale_bytes)
           index = scale_bytes.get_next_bytes(1)[0]
-          if self.const_defined? "ITEM_NAMES"
+          if const_defined? "ITEM_NAMES"
             item_type_str = self::ITEM_TYPE_STRS[index]
             raise "There is no such member with index #{index} for enum #{self}" if item_type_str.nil?
             value = type_of(item_type_str).decode(scale_bytes)
-            return self.new(value)
           else
             value = self::VALUES[index]
-            return self.new(value)
           end
+          new(value)
         end
 
         def items(**items)
@@ -186,12 +185,12 @@ module Scale
             attr_type_strs << attr_type_str
           end
 
-          self.const_set(:ITEM_NAMES, attr_names)
-          self.const_set(:ITEM_TYPE_STRS, attr_type_strs)
+          const_set(:ITEM_NAMES, attr_names)
+          const_set(:ITEM_TYPE_STRS, attr_type_strs)
         end
 
         def values(*values)
-          self.const_set(:VALUES, values)
+          const_set(:VALUES, values)
         end
       end
 
@@ -201,11 +200,11 @@ module Scale
 
       def encode
         if self.class.const_defined? "ITEM_NAMES"
-          value_type_str = self.value.class.to_s.split("::").last.to_s
-          index = self::class::ITEM_TYPE_STRS.index(value_type_str).to_s(16).rjust(2, '0')
-          index + self.value.encode
+          value_type_str = value.class.to_s.split("::").last.to_s
+          index = self.class::ITEM_TYPE_STRS.index(value_type_str).to_s(16).rjust(2, "0")
+          index + value.encode
         else
-          self::class::VALUES.index(self.value).to_s(16).rjust(2, '0')
+          self.class::VALUES.index(value).to_s(16).rjust(2, "0")
         end
       end
     end
@@ -214,18 +213,18 @@ module Scale
       include SingleValue # value is an array
 
       module ClassMethods
-        def decode(scale_bytes, raw=false)
+        def decode(scale_bytes, raw = false)
           number = Scale::Types::Compact.decode(scale_bytes).value
           items = []
           number.times do
             item = type_of(self::INNER_TYPE_STR).decode(scale_bytes)
             items << item
           end
-          raw ? items : self.new(items)
+          raw ? items : new(items)
         end
 
         def inner_type(type_str)
-          self.const_set(:INNER_TYPE_STR, type_str)
+          const_set(:INNER_TYPE_STR, type_str)
         end
       end
 
@@ -234,9 +233,9 @@ module Scale
       end
 
       def encode
-        number = Scale::Types::Compact.new(self.value.length).encode
+        number = Scale::Types::Compact.new(value.length).encode
         [number].tap do |result|
-          self.value.each do |element|
+          value.each do |element|
             result << element.encode
           end
         end.join
@@ -248,11 +247,11 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
-          value = "Scale::Types::U#{self::BYTES_LENGTH*8}".constantize.decode(scale_bytes).value
-          return self.new [] if not value || value <= 0
+          value = "Scale::Types::U#{self::BYTES_LENGTH * 8}".constantize.decode(scale_bytes).value
+          return new [] unless value || value <= 0
 
-          result = self::VALUES.select{ |_, mask| value & mask > 0 }.keys
-          return self.new result
+          result = self::VALUES.select { |_, mask| value & mask > 0 }.keys
+          new result
         end
 
         # values is a hash:
@@ -262,10 +261,10 @@ module Scale
         #     "Reserve" => 0b00000100,
         #     ...
         #   }
-        def values(values, bytes_length=1)
-          raise "byte length is wrong: #{bytes_length}" if not [1, 2, 4, 8, 16].include?(bytes_length)
-          self.const_set(:VALUES, values)
-          self.const_set(:BYTES_LENGTH, bytes_length)
+        def values(values, bytes_length = 1)
+          raise "byte length is wrong: #{bytes_length}" unless [1, 2, 4, 8, 16].include?(bytes_length)
+          const_set(:VALUES, values)
+          const_set(:BYTES_LENGTH, bytes_length)
         end
       end
 
@@ -274,8 +273,8 @@ module Scale
       end
 
       def encode
-        value = self.class::VALUES.select{ |str, _| self.value.include?(str) }.values.sum
-        "Scale::Types::U#{self.class::BYTES_LENGTH*8}".constantize.new(value).encode
+        value = self.class::VALUES.select { |str, _| self.value.include?(str) }.values.sum
+        "Scale::Types::U#{self.class::BYTES_LENGTH * 8}".constantize.new(value).encode
       end
     end
 
@@ -284,17 +283,17 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
-          class_name = self.to_s
-          length = class_name[class_name.length-1]
-          raise "length is wrong: #{length}" if not ["2", "3", "4", "8", "16", "20", "32", "64"].include?(length)
+          class_name = to_s
+          length = class_name[class_name.length - 1]
+          raise "length is wrong: #{length}" unless %w[2 3 4 8 16 20 32 64].include?(length)
           length = length.to_i
 
           bytes = scale_bytes.get_next_bytes(length)
           str = bytes.pack("C*").force_encoding("utf-8")
           if str.valid_encoding?
-            self.new str
+            new str
           else
-            self.new bytes.bytes_to_hex
+            new bytes.bytes_to_hex
           end
         end
       end
@@ -305,14 +304,14 @@ module Scale
 
       def encode
         class_name = self.class.to_s
-        length = class_name[class_name.length-1]
-        raise "length is wrong: #{length}" if not ["2", "3", "4", "8", "16", "20", "32", "64"].include?(length)
+        length = class_name[class_name.length - 1]
+        raise "length is wrong: #{length}" unless %w[2 3 4 8 16 20 32 64].include?(length)
         length = length.to_i
 
-        if self.value.start_with?("0x") && self.value.length == (length*2+2) 
-          self.value[2..]
+        if value.start_with?("0x") && value.length == (length * 2 + 2)
+          value[2..]
         else
-          bytes = self.value.unpack("C*")
+          bytes = value.unpack("C*")
           bytes.bytes_to_hex[2..]
         end
       end

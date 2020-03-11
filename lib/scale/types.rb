@@ -17,7 +17,7 @@ module Scale
       end
 
       def encode
-        self.value === true ? "01" : "00"
+        value === true ? "01" : "00"
       end
     end
 
@@ -51,34 +51,34 @@ module Scale
 
       def self.decode(scale_bytes)
         first_byte = scale_bytes.get_next_bytes(1)[0]
-        first_byte_in_bin = first_byte.to_s(2).rjust(8, '0')
+        first_byte_in_bin = first_byte.to_s(2).rjust(8, "0")
 
         mode = first_byte_in_bin[6..7]
-        value = 
-          if mode == '00'
+        value =
+          if mode == "00"
             first_byte >> 2
-          elsif mode == '01'
+          elsif mode == "01"
             second_byte = scale_bytes.get_next_bytes(1)[0]
             [first_byte, second_byte]
               .reverse
-              .map { |b| b.to_s(16).rjust(2, '0') }
+              .map { |b| b.to_s(16).rjust(2, "0") }
               .join
               .to_i(16) >> 2
-          elsif mode == '10'
+          elsif mode == "10"
             remaining_bytes = scale_bytes.get_next_bytes(3)
             ([first_byte] + remaining_bytes)
               .reverse
-              .map { |b| b.to_s(16).rjust(2, '0') }
+              .map { |b| b.to_s(16).rjust(2, "0") }
               .join
               .to_i(16) >> 2
             # or like this:
             # ['02093d00'].pack('H*').unpack('l').first / 4
-          elsif mode == '11'
+          elsif mode == "11"
             remaining_length = 4 + (first_byte >> 2)
             remaining_bytes = scale_bytes.get_next_bytes(remaining_length)
             remaining_bytes
               .reverse
-              .map { |b| b.to_s(16).rjust(2, '0') }
+              .map { |b| b.to_s(16).rjust(2, "0") }
               .join
               .to_i(16)
           end
@@ -87,22 +87,22 @@ module Scale
       end
 
       def encode
-        if self.value >= 0 and self.value <= 63
-          (value << 2).to_s(16).rjust(2, '0')
-        elsif self.value > 63 and self.value <= (2**14 - 1)
-          ((value << 2) + 1).to_s(16).rjust(4, '0').scan(/.{2}/).reverse.join
-        elsif self.value > (2**14 - 1) and self.value <= (2**30 - 1)
-          ((value << 2) + 2).to_s(16).rjust(8, '0').scan(/.{2}/).reverse.join
-        elsif self.value > (2**30 - 1)
-          value_in_hex = self.value.to_s(16)
+        if (value >= 0) && (value <= 63)
+          (value << 2).to_s(16).rjust(2, "0")
+        elsif (value > 63) && (value <= (2**14 - 1))
+          ((value << 2) + 1).to_s(16).rjust(4, "0").scan(/.{2}/).reverse.join
+        elsif (value > (2**14 - 1)) && (value <= (2**30 - 1))
+          ((value << 2) + 2).to_s(16).rjust(8, "0").scan(/.{2}/).reverse.join
+        elsif value > (2**30 - 1)
+          value_in_hex = value.to_s(16)
           length = if value_in_hex.length % 2 == 1
             value_in_hex.length + 1
           else
             value_in_hex.length
           end
 
-          hex = value_in_hex.rjust(length, '0').scan(/.{2}/).reverse.join
-          (((length/2 - 4) << 2) + 3).to_s(16).rjust(2, '0') + hex
+          hex = value_in_hex.rjust(length, "0").scan(/.{2}/).reverse.join
+          (((length/2 - 4) << 2) + 3).to_s(16).rjust(2, "0") + hex
         end
       end
     end
@@ -125,11 +125,11 @@ module Scale
       end
 
       def encode
-        if self.value.start_with?("0x")
-          length = Compact.new((self.value.length - 2)/2).encode
-          "#{length}#{self.value[2..]}"
+        if value.start_with?("0x")
+          length = Compact.new((value.length - 2)/2).encode
+          "#{length}#{value[2..]}"
         else
-          bytes = self.value.unpack("C*")
+          bytes = value.unpack("C*")
           hex_string = bytes.bytes_to_hex[2..]
           length = Compact.new(bytes.length).encode
           "#{length}#{hex_string}"
@@ -164,8 +164,8 @@ module Scale
       end
 
       def encode
-        raise "Format error" if not self.value.start_with?("0x") || self.value.length != 42
-        ScaleBytes.new self.value
+        raise "Format error" unless value.start_with?("0x") || value.length != 42
+        value[2..]
       end
     end
 
@@ -177,8 +177,8 @@ module Scale
       end
 
       def encode
-        raise "Format error" if not self.value.start_with?("0x") || self.value.length != 66
-        ScaleBytes.new self.value
+        raise "Format error" unless value.start_with?("0x") || value.length != 66
+        value[2..]
       end
     end
 
@@ -190,8 +190,8 @@ module Scale
       end
 
       def encode
-        raise "Format error" if not self.value.start_with?("0x") || self.value.length != 130
-        ScaleBytes.new self.value
+        raise "Format error" unless value.start_with?("0x") || value.length != 130
+        value[2..]
       end
     end
 
@@ -199,38 +199,38 @@ module Scale
       include SingleValue
       def self.decode(scale_bytes)
         prefix = scale_bytes.get_next_bytes(1).first
-        if prefix == 0xff
-          value = scale_bytes.get_next_bytes(32).bytes_to_hex
+        value = if prefix == 0xff
+          scale_bytes.get_next_bytes(32).bytes_to_hex
         elsif prefix == 0xfc
-          value = scale_bytes.get_next_bytes(2).bytes_to_hex
+          scale_bytes.get_next_bytes(2).bytes_to_hex
         elsif prefix == 0xfd
-          value = scale_bytes.get_next_bytes(4).bytes_to_hex
+          scale_bytes.get_next_bytes(4).bytes_to_hex
         elsif prefix == 0xfe
-          value = scale_bytes.get_next_bytes(8).bytes_to_hex
+          scale_bytes.get_next_bytes(8).bytes_to_hex
         else
-          value = [prefix].bytes_to_hex
+          [prefix].bytes_to_hex
         end
 
         Address.new(value)
       end
 
       def encode(ss58=false, addr_type=42)
-        if self.value.start_with?("0x")
+        if value.start_with?("0x")
           if ss58 === true
-            ::Address.encode(self.value, addr_type)
+            ::Address.encode(value, addr_type)
           else
-            prefix = if self.value.length == 66
-                      "ff"
-                    elsif self.value.length == 6
-                      "fc"
-                    elsif self.value.length == 10
-                      "fd"
-                    elsif self.value.length == 18
-                      "fe"
-                    else
-                      ""
-                    end
-            "#{prefix}#{self.value[2..]}"
+            prefix = if value.length == 66
+              "ff"
+            elsif value.length == 6
+              "fc"
+            elsif value.length == 10
+              "fd"
+            elsif value.length == 18
+              "fe"
+            else
+              ""
+            end
+            "#{prefix}#{value[2..]}"
           end
         else
           raise "Format error"
@@ -269,7 +269,7 @@ module Scale
       def self.decode(scale_bytes)
         value = Compact.decode(scale_bytes).value
         if value > 10000000000
-          value = value / 1000
+          value /= 1000
         end
 
         CompactMoment.new Time.at(seconds_since_epoch_integer).to_datetime
@@ -280,14 +280,14 @@ module Scale
       include Struct
       items(
         proposal: "Hex",
-        registredBy: "AccountId",
+        registred_by: "AccountId",
         deposit: "BalanceOf",
         blockNumber: "BlockNumber"
       )
     end
 
     class RewardDestination
-      include Enum 
+      include Enum
       values "Staked", "Stash", "Controller"
     end
 
@@ -372,7 +372,7 @@ module Scale
 
     class VoteThreshold
       include Enum
-      values 'SuperMajorityApprove', 'SuperMajorityAgainst', 'SimpleMajority'
+      values "SuperMajorityApprove", "SuperMajorityAgainst", "SimpleMajority"
     end
 
     class Null
@@ -391,7 +391,7 @@ module Scale
     class LockPeriods < U8; end
 
     class Hash < H256; end
-    
+
     class VoteIndex < U32; end
 
     class ProposalIndex < U32; end
@@ -422,7 +422,7 @@ module Scale
 
     class StorageHasher
       include Enum
-      values 'Blake2_128', 'Blake2_256', 'Blake2_128Concat', 'Twox128', 'Twox256', 'Twox64Concat'
+      values "Blake2_128", "Blake2_256", "Blake2_128Concat", "Twox128", "Twox256", "Twox64Concat"
     end
 
     class VoterInfo
@@ -459,7 +459,7 @@ module Scale
     end
 
     class OpaquePeerId < Bytes; end
-    
+
     class OpaqueMultiaddr < Bytes; end
 
     class SessionKeysSubstrate
@@ -478,7 +478,7 @@ module Scale
         babe: "AccountId"
       )
     end
-    
+
     class EdgewareKeys
       include Struct
       items(
@@ -516,35 +516,35 @@ module Scale
     end
 
     class VecU8Length2
-      include VecU8FixedLength 
+      include VecU8FixedLength
     end
 
     class VecU8Length3
-      include VecU8FixedLength 
+      include VecU8FixedLength
     end
 
     class VecU8Length4
-      include VecU8FixedLength 
+      include VecU8FixedLength
     end
 
     class VecU8Length8
-      include VecU8FixedLength 
+      include VecU8FixedLength
     end
 
     class VecU8Length16
-      include VecU8FixedLength 
+      include VecU8FixedLength
     end
 
     class VecU8Length20
-      include VecU8FixedLength 
+      include VecU8FixedLength
     end
 
     class VecU8Length32
-      include VecU8FixedLength 
+      include VecU8FixedLength
     end
-    
+
     class VecU8Length64
-      include VecU8FixedLength 
+      include VecU8FixedLength
     end
 
     class BalanceLock
@@ -556,6 +556,168 @@ module Scale
         reasons: "WithdrawReasons"
       )
     end
+
+    class EthereumAddress
+      include SingleValue
+
+      def self.decode(scale_bytes)
+        bytes = scale_bytes.get_next_bytes(20)
+        EthereumAddress.new(bytes.bytes_to_hex)
+      end
+
+      def encode
+        if value.start_with?("0x") && value.length == 42
+          value[2..]
+        else
+          raise 'Value should start with "0x" and must be 20 bytes long'
+        end
+      end
+    end
+
+    class EcdsaSignature
+      include SingleValue
+
+      def self.decode(scale_bytes)
+        bytes = scale_bytes.get_next_bytes(65)
+        EcdsaSignature.new(bytes.bytes_to_hex)
+      end
+
+      def encode
+        if value.start_with?("0x") && value.length == 132
+          value[2..]
+        else
+          raise 'Value should start with "0x" and must be 65 bytes long'
+        end
+      end
+    end
+
+    class Bidder
+      include Enum
+      values "NewBidder", "ParaId"
+    end
+
+    class BlockAttestations
+      include Struct
+      items(
+        receipt: "CandidateReceipt",
+        valid: "Vec<AccountId>",
+        invalid: "Vec<AccountId>"
+      )
+    end
+
+    class IncludedBlocks
+      include Struct
+      items(
+        actual_number: "BlockNumber",
+        session: "SessionIndex",
+        random_seed: "H256",
+        active_parachains: "Vec<ParaId>",
+        para_blocks: "Vec<Hash>"
+      )
+    end
+
+    class HeadData < Bytes; end
+
+    class Conviction
+      include Enum
+      values "None", "Locked1x", "Locked2x", "Locked3x", "Locked4x", "Locked5x", "Locked6x"
+    end
+
+    class EraRewards
+      include Struct
+      items(
+        total: "U32",
+        rewards: "Vec<U32>"
+      )
+    end
+
+    class SlashJournalEntry
+      include Struct
+      items(
+        who: "AccountId",
+        amount: "Balance",
+        ownSlash: "Balance"
+      )
+    end
+
+    class UpwardMessage
+      include Struct
+      items(
+        origin: "ParachainDispatchOrigin",
+        data: "Bytes"
+      )
+    end
+
+    class ParachainDispatchOrigin
+      include Enum
+      values "Signed", "Parachain"
+    end
+
+    class StoredState
+      include Enum
+      values "Live", "PendingPause", "Paused", "PendingResume"
+    end
+
+    class Votes
+      include Struct
+      items(
+        index: "ProposalIndex",
+        threshold: "MemberCount",
+        ayes: "Vec<AccountId>",
+        nays: "Vec<AccountId>"
+      )
+    end
+
+    class WinningDataEntry
+      include Struct
+      items(
+        account_id: "AccountId",
+        para_id_of: "ParaIdOf",
+        balance_of: "BalanceOf"
+      )
+    end
+
+    class IdentityType < Bytes; end
+
+    class VoteType
+      include Enum
+      values "Binary", "MultiOption"
+    end
+
+    class VoteOutcome
+      include SingleValue
+      def self.decode(scale_bytes)
+        new(scale_bytes.get_next_bytes(32))
+      end
+    end
+
+    class Identity < Bytes; end
+
+    class ProposalTitle < Bytes; end
+
+    class ProposalContents < Bytes; end
+
+    class ProposalStage
+      include Enum
+      values "PreVoting", "Voting", "Completed"
+    end
+
+    class ProposalCategory
+      include Enum
+      values "Signaling"
+    end
+
+    class VoteStage
+      include Enum
+      values "PreVoting", "Commit", "Voting", "Completed"
+    end
+
+    class TallyType
+      include Enum
+      values "OnePerson", "OneCoin"
+    end
+
+    class Attestation < Bytes; end
 
   end
 end

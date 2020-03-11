@@ -4,9 +4,9 @@ else
     EXT := so
 endif
 
-all: target/debug/libvector_ffi.$(EXT)
+all: target/debug/libscale_ffi.$(EXT)
 
-target/debug/libvector_ffi.$(EXT): src/lib.rs Cargo.toml
+target/debug/libscale_ffi.$(EXT): src/lib.rs Cargo.toml
 	cargo build
 
 clean:
