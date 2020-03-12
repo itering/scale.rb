@@ -293,13 +293,13 @@ module Scale
 
     class WithdrawReasons
       include Set
-      values(
+      items(
         {
-          "TransactionPayment" => 1,
-          "Transfer" => 2,
-          "Reserve" => 4,
-          "Fee" => 8,
-          "Tip" => 16
+          TransactionPayment: 1,
+          Transfer: 2,
+          Reserve: 4,
+          Fee: 8,
+          Tip: 16
         }, 1
       )
     end
@@ -718,6 +718,11 @@ module Scale
     end
 
     class Attestation < Bytes; end
+
+    class VecNextAuthority
+      include Vec
+      inner_type "NextAuthority"
+    end
 
   end
 end

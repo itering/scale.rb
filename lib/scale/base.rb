@@ -27,7 +27,7 @@ module Scale
               new(false)
             else
               # big process
-              value = type_of(self::INNER_TYPE_STR).decode(scale_bytes)
+              value = Scale::Types.get(self::INNER_TYPE_STR).decode(scale_bytes)
               new(value)
             end
           elsif byte == [2]
@@ -92,7 +92,7 @@ module Scale
       module ClassMethods
         def decode(scale_bytes)
           item_values = self::ITEM_TYPE_STRS.map do |item_type_str|
-            type_of(item_type_str).decode(scale_bytes)
+            Scale::Types.get(item_type_str).decode(scale_bytes)
           end
 
           value = {}
@@ -107,7 +107,7 @@ module Scale
           result
         end
 
-        def items(**items)
+        def items(items)
           attr_names = []
           attr_type_strs = []
 
@@ -141,7 +141,7 @@ module Scale
       module ClassMethods
         def decode(scale_bytes)
           values = self::TYPE_STRS.map do |type_str|
-            type_of(type_str).decode(scale_bytes)
+            Scale::Types.get(type_str).decode(scale_bytes)
           end
           new(values)
         end
@@ -169,14 +169,14 @@ module Scale
           if const_defined? "ITEM_NAMES"
             item_type_str = self::ITEM_TYPE_STRS[index]
             raise "There is no such member with index #{index} for enum #{self}" if item_type_str.nil?
-            value = type_of(item_type_str).decode(scale_bytes)
+            value = Scale::Types.get(item_type_str).decode(scale_bytes)
           else
             value = self::VALUES[index]
           end
           new(value)
         end
 
-        def items(**items)
+        def items(items)
           attr_names = []
           attr_type_strs = []
 
@@ -217,7 +217,7 @@ module Scale
           number = Scale::Types::Compact.decode(scale_bytes).value
           items = []
           number.times do
-            item = type_of(self::INNER_TYPE_STR).decode(scale_bytes)
+            item = Scale::Types.get(self::INNER_TYPE_STR).decode(scale_bytes)
             items << item
           end
           raw ? items : new(items)
@@ -250,20 +250,20 @@ module Scale
           value = "Scale::Types::U#{self::BYTES_LENGTH * 8}".constantize.decode(scale_bytes).value
           return new [] unless value || value <= 0
 
-          result = self::VALUES.select { |_, mask| value & mask > 0 }.keys
+          result = self::ITEMS.select { |_, mask| value & mask > 0 }.keys
           new result
         end
 
-        # values is a hash:
+        # items is a hash:
         #   {
         #     "TransactionPayment" => 0b00000001,
         #     "Transfer" => 0b00000010,
         #     "Reserve" => 0b00000100,
         #     ...
         #   }
-        def values(values, bytes_length = 1)
+        def items(items, bytes_length = 1)
           raise "byte length is wrong: #{bytes_length}" unless [1, 2, 4, 8, 16].include?(bytes_length)
-          const_set(:VALUES, values)
+          const_set(:ITEMS, items)
           const_set(:BYTES_LENGTH, bytes_length)
         end
       end
@@ -273,7 +273,7 @@ module Scale
       end
 
       def encode
-        value = self.class::VALUES.select { |str, _| self.value.include?(str) }.values.sum
+        value = self.class::ITEMS.select { |key, _| self.value.include?(key) }.values.sum
         "Scale::Types::U#{self.class::BYTES_LENGTH * 8}".constantize.new(value).encode
       end
     end

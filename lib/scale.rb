@@ -1,6 +1,10 @@
 require "scale/version"
 
 require "substrate_common"
+require "json"
+require "active_support"
+require 'active_support/core_ext/string'
+require 'singleton'
 
 require "scale/base"
 require "scale/types"
@@ -14,6 +18,23 @@ require "metadata/metadata_v10"
 
 module Scale
   class Error < StandardError; end
+
+  class TypeRegistry
+    include Singleton
+
+    def initialize
+      @types = {}
+    end
+
+    def get(type_name)
+      @types[type_name]
+    end
+
+    def set(type_name, type)
+      @types[type_name] = type unless @types.has_key?(type_name)
+    end
+  end
+
   # TODO: == implement
 
   class Bytes
@@ -111,60 +132,174 @@ module Scale
     end
   end
 
-end
+  module Types
+    
+    def self.list(chain_spec = "default")
+      hard_coded_types = Scale::Types
+        .constants
+        .select { |c| Scale::Types.const_get(c).is_a? Class }
+        .map { |type_name| [type_name.to_s, type_name.to_s] }
+        .to_h
 
-def type_of(type_string, enum_values: nil)
-  if type_string.end_with?(">")
-    type_strs = type_string.scan(/^([^<]*)<(.+)>$/).first
-    type_str = type_strs.first
-    inner_type_str = type_strs.last
+      # load types from chain spec file
+      chain_spec_types = load_chain_spec_types(chain_spec, hard_coded_types)
+      
+      hard_coded_types.merge(chain_spec_types).keys
+    end
 
-    if type_str == "Vec" || type_str == "Option"
-      klass = Class.new do
-        include type_of(type_str)
-        inner_type inner_type_str
+    def self.get(type_string, chain_spec = "default")
+      type = TypeRegistry.instance.get(type_string)
+      return type if type
+
+      hard_coded_types = Scale::Types
+        .constants
+        .select { |c| Scale::Types.const_get(c).is_a? Class }
+        .map { |type_name| [type_name.to_s, type_name.to_s] }
+        .to_h
+      if hard_coded_types.has_key?(type_string)
+        type = constantize(hard_coded_types[type_string]) 
+        TypeRegistry.instance.set(type_string, type)
+        return type
       end
-      name = "#{type_str}#{klass.object_id}"
-      Object.const_set name, klass
-      name.constantize
-    else
-      raise "#{type_str} not support inner type"
-    end
-  elsif type_string.start_with?("(") && type_string.end_with?(")") # tuple
-    # TODO: add nested tuple support
-    types_with_inner_type = type_string[1...-1].scan(/([A-Za-z]+<[^>]*>)/).first
 
-    types_with_inner_type&.each do |type_str|
-      new_type_str = type_str.tr(",", ";")
-      type_string = type_string.gsub(type_str, new_type_str)
-    end
-
-    type_strs = type_string[1...-1].split(",").map do |type_str|
-      type_str.strip.tr(";", ",")
-    end
-
-    klass = Class.new do
-      include Scale::Types::Tuple
-      inner_types *type_strs
-    end
-    name = "Tuple#{klass.object_id}"
-    Object.const_set name, klass
-    name.constantize
-  else
-    if type_string == "Enum"
-      klass = Class.new do
-        include Scale::Types::Enum
-        values *enum_values
+      # load types from chain spec file
+      chain_spec_types = load_chain_spec_types(chain_spec, hard_coded_types)
+      if chain_spec_types.has_key?(type_string)
+        type = constantize(chain_spec_types[type_string]) 
+        TypeRegistry.instance.set(type_string, type)
+        return type
       end
-      name = "Enum#{klass.object_id}"
-      Object.const_set name, klass
-      name.constantize
-    else
-      type_string = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
-      type_string.constantize
+
+      type = constantize(type_string)
+      TypeRegistry.instance.set(type_string, type)
+      type
+    end
+
+    def self.constantize(type)
+      if type.class == ::String
+        type_of(type.strip)
+      else
+        if type["type"] == "enum" && type.has_key?("type_mapping")
+          type_of("Enum", type["type_mapping"].to_h)
+        elsif type["type"] == "enum" && type.has_key?("value_list")
+          type_of("Enum", type["value_list"])
+        elsif type["type"] == "struct"
+          type_of("Struct", type["type_mapping"].to_h)
+        elsif type["type"] == "set"
+          type_of("Set", type["value_list"])
+        end
+      end
+    end
+    
+    def self.load_chain_spec_types(chain_spec, hard_coded_types)
+      chain_spec_file = File.join(File.dirname(__FILE__), "#{chain_spec}.json")
+      chain_spec_json = File.open(chain_spec_file).read
+      chain_spec_types = JSON.parse(chain_spec_json)["types"]
+
+      types = chain_spec_types.merge(hard_coded_types)
+
+      # chain spec type mapping
+      result = {}
+      chain_spec_types.each_pair do |type_name, type|
+        result[type_name] = type_mapping(type, types)
+      end
+
+      result
+    end
+
+    def self.type_mapping(type, types)
+      if type.class == ::String
+        if type =~ /\[u\d+; \d+\]/
+          byte_length = type.scan(/\[u\d+; (\d+)\]/).first.first
+          "VecU8Length#{byte_length}"
+        elsif types.has_key?(type) && types[type] != type
+          type_mapping(types[type], types)
+        else
+          # u32 => U32
+          type.gsub(/(u)(\d+)/, 'U\2')
+        end
+      else
+        type
+      end
+    end
+
+    def self.type_of(type_string, values = nil)
+      if type_string.end_with?(">")
+        type_strs = type_string.scan(/^([^<]*)<(.+)>$/).first
+        type_str = type_strs.first
+        inner_type_str = type_strs.last
+
+        if type_str == "Vec" || type_str == "Option"
+          klass = Class.new do
+            include Scale::Types.type_of(type_str)
+            inner_type inner_type_str
+          end
+          name = "#{type_str}_Of_#{inner_type_str.camelize}".gsub("<", "˂").gsub(">", "˃")
+          Scale::Types.const_set name, klass
+        else
+          raise "#{type_str} not support inner type"
+        end
+      elsif type_string.start_with?("(") && type_string.end_with?(")") # tuple
+        # TODO: add nested tuple support
+        types_with_inner_type = type_string[1...-1].scan(/([A-Za-z]+<[^>]*>)/).first
+
+        types_with_inner_type&.each do |type_str|
+          new_type_str = type_str.tr(",", ";")
+          type_string = type_string.gsub(type_str, new_type_str)
+        end
+
+        type_strs = type_string[1...-1].split(",").map do |type_str|
+          type_str.strip.tr(";", ",")
+        end
+
+        klass = Class.new do
+          include Scale::Types::Tuple
+          inner_types *type_strs
+        end
+        name = "Tuple_Of_#{type_strs.map(&:camelize).join("_")}".gsub("<", "˂").gsub(">", "˃")
+        Scale::Types.const_set name, klass
+      else
+        if type_string == "Enum"
+          # TODO: combine values to items
+          klass = Class.new do
+            include Scale::Types::Enum
+            if values.class == ::Hash
+              items values
+            else
+              values values
+            end
+          end
+          name = values.class == Hash ? values.values.map(&:camelize).join("_") : values.map(&:camelize).join("_")
+          name = "Enum_Of_#{name}".gsub("<", "˂").gsub(">", "˃")
+          Scale::Types.const_set name, klass
+        elsif type_string == "Struct"
+          klass = Class.new do
+            include Scale::Types::Struct
+            items values
+          end
+          name = "Struct_Of_#{values.values.map(&:camelize).join("_")}".gsub("<", "˂").gsub(">", "˃")
+          Scale::Types.const_set name, klass
+        elsif type_string == "Set"
+          klass = Class.new do
+            include Scale::Types::Set
+            items values, 1
+          end
+          name = "Set_Of#{values.keys.map(&:camelize).join("_")}".gsub("<", "˂").gsub(">", "˃")
+          Scale::Types.const_set name, klass
+        else
+          type_string = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
+          begin
+            type_string.constantize
+          rescue NameError => e
+            puts "#{type_string} is not defined"
+          end
+        end
+      end
     end
   end
+
 end
+
 
 def adjust(type)
   type = type.gsub("T::", "")

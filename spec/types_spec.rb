@@ -127,7 +127,7 @@ module Scale
         expect(o.encode).to eql("01")
         # Rust SCALE does not implement Optional Booleans conformant to
         # specification yet, so this is commented for now
-        # parse_via_ffi(o.value, OptionBool)
+        parse_via_ffi(o.value, OptionBool)
 
         scale_bytes = Scale::Bytes.new("0x02")
         o = OptionBool.decode scale_bytes
@@ -135,7 +135,7 @@ module Scale
         expect(o.encode).to eql("02")
         # Rust SCALE does not implement Optional Booleans conformant to
         # specification yet, so this is commented for now
-        # parse_via_ffi(o.value, OptionBool)
+        parse_via_ffi(o.value, OptionBool)
       end
 
       it "option u32 should work correctly" do
@@ -154,20 +154,21 @@ module Scale
 
       it "can be construct form type string" do
         scale_bytes = Scale::Bytes.new("0x01ffffff00")
-        type = type_of("Option<U32>")
+        type = Scale::Types.type_of("Option<U32>")
         o = type.decode scale_bytes
         expect(o.value.value).to eql(16_777_215)
         expect(o.encode).to eql("01ffffff00")
         parse_via_ffi(o.value, OptionU32)
 
         scale_bytes = Scale::Bytes.new("0x010c003afe")
-        type = type_of("Option<Vec<U8>>")
+        type = Scale::Types.type_of("Option<Vec<U8>>")
+        expect(type.name).to eql("Scale::Types::Option_Of_Vec˂U8˃")
         o = type.decode scale_bytes
         expect(o.value.value.map(&:value)).to eql([0, 58, 254])
         expect(o.encode).to eql("010c003afe")
 
         scale_bytes = Scale::Bytes.new("0x0c0100013a01fe")
-        type = type_of("Vec<Option<U8>>")
+        type = Scale::Types.type_of("Vec<Option<U8>>")
         o = type.decode scale_bytes
         expect(o.value.map { |e| e.value.value }).to eql([0, 58, 254])
         expect(o.encode).to eql("0c0100013a01fe")
@@ -184,7 +185,7 @@ module Scale
 
       it "Vec<U8> should work correctly" do
         scale_bytes = Scale::Bytes.new("0x0c003afe")
-        o = type_of("Vec<U8>").decode scale_bytes
+        o = Scale::Types.type_of("Vec<U8>").decode scale_bytes
         expect(o.value.map(&:value)).to eql([0, 58, 254])
         expect(o.encode).to eql("0c003afe")
       end
@@ -192,7 +193,7 @@ module Scale
       it "Vec<BalanceLock> should work correctly" do
         # scale_bytes = Scale::Bytes.new("0x0876657374696e67207326160de7075e035823000000000000017374616b696e67208018179741946c6630a039000000000002")
         scale_bytes = Scale::Bytes.new("0x0c7374616b696e6720a18161b5b58201000000000000000000ffffffff1f706872656c6563740030434cc42501000000000000000000ffffffff1e64656d6f63726163ffffffffffffffffffffffffffffffffc0c0150002")
-        o = type_of("Vec<BalanceLock>").decode scale_bytes
+        o = Scale::Types.type_of("Vec<BalanceLock>").decode scale_bytes
         expect(o.value.length).to eql(3)
 
         first_balance_lock = o.value[0]
@@ -204,19 +205,19 @@ module Scale
             [first_balance_lock.id, VecU8Length8, "staking "],
             [first_balance_lock.amount, Balance, 425_191_920_468_385],
             [first_balance_lock.until, U32, 4_294_967_295],
-            [first_balance_lock.reasons, WithdrawReasons, %w[TransactionPayment Transfer Reserve Fee Tip]]
+            [first_balance_lock.reasons, WithdrawReasons, %i[TransactionPayment Transfer Reserve Fee Tip]]
           ],
           [
             [second_balance_lock.id, VecU8Length8, "phrelect"],
             [second_balance_lock.amount, Balance, 323_000_000_000_000],
             [second_balance_lock.until, U32, 4_294_967_295],
-            [second_balance_lock.reasons, WithdrawReasons, %w[Transfer Reserve Fee Tip]]
+            [second_balance_lock.reasons, WithdrawReasons, %i[Transfer Reserve Fee Tip]]
           ],
           [
             [third_balance_lock.id, VecU8Length8, "democrac"],
             [third_balance_lock.amount, Balance, 340_282_366_920_938_463_463_374_607_431_768_211_455],
             [third_balance_lock.until, U32, 1_425_600],
-            [third_balance_lock.reasons, WithdrawReasons, ["Transfer"]]
+            [third_balance_lock.reasons, WithdrawReasons, [:Transfer]]
           ]
         ].each do |item|
           item.each do |(actual_value, expectation_type, expectation_value)|
@@ -262,8 +263,8 @@ module Scale
       end
 
       it "can be typed from type string" do
-        klass = type_of("(U8, U8)")
-        expect(klass.name.start_with?("Tuple")).to be true
+        klass = Scale::Types.type_of("(U8, U8)")
+        expect(klass.name.start_with?("Scale::Types::Tuple")).to be true
 
         scale_bytes = Scale::Bytes.new("0x4545")
         o = klass.decode scale_bytes
@@ -289,15 +290,15 @@ module Scale
     describe Set do
       it "should work correctly" do
         o = WithdrawReasons.decode Scale::Bytes.new("0x01")
-        expect(o.value).to eql(["TransactionPayment"])
+        expect(o.value).to eql([:TransactionPayment])
         expect(o.encode).to eql("01")
 
         o = WithdrawReasons.decode Scale::Bytes.new("0x03")
-        expect(o.value).to eql(%w[TransactionPayment Transfer])
+        expect(o.value).to eql(%i[TransactionPayment Transfer])
         expect(o.encode).to eql("03")
 
         o = WithdrawReasons.decode Scale::Bytes.new("0x16")
-        expect(o.value).to eql(%w[Transfer Reserve Tip])
+        expect(o.value).to eql(%i[Transfer Reserve Tip])
         expect(o.encode).to eql("16")
       end
     end
