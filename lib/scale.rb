@@ -142,9 +142,13 @@ module Scale
         .to_h
 
       # load types from chain spec file
-      chain_spec_types = load_chain_spec_types(chain_spec, hard_coded_types)
-      
-      hard_coded_types.merge(chain_spec_types).keys
+      default_chain_spec_types = load_chain_spec_types("default", hard_coded_types)
+      if chain_spec != "default"
+        chain_spec_types = load_chain_spec_types(chain_spec, hard_coded_types.merge(default_chain_spec_types))
+        return hard_coded_types.merge(default_chain_spec_types).merge(chain_spec_types).keys
+      end
+
+      hard_coded_types.merge(default_chain_spec_types).keys
     end
 
     def self.get(type_string, chain_spec = "default")
@@ -162,12 +166,22 @@ module Scale
         return type
       end
 
-      # load types from chain spec file
-      chain_spec_types = load_chain_spec_types(chain_spec, hard_coded_types)
-      if chain_spec_types.has_key?(type_string)
-        type = constantize(chain_spec_types[type_string]) 
+      # from default chain spec file
+      default_chain_spec_types = load_chain_spec_types("default", hard_coded_types)
+      if default_chain_spec_types.has_key?(type_string)
+        type = constantize(default_chain_spec_types[type_string]) 
         TypeRegistry.instance.set(type_string, type)
         return type
+      end
+
+      # from chain spec file
+      if chain_spec != "default"
+        chain_spec_types = load_chain_spec_types(chain_spec, hard_coded_types)
+        if chain_spec_types.has_key?(type_string)
+          type = constantize(chain_spec_types[type_string]) 
+          TypeRegistry.instance.set(type_string, type)
+          return type
+        end
       end
 
       type = constantize(type_string)
@@ -301,9 +315,10 @@ module Scale
 end
 
 def fix(name)
-  # name = name.gsub("<", "❮").gsub(">", "❯")
-  name = name.gsub("<", "˂").gsub(">", "˃")
-  name.gsub("(", "⁽").gsub(")", "⁾").gsub(" ", "").gsub(",", "‚")
+  name
+    .gsub("<", "˂").gsub(">", "˃")
+    .gsub("(", "⁽").gsub(")", "⁾")
+    .gsub(" ", "").gsub(",", "‚")
 end
 
 def adjust(type)
