@@ -1,0 +1,6 @@
+{
+  "runtime_id": 2,
+  "types": {
+    "Weight": "u16"
+  }
+}

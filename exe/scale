@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'scale'
+require 'thor'
+
+class ScaleCli < Thor
+  desc "specs", "list all chain specs"
+  def specs
+    path = File.join File.expand_path('../..', __FILE__), "lib", "type_registry", "*.json"
+    specs = Dir[path].map do |file|
+      File.basename file, ".json"
+    end
+    puts specs.join(", ")
+  end
+
+  desc "types CHAIN_SPEC", "list all types implemented for chain"
+  def types(chain_spec = "default")
+    puts Scale::Types.list(chain_spec).join(", ")
+  end
+
+  desc "type TYPE_NAME CHAIN_SPEC", "show type's ruby class"
+  def type(type_name, chain_spec = "default")
+    puts Scale::Types.get(type_name, chain_spec)
+  end
+
+  desc "decode TYPE_NAME HEX CHAIN_SPEC", "decode HEX string using TYPE_NAME"
+  def decode(type_name, hex, chain_spec = "default")
+    type = Scale::Types.get(type_name, chain_spec)
+    scale_bytes = Scale::Bytes.new(hex)
+    p type.decode(scale_bytes)
+  end
+end
+
+ScaleCli.start(ARGV)

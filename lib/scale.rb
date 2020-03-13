@@ -192,7 +192,7 @@ module Scale
     end
     
     def self.load_chain_spec_types(chain_spec, hard_coded_types)
-      chain_spec_file = File.join(File.dirname(__FILE__), "#{chain_spec}.json")
+      chain_spec_file = File.join(File.dirname(__FILE__), "type_registry", "#{chain_spec}.json")
       chain_spec_json = File.open(chain_spec_file).read
       chain_spec_types = JSON.parse(chain_spec_json)["types"]
 
@@ -269,7 +269,7 @@ module Scale
               values values
             end
           end
-          name = values.class == Hash ? values.values.map(&:camelize).join("_") : values.map(&:camelize).join("_")
+          name = values.class == ::Hash ? values.values.map(&:camelize).join("_") : values.map(&:camelize).join("_")
           name = "Enum_Of_#{name}".gsub("<", "˂").gsub(">", "˃")
           Scale::Types.const_set name, klass
         elsif type_string == "Struct"
