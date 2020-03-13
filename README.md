@@ -53,29 +53,65 @@ p o.encode # "1501"
 ```
 Please go to `spec` dir for more examples.
 
+## Command line tools
+
+After install scale.rb gem, there is a command named `scale` available. You can use it directly in your terminal.
+
+```bash
+> scale
+Commands:
+  scale decode TYPE_NAME HEX CHAIN_SPEC  # decode HEX string using TYPE_NAME
+  scale help [COMMAND]                   # Describe available commands or one specific command
+  scale specs                            # list all chain specs
+  scale type TYPE_NAME CHAIN_SPEC        # show type's ruby class
+  scale types CHAIN_SPEC                 # list all types implemented for chain
+```
+
+```bash
+> scale decode Compact 0x0300000040
+#<Scale::Types::Compact:0x00007f951c21fd00 @value=1073741824>
+```
+
+```bash
+> scale specs
+robonomics, darwinia, kusama-cc2, kusama-cc3, westend, test, centrifuge, kulupu, edgeware, plasm, joystream, default, acala, kusama
+```
+
+```bash
+> scale types kusama
+String, Address, Hash, Compact, Metadata, Bool, U8, U16, U32, U64, U128, MetadataModule, 
+...
+```
+
+```bash
+> scale type AuthoritySignature
+Scale::Types::H512
+```
+
+```bash
+> scale type "(AccountId, Balance)"
+Scale::Types::Struct_Of_AccountId_Balance
+```
+
 ## Types supported
 
-scale.rb now support types:
+You can use the command line tool to list all types supported by scale.rb.
 
-- [x] Compact
-- [x] Bool
-- [x] U8, U16, U32, U64, U128
-- [x] Enum
-- [x] Option
-- [x] Struct
-- [x] Tuple
-- [x] Vec
-- [x] Set
-- [x] Bytes
-- [x] Hex
-- [x] String
-- [x] H160, H256, H512
-- [x] AccountId
-- [x] Balance
-- [x] BalanceOf
-- [x] BlockNumber
-- [x] AccountIndex
-- [x] Era
+default spec:
+
+```bash
+> scale types
+String, Address, Hash, Compact, Metadata, Bool, U8, U16, U32, U64, U128, MetadataModule,
+...
+```
+
+chain spec:
+
+```bash
+> scale types kusama
+String, Address, Hash, Compact, Metadata, Bool, U8, U16, U32, U64, U128, MetadataModule,
+...
+```
 
 ## Running tests
 
