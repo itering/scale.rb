@@ -234,8 +234,8 @@ module Scale
             include Scale::Types.type_of(type_str)
             inner_type inner_type_str
           end
-          name = "#{type_str}_Of_#{inner_type_str.camelize}".gsub("<", "˂").gsub(">", "˃")
-          Scale::Types.const_set name, klass
+          name = "#{type_str}_Of_#{inner_type_str.camelize}"
+          Scale::Types.const_set fix(name), klass
         else
           raise "#{type_str} not support inner type"
         end
@@ -256,8 +256,8 @@ module Scale
           include Scale::Types::Tuple
           inner_types *type_strs
         end
-        name = "Tuple_Of_#{type_strs.map(&:camelize).join("_")}".gsub("<", "˂").gsub(">", "˃")
-        Scale::Types.const_set name, klass
+        name = "Tuple_Of_#{type_strs.map(&:camelize).join("_")}"
+        Scale::Types.const_set fix(name), klass
       else
         if type_string == "Enum"
           # TODO: combine values to items
@@ -270,22 +270,22 @@ module Scale
             end
           end
           name = values.class == ::Hash ? values.values.map(&:camelize).join("_") : values.map(&:camelize).join("_")
-          name = "Enum_Of_#{name}".gsub("<", "˂").gsub(">", "˃")
-          Scale::Types.const_set name, klass
+          name = "Enum_Of_#{name}"
+          Scale::Types.const_set fix(name), klass
         elsif type_string == "Struct"
           klass = Class.new do
             include Scale::Types::Struct
             items values
           end
-          name = "Struct_Of_#{values.values.map(&:camelize).join("_")}".gsub("<", "˂").gsub(">", "˃")
-          Scale::Types.const_set name, klass
+          name = "Struct_Of_#{values.values.map(&:camelize).join("_")}"
+          Scale::Types.const_set fix(name), klass
         elsif type_string == "Set"
           klass = Class.new do
             include Scale::Types::Set
             items values, 1
           end
-          name = "Set_Of#{values.keys.map(&:camelize).join("_")}".gsub("<", "˂").gsub(">", "˃")
-          Scale::Types.const_set name, klass
+          name = "Set_Of#{values.keys.map(&:camelize).join("_")}"
+          Scale::Types.const_set fix(name), klass
         else
           type_string = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
           begin
@@ -300,6 +300,11 @@ module Scale
 
 end
 
+def fix(name)
+  # name = name.gsub("<", "❮").gsub(">", "❯")
+  name = name.gsub("<", "˂").gsub(">", "˃")
+  name.gsub("(", "⁽").gsub(")", "⁾").gsub(" ", "").gsub(",", "‚")
+end
 
 def adjust(type)
   type = type.gsub("T::", "")
