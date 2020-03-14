@@ -24,10 +24,13 @@ module Scale
     attr_reader :types
 
     def initialize
-      @types = load_types.transform_values do |types|
-        types.transform_values do |type|
+      @types = {}
+      load_types.each_pair do |chain_spec, types|
+        puts "- #{chain_spec}"
+        @types[chain_spec] = types.transform_values do |type|
           Scale::Types.constantize(type)
         end
+        puts ""
       end
     end
 
@@ -273,9 +276,9 @@ module Scale
           name = "Set_Of#{values.keys.map(&:camelize).join("_")}_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         else
-          type_string = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
+          type_name = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
           begin
-            type_string.constantize
+            type_name.constantize
           rescue NameError => e
             puts "#{type_string} is not defined"
           end
