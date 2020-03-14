@@ -21,18 +21,55 @@ module Scale
 
   class TypeRegistry
     include Singleton
+    attr_reader :types
 
     def initialize
-      @types = {}
+      @types = load_types.transform_values do |types|
+        types.transform_values do |type|
+          Scale::Types.constantize(type)
+        end
+      end
     end
 
-    def get(type_name)
-      @types[type_name]
+    def get(type_name, chain_spec = "default")
+      @types[chain_spec][type_name]
     end
 
-    def set(type_name, type)
-      @types[type_name] = type unless @types.has_key?(type_name)
+    private 
+    def load_types
+      specs = {}
+
+      coded_types = Scale::Types
+        .constants
+        .select { |c| Scale::Types.const_get(c).is_a? Class }
+        .map { |type_name| [type_name.to_s, type_name.to_s] }
+        .to_h
+
+      default_types = load_chain_spec_types("default")
+      specs["default"] = coded_types.merge(default_types.transform_values do |type|
+        Scale::Types.type_convert(type, coded_types.merge(default_types))
+      end)
+
+      # chain specs
+      path = File.join File.expand_path('../..', __FILE__), "lib", "type_registry", "*.json"
+      chain_specs = Dir[path]
+        .map {|file| File.basename file, ".json" }
+        .reject {|type_name, type| type_name == "default"}
+      specs.merge(chain_specs.map do |chain_spec|
+        chain_types = load_chain_spec_types(chain_spec)
+        chain_types = chain_types.transform_values do |type|
+          Scale::Types.type_convert(type, coded_types.merge(default_types))
+        end
+        [chain_spec, chain_types]
+      end.to_h)
     end
+
+    def load_chain_spec_types(chain_spec)
+      chain_spec_file = File.join(File.dirname(__FILE__), "type_registry", "#{chain_spec}.json")
+      chain_spec_json = File.open(chain_spec_file).read
+      JSON.parse(chain_spec_json)["types"]
+    end
+
   end
 
   # TODO: == implement
@@ -135,58 +172,11 @@ module Scale
   module Types
     
     def self.list(chain_spec = "default")
-      hard_coded_types = Scale::Types
-        .constants
-        .select { |c| Scale::Types.const_get(c).is_a? Class }
-        .map { |type_name| [type_name.to_s, type_name.to_s] }
-        .to_h
-
-      # load types from chain spec file
-      default_chain_spec_types = load_chain_spec_types("default", hard_coded_types)
-      if chain_spec != "default"
-        chain_spec_types = load_chain_spec_types(chain_spec, hard_coded_types.merge(default_chain_spec_types))
-        return hard_coded_types.merge(default_chain_spec_types).merge(chain_spec_types).keys
-      end
-
-      hard_coded_types.merge(default_chain_spec_types).keys
+      TypeRegistry.instance.types[chain_spec].keys
     end
 
-    def self.get(type_string, chain_spec = "default")
-      type = TypeRegistry.instance.get(type_string)
-      return type if type
-
-      hard_coded_types = Scale::Types
-        .constants
-        .select { |c| Scale::Types.const_get(c).is_a? Class }
-        .map { |type_name| [type_name.to_s, type_name.to_s] }
-        .to_h
-      if hard_coded_types.has_key?(type_string)
-        type = constantize(hard_coded_types[type_string]) 
-        TypeRegistry.instance.set(type_string, type)
-        return type
-      end
-
-      # from default chain spec file
-      default_chain_spec_types = load_chain_spec_types("default", hard_coded_types)
-      if default_chain_spec_types.has_key?(type_string)
-        type = constantize(default_chain_spec_types[type_string]) 
-        TypeRegistry.instance.set(type_string, type)
-        return type
-      end
-
-      # from chain spec file
-      if chain_spec != "default"
-        chain_spec_types = load_chain_spec_types(chain_spec, hard_coded_types)
-        if chain_spec_types.has_key?(type_string)
-          type = constantize(chain_spec_types[type_string]) 
-          TypeRegistry.instance.set(type_string, type)
-          return type
-        end
-      end
-
-      type = constantize(type_string)
-      TypeRegistry.instance.set(type_string, type)
-      type
+    def self.get(type_name, chain_spec = "default")
+      TypeRegistry.instance.get(type_name, chain_spec)
     end
 
     def self.constantize(type)
@@ -204,36 +194,18 @@ module Scale
         end
       end
     end
-    
-    def self.load_chain_spec_types(chain_spec, hard_coded_types)
-      chain_spec_file = File.join(File.dirname(__FILE__), "type_registry", "#{chain_spec}.json")
-      chain_spec_json = File.open(chain_spec_file).read
-      chain_spec_types = JSON.parse(chain_spec_json)["types"]
 
-      types = chain_spec_types.merge(hard_coded_types)
+    def self.type_convert(type, types)
+      return type if type.class != ::String
 
-      # chain spec type mapping
-      result = {}
-      chain_spec_types.each_pair do |type_name, type|
-        result[type_name] = type_mapping(type, types)
-      end
-
-      result
-    end
-
-    def self.type_mapping(type, types)
-      if type.class == ::String
-        if type =~ /\[u\d+; \d+\]/
-          byte_length = type.scan(/\[u\d+; (\d+)\]/).first.first
-          "VecU8Length#{byte_length}"
-        elsif types.has_key?(type) && types[type] != type
-          type_mapping(types[type], types)
-        else
-          # u32 => U32
-          type.gsub(/(u)(\d+)/, 'U\2')
-        end
+      if type =~ /\[u\d+; \d+\]/
+        byte_length = type.scan(/\[u\d+; (\d+)\]/).first.first
+        "VecU8Length#{byte_length}"
+      elsif types.has_key?(type) && types[type] != type
+        type_convert(types[type], types)
       else
-        type
+        # u32 => U32
+        type.gsub(/(u)(\d+)/, 'U\2')
       end
     end
 
@@ -248,7 +220,7 @@ module Scale
             include Scale::Types.type_of(type_str)
             inner_type inner_type_str
           end
-          name = "#{type_str}_Of_#{inner_type_str.camelize}"
+          name = "#{type_str}_Of_#{inner_type_str.camelize}_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         else
           raise "#{type_str} not support inner type"
@@ -270,7 +242,7 @@ module Scale
           include Scale::Types::Tuple
           inner_types *type_strs
         end
-        name = "Tuple_Of_#{type_strs.map(&:camelize).join("_")}"
+        name = "Tuple_Of_#{type_strs.map(&:camelize).join("_")}_#{klass.object_id}"
         Scale::Types.const_set fix(name), klass
       else
         if type_string == "Enum"
@@ -284,21 +256,21 @@ module Scale
             end
           end
           name = values.class == ::Hash ? values.values.map(&:camelize).join("_") : values.map(&:camelize).join("_")
-          name = "Enum_Of_#{name}"
+          name = "Enum_Of_#{name}_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         elsif type_string == "Struct"
           klass = Class.new do
             include Scale::Types::Struct
             items values
           end
-          name = "Struct_Of_#{values.values.map(&:camelize).join("_")}"
+          name = "Struct_Of_#{values.values.map(&:camelize).join("_")}_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         elsif type_string == "Set"
           klass = Class.new do
             include Scale::Types::Set
             items values, 1
           end
-          name = "Set_Of#{values.keys.map(&:camelize).join("_")}"
+          name = "Set_Of#{values.keys.map(&:camelize).join("_")}_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         else
           type_string = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
