@@ -724,5 +724,28 @@ module Scale
       inner_type "NextAuthority"
     end
 
+    # TODO: 
+    class BoxProposal
+      include SingleValue
+
+      def self.decode(scale_bytes)
+        call_index = scale_bytes.get_next_bytes(2).bytes_to_hex
+        self.new call_index
+      end
+
+      def encode
+      end
+    end
+
+    class ValidatorPrefsLegacy
+      include Struct
+      items(
+        unstake_threshold: "Compact",
+        validator_payment: "Compact"
+      )
+    end
+
+
+
   end
 end

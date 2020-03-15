@@ -24,14 +24,7 @@ module Scale
     attr_reader :types
 
     def initialize
-      @types = {}
-      load_types.each_pair do |chain_spec, types|
-        puts "- #{chain_spec}"
-        @types[chain_spec] = types.transform_values do |type|
-          Scale::Types.constantize(type)
-        end
-        puts ""
-      end
+      @types = load_types
     end
 
     def get(type_name, chain_spec = "default")
@@ -47,30 +40,42 @@ module Scale
         .select { |c| Scale::Types.const_get(c).is_a? Class }
         .map { |type_name| [type_name.to_s, type_name.to_s] }
         .to_h
+        .transform_values {|type| Scale::Types.constantize(type) }
 
-      default_types = load_chain_spec_types("default")
-      specs["default"] = coded_types.merge(default_types.transform_values do |type|
-        Scale::Types.type_convert(type, coded_types.merge(default_types))
-      end)
+      default_file = File.join File.expand_path('../..', __FILE__), "lib", "type_registry", "default.json"
+      default_types = load_chain_spec_types(default_file).transform_values do |type|
+        Scale::Types.type_convert(type, coded_types)
+      end
+      specs["default"] = coded_types.merge(default_types)
 
       # chain specs
       path = File.join File.expand_path('../..', __FILE__), "lib", "type_registry", "*.json"
       chain_specs = Dir[path]
-        .map {|file| File.basename file, ".json" }
-        .reject {|type_name, type| type_name == "default"}
-      specs.merge(chain_specs.map do |chain_spec|
-        chain_types = load_chain_spec_types(chain_spec)
-        chain_types = chain_types.transform_values do |type|
-          Scale::Types.type_convert(type, coded_types.merge(default_types))
+        .reject {|file| file.end_with?("default.json") }
+        .map {|file| [File.basename(file, ".json"), file] }
+        .to_h
+        .transform_values {|file| load_chain_spec_types(file) }
+        .transform_values do |chain_types|
+          chain_types.transform_values do |type|
+            Scale::Types.type_convert(type, specs["default"])
+          end
         end
-        [chain_spec, chain_types]
-      end.to_h)
+
+      specs.merge(chain_specs)
     end
 
-    def load_chain_spec_types(chain_spec)
-      chain_spec_file = File.join(File.dirname(__FILE__), "type_registry", "#{chain_spec}.json")
-      chain_spec_json = File.open(chain_spec_file).read
-      JSON.parse(chain_spec_json)["types"]
+    def load_chain_spec_types(file)
+      json_string = File.open(file).read
+      types = JSON.parse(json_string)["types"]
+
+      types.transform_values! do |type|
+        if type.class != ::String
+          Scale::Types.constantize(type)
+        else
+          Scale::Types.type_convert(type, types)
+        end
+      end
+      types
     end
 
   end
@@ -255,7 +260,7 @@ module Scale
             if values.class == ::Hash
               items values
             else
-              values values
+              values(*values)
             end
           end
           name = values.class == ::Hash ? values.values.map(&:camelize).join("_") : values.map(&:camelize).join("_")

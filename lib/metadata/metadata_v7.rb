@@ -3,7 +3,7 @@ module Scale
     class MetadataV7
       include SingleValue
       def self.decode(scale_bytes)
-        modules = type_of('Vec<MetadataV7Module>').decode(scale_bytes).value
+        modules = Scale::Types.type_of('Vec<MetadataV7Module>').decode(scale_bytes).value
         result = {
           magicNumber: 1_635_018_093,
           metadata: {
@@ -35,17 +35,17 @@ module Scale
 
         has_calls = Bool.decode(scale_bytes).value
         if has_calls
-          calls = type_of('Vec<MetadataModuleCall>').decode(scale_bytes).value
+          calls = Scale::Types.type_of('Vec<MetadataModuleCall>').decode(scale_bytes).value
           result[:calls] = calls.map(&:value)
         end
 
         has_events = Bool.decode(scale_bytes).value
         if has_events
-          events = type_of('Vec<MetadataModuleEvent>').decode(scale_bytes).value
+          events = Scale::Types.type_of('Vec<MetadataModuleEvent>').decode(scale_bytes).value
           result[:events] = events.map(&:value)
         end
 
-        result[:constants] = type_of('Vec<MetadataV7ModuleConstants>').decode(scale_bytes).value.map(&:value)
+        result[:constants] = Scale::Types.type_of('Vec<MetadataV7ModuleConstants>').decode(scale_bytes).value.map(&:value)
 
         MetadataV7Module.new(result)
       end
@@ -55,7 +55,7 @@ module Scale
       include SingleValue
       def self.decode(scale_bytes)
         prefix = String.decode(scale_bytes).value
-        items = type_of('Vec<MetadataV7ModuleStorageEntry>').decode(scale_bytes).value.map(&:value)
+        items = Scale::Types.type_of('Vec<MetadataV7ModuleStorageEntry>').decode(scale_bytes).value.map(&:value)
         result = {
           prefix: prefix,
           items: items
@@ -70,9 +70,9 @@ module Scale
       def self.decode(scale_bytes)
         result = {
           name: String.decode(scale_bytes).value,
-          modifier: type_of('Enum', enum_values: %w[Optional Default]).decode(scale_bytes).value
+          modifier: Scale::Types.type_of('Enum', %w[Optional Default]).decode(scale_bytes).value
         }
-        storage_function_type = type_of('Enum', enum_values: %w[Plain Map DoubleMap]).decode(scale_bytes).value
+        storage_function_type = Scale::Types.type_of('Enum', %w[Plain Map DoubleMap]).decode(scale_bytes).value
         if storage_function_type == 'Plain'
           result[:type] = {
             Plain: adjust(String.decode(scale_bytes).value)
@@ -99,7 +99,7 @@ module Scale
         end
 
         result[:fallback] = Hex.decode(scale_bytes).value
-        result[:docs] = type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
+        result[:docs] = Scale::Types.type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
 
         MetadataV7ModuleStorageEntry.new(result)
       end
@@ -112,7 +112,7 @@ module Scale
           name: String.decode(scale_bytes).value,
           type: String.decode(scale_bytes).value, # convert
           value: Hex.decode(scale_bytes).value,
-          docs: type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
+          docs: Scale::Types.type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
         }
         MetadataV7ModuleConstants.new result
       end

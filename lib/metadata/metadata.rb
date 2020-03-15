@@ -5,21 +5,20 @@ module Scale
       def self.decode(scale_bytes)
         bytes = scale_bytes.get_next_bytes(4)
         if bytes.bytes_to_utf8 == 'meta'
-          metadata_v_name = type_of('Enum', enum_values: [
-                                      'Scale::Types::MetadataV0',
-                                      'Scale::Types::MetadataV1',
-                                      'Scale::Types::MetadataV2',
-                                      'Scale::Types::MetadataV3',
-                                      'Scale::Types::MetadataV4',
-                                      'Scale::Types::MetadataV5',
-                                      'Scale::Types::MetadataV6',
-                                      'Scale::Types::MetadataV7',
-                                      'Scale::Types::MetadataV8',
-                                      'Scale::Types::MetadataV9',
-                                      'Scale::Types::MetadataV10'
+          metadata_version = Scale::Types.type_of('Enum', [
+                                      'MetadataV0',
+                                      'MetadataV1',
+                                      'MetadataV2',
+                                      'MetadataV3',
+                                      'MetadataV4',
+                                      'MetadataV5',
+                                      'MetadataV6',
+                                      'MetadataV7',
+                                      'MetadataV8',
+                                      'MetadataV9',
+                                      'MetadataV10'
                                     ]).decode(scale_bytes).value
-
-          Metadata.new(metadata_v_name.constantize.decode(scale_bytes).value)
+          Metadata.new "Scale::Types::#{metadata_version}".constantize.decode(scale_bytes)
         end
       end
     end
@@ -37,19 +36,19 @@ module Scale
 
         has_storage = Bool.decode(scale_bytes).value
         if has_storage
-          storages = type_of('Vec<MetadataModuleStorage>').decode(scale_bytes).value
+          storages = Scale::Types.type_of('Vec<MetadataModuleStorage>').decode(scale_bytes).value
           result[:storage] = storages.map(&:value)
         end
 
         has_calls = Bool.decode(scale_bytes).value
         if has_calls
-          calls = type_of('Vec<MetadataModuleCall>').decode(scale_bytes).value
+          calls = Scale::Types.type_of('Vec<MetadataModuleCall>').decode(scale_bytes).value
           result[:calls] = calls.map(&:value)
         end
 
         has_events = Bool.decode(scale_bytes).value
         if has_events
-          events = type_of('Vec<MetadataModuleEvent>').decode(scale_bytes).value
+          events = Scale::Types.type_of('Vec<MetadataModuleEvent>').decode(scale_bytes).value
           result[:events] = events.map(&:value)
         end
 
@@ -62,7 +61,7 @@ module Scale
       def self.decode(scale_bytes)
         result = {
           name: String.decode(scale_bytes).value,
-          modifier: type_of('Enum', enum_values: %w[Optional Default]).decode(scale_bytes).value
+          modifier: Scale::Types.type_of('Enum', %w[Optional Default]).decode(scale_bytes).value
         }
 
         is_key_value = Bool.decode(scale_bytes).value
@@ -81,7 +80,7 @@ module Scale
                         end
 
         result[:fallback] = Hex.decode(scale_bytes).value
-        result[:documentation] = type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
+        result[:documentation] = Scale::Types.type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
 
         MetadataModuleStorage.new(result)
       end
@@ -92,8 +91,8 @@ module Scale
       def self.decode(scale_bytes)
         result = {}
         result[:name] = String.decode(scale_bytes).value
-        result[:args] = type_of('Vec<MetadataModuleCallArgument>').decode(scale_bytes).value.map(&:value)
-        result[:documentation] = type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
+        result[:args] = Scale::Types.type_of('Vec<MetadataModuleCallArgument>').decode(scale_bytes).value.map(&:value)
+        result[:documentation] = Scale::Types.type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
         MetadataModuleCall.new(result)
       end
     end
@@ -114,8 +113,8 @@ module Scale
       def self.decode(scale_bytes)
         result = {}
         result[:name] = String.decode(scale_bytes).value
-        result[:args] = type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
-        result[:documentation] = type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
+        result[:args] = Scale::Types.type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
+        result[:documentation] = Scale::Types.type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
 
         MetadataModuleEvent.new(result)
       end
