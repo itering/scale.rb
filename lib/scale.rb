@@ -21,7 +21,7 @@ module Scale
 
   class TypeRegistry
     include Singleton
-    attr_reader :types
+    attr_accessor :types
 
     def initialize
       @types = load_types
@@ -215,8 +215,7 @@ module Scale
       elsif types.has_key?(type) && types[type] != type
         type_convert(types[type], types)
       else
-        # u32 => U32
-        type.gsub(/(u)(\d+)/, 'U\2')
+        adjust(type)
       end
     end
 
@@ -310,8 +309,10 @@ def adjust(type)
     .gsub("<T as Trait>::", "")
     .delete("\n")
     .gsub("EventRecord<Event, Hash>", "EventRecord")
+    .gsub(/(u)(\d+)/, 'U\2')
   return "Null" if type == "()"
   return "String" if type == "Vec<u8>"
+  return "Compact" if type == "Compact<u32>" || type == "Compact<U32>"
   return "Address" if type == "<Lookup as StaticLookup>::Source"
   return "Vec<Address>" if type == "Vec<<Lookup as StaticLookup>::Source>"
   return "CompactBalance" if type == "<Balance as HasCompact>::Type"

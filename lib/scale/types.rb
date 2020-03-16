@@ -724,16 +724,31 @@ module Scale
       inner_type "NextAuthority"
     end
 
-    # TODO: 
     class BoxProposal
       include SingleValue
 
-      def self.decode(scale_bytes)
-        call_index = scale_bytes.get_next_bytes(2).bytes_to_hex
-        self.new call_index
+      def self.decode(scale_bytes, metadata, chain_spec)
+        call_index = scale_bytes.get_next_bytes(2).bytes_to_hex[2..]
+        call_module, call = metadata.value.call_index[call_index]
+
+        call_args = call[:args].map do |arg|
+          arg_obj = Scale::Types.get(arg[:type], chain_spec).decode(scale_bytes)
+          {name: arg[:name], type: arg[:type], value: arg_obj.encode, value_raw: arg_obj.value}
+        end
+
+        self.new({
+          call_index: call_index, 
+          call_function: call[:name],
+          call_module: call_module[:name],
+          call_args: call_args
+        })
       end
 
       def encode
+        value[:call_index] +
+        value[:call_args]
+          .map {|call_arg| call_arg[:value]}
+          .join("")
       end
     end
 
