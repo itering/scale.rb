@@ -60,6 +60,9 @@ module Scale
             Scale::Types.type_convert(type, specs["default"])
           end
         end
+        .transform_values do |chain_types|
+          specs["default"].merge(chain_types)
+        end
 
       specs.merge(chain_specs)
     end
