@@ -2,11 +2,11 @@
 
 # scale.rb
 
-**Ruby SCALE Codec Library and Substrate Json-rpc Api Client.**
+**Ruby SCALE Codec Library**
 
 SCALE is a lightweight, efficient, binary serialization and deserialization codec used by substrate. Most of the input and output data of the substrate API are encoded in SCALE data format. 
 
-This is a SCALE codec library and substrate json-rpc api client implemented in ruby language for general use. It contains the implementation of low-level data formats, various substrate types, metadata support and json-rpc client.
+This is a SCALE codec library implemented in ruby language for general use. It contains the implementation of low-level data formats, various substrate types, metadata support.
 
 This work is the prerequisite of our subsequent series of projects. We hope to familiarize and quickly access Polkadot and Substrate through ruby. We plan to develop the back end of our applications in ruby language, and then interact with nodes or synchronize data through this library.
 

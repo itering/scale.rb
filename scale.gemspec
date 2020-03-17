@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Wu Minzhe"]
   spec.email = ["wuminzhe@gmail.com"]
 
-  spec.summary = "Ruby implementation of the parity SCALE data format"
-  spec.description = "SCALE - Simple Concatenating Aggregated Little Endians"
+  spec.summary = "Ruby SCALE Codec Library"
+  spec.description = "Ruby implementation of the parity SCALE data format"
   spec.homepage = "https://github.com/itering/scale.rb"
   spec.license = "MIT"
 
