@@ -11,10 +11,14 @@ require "scale/types"
 
 require "metadata/metadata"
 require "metadata/metadata_v3"
+require "metadata/metadata_v4"
+require "metadata/metadata_v5"
+require "metadata/metadata_v6"
 require "metadata/metadata_v7"
 require "metadata/metadata_v8"
 require "metadata/metadata_v9"
 require "metadata/metadata_v10"
+require "metadata/metadata_v11"
 
 module Scale
   class Error < StandardError; end
@@ -119,9 +123,8 @@ module Scale
     end
 
     def get_remaining_bytes
+      puts offset
       @bytes[offset..]
-      @offset = @bytes.length
-      result
     end
 
     def to_hex_string

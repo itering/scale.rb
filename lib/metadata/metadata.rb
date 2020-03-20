@@ -16,7 +16,8 @@ module Scale
                                       'MetadataV7',
                                       'MetadataV8',
                                       'MetadataV9',
-                                      'MetadataV10'
+                                      'MetadataV10',
+                                      'MetadataV11'
                                     ]).decode(scale_bytes).value
           Metadata.new "Scale::Types::#{metadata_version}".constantize.decode(scale_bytes)
         end
