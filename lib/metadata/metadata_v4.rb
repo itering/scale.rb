@@ -11,7 +11,7 @@ module Scale
       end
 
       def self.decode(scale_bytes)
-        modules = Scale::Types.type_of('Vec<MetadataV4Module>').decode(scale_bytes).value
+        modules = Scale::Types.type_of("Vec<MetadataV4Module>").decode(scale_bytes).value
 
         value = {
           magicNumber: 1_635_018_093,
@@ -62,19 +62,19 @@ module Scale
 
         has_storage = Bool.decode(scale_bytes).value
         if has_storage
-          storages = Scale::Types.type_of('Vec<MetadataV4ModuleStorage>').decode(scale_bytes).value
+          storages = Scale::Types.type_of("Vec<MetadataV4ModuleStorage>").decode(scale_bytes).value
           result[:storage] = storages.map(&:value)
         end
 
         has_calls = Bool.decode(scale_bytes).value
         if has_calls
-          calls = Scale::Types.type_of('Vec<MetadataModuleCall>').decode(scale_bytes).value
+          calls = Scale::Types.type_of("Vec<MetadataModuleCall>").decode(scale_bytes).value
           result[:calls] = calls.map(&:value)
         end
 
         has_events = Bool.decode(scale_bytes).value
         if has_events
-          events = Scale::Types.type_of('Vec<MetadataModuleEvent>').decode(scale_bytes).value
+          events = Scale::Types.type_of("Vec<MetadataModuleEvent>").decode(scale_bytes).value
           result[:events] = events.map(&:value)
         end
 
@@ -87,15 +87,15 @@ module Scale
       def self.decode(scale_bytes)
         result = {
           name: String.decode(scale_bytes).value,
-          modifier: Scale::Types.type_of('Enum', %w[Optional Default]).decode(scale_bytes).value
+          modifier: Scale::Types.type_of("Enum", %w[Optional Default]).decode(scale_bytes).value
         }
 
-        storage_function_type = Scale::Types.type_of('Enum', %w[Plain Map DoubleMap]).decode(scale_bytes).value
-        if storage_function_type == 'Plain'
+        storage_function_type = Scale::Types.type_of("Enum", %w[Plain Map DoubleMap]).decode(scale_bytes).value
+        if storage_function_type == "Plain"
           result[:type] = {
             Plain: adjust(String.decode(scale_bytes).value)
           }
-        elsif storage_function_type == 'Map'
+        elsif storage_function_type == "Map"
           result[:type] = {
             Map: {
               hasher: StorageHasher.decode(scale_bytes).value,
@@ -104,7 +104,7 @@ module Scale
               linked: Bool.decode(scale_bytes).value
             }
           }
-        elsif storage_function_type == 'DoubleMap'
+        elsif storage_function_type == "DoubleMap"
           result[:type] = {
             DoubleMap: {
               hasher: StorageHasher.decode(scale_bytes).value,
@@ -117,7 +117,7 @@ module Scale
         end
 
         result[:fallback] = Hex.decode(scale_bytes).value
-        result[:documentation] = Scale::Types.type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
+        result[:documentation] = Scale::Types.type_of("Vec<String>").decode(scale_bytes).value.map(&:value)
 
         MetadataV4ModuleStorage.new(result)
       end

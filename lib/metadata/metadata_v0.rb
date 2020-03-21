@@ -29,6 +29,14 @@ module Scale
         events_modules = Scale::Types.type_of("Vec<MetadataV0EventModule>").decode(scale_bytes).value.map(&:value)
         modules = Scale::Types.type_of("Vec<MetadataV0Module>").decode(scale_bytes).value.map(&:value)
 
+        Bytes.decode(scale_bytes).value
+
+        sections = Scale::Types.type_of("Vec<MetadataV0Section>").value.map(&:value)
+
+        value[:metadata][:V0][:outerEvent][:events] = events_modules
+        value[:metadata][:V0][:modules] = modules
+        value[:metadata][:V0][:sections] = sections
+
         result = MetadataV0.new(value)
 
         # call_module_index = 0
