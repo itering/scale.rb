@@ -19,8 +19,14 @@ describe Scale::Types::Metadata do
     # meta = Scale::Types::Metadata.decode scale_bytes
   # end
 
-  it "can decode v1 hex data" do
-    content = get_metadata_hex(1)
+  # it "can decode v1 hex data" do
+    # content = get_metadata_hex(1)
+    # scale_bytes = Scale::Bytes.new(content)
+    # meta = Scale::Types::Metadata.decode scale_bytes
+  # end
+
+  it "can decode v2 hex data" do
+    content = get_metadata_hex(2)
     scale_bytes = Scale::Bytes.new(content)
     meta = Scale::Types::Metadata.decode scale_bytes
   end
