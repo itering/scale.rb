@@ -13,8 +13,14 @@ def get_metadata_hex(version)
 end
 
 describe Scale::Types::Metadata do
-  it "can decode v0 hex data" do
-    content = get_metadata_hex(0)
+  # it "can decode v0 hex data" do
+    # content = get_metadata_hex(0)
+    # scale_bytes = Scale::Bytes.new(content)
+    # meta = Scale::Types::Metadata.decode scale_bytes
+  # end
+
+  it "can decode v1 hex data" do
+    content = get_metadata_hex(1)
     scale_bytes = Scale::Bytes.new(content)
     meta = Scale::Types::Metadata.decode scale_bytes
   end
