@@ -20,6 +20,9 @@ module Scale
                                       'MetadataV11'
                                     ]).decode(scale_bytes).value
           Metadata.new "Scale::Types::#{metadata_version}".constantize.decode(scale_bytes)
+        else
+          scale_bytes.reset_offset
+          Scale::Types::MetadataV0.decode(scale_bytes)
         end
       end
     end

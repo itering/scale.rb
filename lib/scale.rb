@@ -10,6 +10,7 @@ require "scale/base"
 require "scale/types"
 
 require "metadata/metadata"
+require "metadata/metadata_v0"
 require "metadata/metadata_v3"
 require "metadata/metadata_v4"
 require "metadata/metadata_v5"
@@ -120,6 +121,10 @@ module Scale
       end
       @offset += length
       result
+    rescue RangeError => ex
+      puts "length: #{length}"
+      puts ex.message
+      puts ex.backtrace
     end
 
     def get_remaining_bytes
