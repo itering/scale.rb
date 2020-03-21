@@ -123,7 +123,6 @@ module Scale
     end
 
     def get_remaining_bytes
-      puts offset
       @bytes[offset..]
     end
 
@@ -135,8 +134,16 @@ module Scale
       @bytes.bytes_to_bin
     end
 
+    def to_ascii 
+      @bytes[0...offset].pack("C*") + "<================================>" + @bytes[offset..].pack("C*")
+    end
+
     def ==(other)
       bytes == other.bytes && offset == other.offset
+    end
+
+    def to_s
+      green(@bytes[0...offset].bytes_to_hex) + yellow(@bytes[offset..].bytes_to_hex[2..])
     end
   end
 
@@ -324,4 +331,12 @@ def adjust(type)
   return "CompactMoment" if type == "<Moment as HasCompact>::Type"
   return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
   type
+end
+
+def green(text)
+  "\033[32m#{text}\033[0m"
+end
+
+def yellow(text)
+  "\033[33m#{text}\033[0m"
 end

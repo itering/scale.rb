@@ -116,7 +116,6 @@ module Scale
           }
         end
 
-        # puts scale_bytes.get_remaining_bytes.bytes_to_hex
         result[:fallback] = Hex.decode(scale_bytes).value
         result[:documentation] = Scale::Types.type_of('Vec<String>').decode(scale_bytes).value.map(&:value)
 
