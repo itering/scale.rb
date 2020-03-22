@@ -23,6 +23,11 @@ end
   # end
 # end
 
+# def get_metadata_json(version)
+  # url = "https://raw.githubusercontent.com/polkadot-js/api/master/packages/metadata/src/Metadata/v#{version}/static-substrate.json"
+  # open(url).read
+# end
+
 describe Scale::Types::Metadata do
   it "can decode v0 hex data" do
     hex = get_metadata_hex(0)
@@ -40,82 +45,19 @@ describe Scale::Types::Metadata do
     expect(v0.to_json).to eql(expected.to_json)
   end
 
-  it "can decode v1 hex data" do
-    hex = get_metadata_hex(1)
-    scale_bytes = Scale::Bytes.new(hex)
-    metadata = Scale::Types::Metadata.decode scale_bytes
-    v1 = metadata.value.value[:metadata][:V1]
+  # fixed: the v4 metadata hex from polkadot-js/api is not correct
+  (1 .. 11).each do |i|
+    it "can decode v#{i} hex data" do
+      hex = get_metadata_hex(i)
+      scale_bytes = Scale::Bytes.new(hex)
+      metadata = Scale::Types::Metadata.decode scale_bytes
+      v = metadata.value.value[:metadata]["V#{i}".to_sym]
 
-    expected = get_metadata(1)["metadata"]["V1"]
+      expected = get_metadata(i)["metadata"]["V#{i}"]
 
-    expect(metadata.version).to eql(1)
-    expect(v1[:modules].length).to eql(expected["modules"].length)
+      expect(metadata.version).to eql(i)
+      expect(v[:modules].length).to eql(expected["modules"].length)
+    end
   end
 
-  it "can decode v2 hex data" do
-    hex = get_metadata_hex(2)
-    scale_bytes = Scale::Bytes.new(hex)
-    metadata = Scale::Types::Metadata.decode scale_bytes
-    v2 = metadata.value.value[:metadata][:V2]
-
-    expected = get_metadata(2)["metadata"]["V2"]
-
-    expect(metadata.version).to eql(2)
-    expect(v2[:modules].length).to eql(expected["modules"].length)
-  end
-
-  # it "can decode v3 hex data" do
-  #   content = get_metadata_hex(3)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
-
-  # # the v4 metadata hex from polkadot-js/api is not correct
-  # it "can decode v4 hex data" do
-  #   content = File.open(File.join(ROOT, "spec", "v4")).read.strip
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
-
-  # it "can decode v5 hex data" do
-  #   content = get_metadata_hex(5)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
-
-  # it "can decode v6 hex data" do
-  #   content = get_metadata_hex(6)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
-
-  # it "can decode v7 hex data" do
-  #   content = get_metadata_hex(7)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
-
-  # it "can decode v8 hex data" do
-  #   content = get_metadata_hex(8)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
-
-  # it "can decode v9 hex data" do
-  #   content = get_metadata_hex(9)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
-
-  # it "can decode v10 hex data" do
-  #   content = get_metadata_hex(10)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
-
-  # it "can decode v11 hex data" do
-  #   content = get_metadata_hex(11)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
 end

@@ -22,7 +22,7 @@ module Scale
           }
         }
 
-        result = MetadataV9.new(result)
+        result = MetadataV9.new(value)
 
         call_module_index = 0
         event_module_index = 0
