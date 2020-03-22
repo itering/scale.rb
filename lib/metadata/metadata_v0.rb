@@ -11,8 +11,6 @@ module Scale
       end
 
       def self.decode(scale_bytes)
-        # modules = Scale::Types.type_of('Vec<MetadataModule>').decode(scale_bytes).value
-
         value = {
           metadata: {
             V0: {
@@ -21,7 +19,10 @@ module Scale
                 events: []
               },
               modules: [],
-              sections: []
+              outerDispatch: {
+                name: "Call",
+                calls: []
+              }
             }
           }
         }
@@ -31,11 +32,11 @@ module Scale
 
         Bytes.decode(scale_bytes).value
 
-        sections = Scale::Types.type_of("Vec<MetadataV0Section>").value.map(&:value)
+        sections = Scale::Types.type_of("Vec<MetadataV0Section>").decode(scale_bytes).value.map(&:value)
 
         value[:metadata][:V0][:outerEvent][:events] = events_modules
         value[:metadata][:V0][:modules] = modules
-        value[:metadata][:V0][:sections] = sections
+        value[:metadata][:V0][:outerDispatch][:calls] = sections
 
         result = MetadataV0.new(value)
 
@@ -70,7 +71,10 @@ module Scale
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
         events = Scale::Types.type_of('Vec<MetadataV0Event>').decode(scale_bytes).value.map(&:value)
-        MetadataV0EventModule.new({name: name, events: events})
+        MetadataV0EventModule.new([
+          name, 
+          events
+        ])
       end
     end
 
@@ -80,8 +84,8 @@ module Scale
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
         args = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
-        docs = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
-        MetadataV0Event.new({name: name, args: args, docs: docs})
+        documentation = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
+        MetadataV0Event.new({name: name, args: args.map {|arg| arg }, documentation: documentation})
       end
     end
 
@@ -92,12 +96,11 @@ module Scale
         prefix = Bytes.decode(scale_bytes).value
         name = Bytes.decode(scale_bytes).value
         call_name = Bytes.decode(scale_bytes).value
-        
+
         functions = Scale::Types.type_of("Vec<MetadataV0ModuleFunction>").decode(scale_bytes).value.map(&:value)
 
         result = {
             prefix: prefix,
-            index: nil,
             module: {
                 name: name,
                 call: {
@@ -125,15 +128,15 @@ module Scale
       include SingleValue
 
       def self.decode(scale_bytes)
-        id = scale_bytes.get_next_bytes(2).bytes_to_hex
+        id = U16.decode(scale_bytes).value
         name = Bytes.decode(scale_bytes).value
         args = Scale::Types.type_of("Vec<MetadataModuleCallArgument>").decode(scale_bytes).value.map(&:value)
-        docs = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
+        documentation = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
         MetadataV0ModuleFunction.new({
           id: id,
           name: name,
           args: args,
-          docs: docs
+          documentation: documentation
         })
       end
     end
@@ -143,7 +146,7 @@ module Scale
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
-        type = adjust(Bytes.decode(scale_bytes).value)
+        type = Bytes.decode(scale_bytes).value
 
         MetadataModuleCallArgument.new({name: name, type: type})
       end
@@ -160,26 +163,42 @@ module Scale
 
         if is_key_value
           type = {
-            MapType: {
-              key: adjust(Bytes.decode(scale_bytes).value),
-              value: adjust(Bytes.decode(scale_bytes).value)
+            Map: {
+              key: Bytes.decode(scale_bytes).value,
+              value: Bytes.decode(scale_bytes).value
             }
           }
         else
           type = {
-            PlainType: adjust(Bytes.decode(scale_bytes).value)
+            Plain: Bytes.decode(scale_bytes).value
           }
         end
 
         fallback = Hex.decode(scale_bytes).value
-        docs = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value
+        documentation = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
 
         MetadataV0ModuleStorage.new({
           name: name,
           modifier: modifier,
           type: type,
-          default: fallback,
-          docs: docs
+          fallback: fallback,
+          documentation: documentation
+        })
+      end
+    end
+
+    class MetadataV0Section
+      include SingleValue
+
+      def self.decode(scale_bytes)
+        name = Bytes.decode(scale_bytes).value
+        prefix = Bytes.decode(scale_bytes).value
+        id = U16.decode(scale_bytes).value
+        
+        MetadataV0Section.new({
+          name: name,
+          prefix: prefix,
+          index: id
         })
       end
     end

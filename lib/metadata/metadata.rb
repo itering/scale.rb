@@ -2,6 +2,7 @@ module Scale
   module Types
     class Metadata
       include SingleValue
+      attr_accessor :version
       def self.decode(scale_bytes)
         bytes = scale_bytes.get_next_bytes(4)
         if bytes.bytes_to_utf8 == 'meta'
@@ -19,11 +20,15 @@ module Scale
                                       'MetadataV10',
                                       'MetadataV11'
                                     ]).decode(scale_bytes).value
-          Metadata.new "Scale::Types::#{metadata_version}".constantize.decode(scale_bytes)
+          metadata = Metadata.new "Scale::Types::#{metadata_version}".constantize.decode(scale_bytes)
+          metadata.version = metadata_version[9..].to_i
         else
           scale_bytes.reset_offset
-          Scale::Types::MetadataV0.decode(scale_bytes)
+          metadata_v0 = Scale::Types::MetadataV0.decode(scale_bytes)
+          metadata = Metadata.new metadata_v0
+          metadata.version = 0
         end
+        metadata
       end
     end
 
