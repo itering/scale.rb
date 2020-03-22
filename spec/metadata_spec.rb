@@ -5,7 +5,7 @@ require "open-uri"
 
 ROOT = Pathname.new File.expand_path("../../", __FILE__)
 
-def get_metadata_data(version)
+def get_metadata_hex(version)
   File.open(File.join(ROOT, "spec", "metadata", "v#{version}", "data")).read.strip
 end
 
@@ -25,23 +25,32 @@ end
 
 describe Scale::Types::Metadata do
   it "can decode v0 hex data" do
-    data = get_metadata_data(0)
-    scale_bytes = Scale::Bytes.new(data)
-    metadata = Scale::Types::Metadata.decode scale_bytes
-
-    expect(metadata.version).to eql(0)
-    expect(metadata.value.value[:metadata][:V0][:outerEvent][:events].length).to eql(13)
-    expect(metadata.value.value[:metadata][:V0][:modules].length).to eql(16)
+    hex = get_metadata_hex(0)
+    scale_bytes = Scale::Bytes.new(hex)
+    metadata = Scale::Types::Metadata.decode(scale_bytes)
+    v0 = metadata.value.value[:metadata][:V0]
 
     expected = get_metadata(0)
-    expect(metadata.value.value[:metadata][:V0].to_json).to eql(expected.to_json)
+
+    expect(metadata.version).to eql(0)
+    expect(v0[:outerEvent][:events].length).to eql(expected["outerEvent"]["events"].length)
+    expect(v0[:modules].length).to eql(expected["modules"].length)
+    expect(v0[:outerDispatch][:calls].length).to eql(expected["outerDispatch"]["calls"].length)
+
+    expect(v0.to_json).to eql(expected.to_json)
   end
 
-  # it "can decode v1 hex data" do
-  #   content = get_metadata_hex(1)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
+  it "can decode v1 hex data" do
+    hex = get_metadata_hex(1)
+    scale_bytes = Scale::Bytes.new(hex)
+    metadata = Scale::Types::Metadata.decode scale_bytes
+    v1 = metadata.value.value[:metadata][:V1]
+
+    expected = get_metadata(1)["metadata"]["V1"]
+
+    expect(metadata.version).to eql(1)
+    expect(v1[:modules].length).to eql(expected["modules"].length)
+  end
 
   # it "can decode v2 hex data" do
   #   content = get_metadata_hex(2)
