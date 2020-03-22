@@ -10,7 +10,7 @@ def get_metadata_data(version)
 end
 
 def get_metadata(version)
-  content = File.open(File.join(ROOT, "spec", "metadata", "v#{version}", "decoded.json")).read.strip
+  content = File.open(File.join(ROOT, "spec", "metadata", "v#{version}", "expect.json")).read.strip
   JSON.parse content
 end
 
