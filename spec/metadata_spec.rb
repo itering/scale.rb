@@ -45,7 +45,8 @@ describe Scale::Types::Metadata do
     expect(v0.to_json).to eql(expected.to_json)
   end
 
-  # fixed: the v4 metadata hex from polkadot-js/api is not correct
+  # Fixed: the v4 metadata hex from polkadot-js/api is not correct
+  # TODO: Add more detailed tests
   (1 .. 11).each do |i|
     it "can decode v#{i} hex data" do
       hex = get_metadata_hex(i)
