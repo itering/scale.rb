@@ -6,7 +6,7 @@ require "open-uri"
 ROOT = Pathname.new File.expand_path("../../", __FILE__)
 
 def get_metadata_hex(version)
-  File.open(File.join(ROOT, "spec", "metadata", "v#{version}", "data")).read.strip
+  File.open(File.join(ROOT, "spec", "metadata", "v#{version}", "hex")).read.strip
 end
 
 def get_metadata(version)
@@ -52,11 +52,17 @@ describe Scale::Types::Metadata do
     expect(v1[:modules].length).to eql(expected["modules"].length)
   end
 
-  # it "can decode v2 hex data" do
-  #   content = get_metadata_hex(2)
-  #   scale_bytes = Scale::Bytes.new(content)
-  #   meta = Scale::Types::Metadata.decode scale_bytes
-  # end
+  it "can decode v2 hex data" do
+    hex = get_metadata_hex(2)
+    scale_bytes = Scale::Bytes.new(hex)
+    metadata = Scale::Types::Metadata.decode scale_bytes
+    v2 = metadata.value.value[:metadata][:V2]
+
+    expected = get_metadata(2)["metadata"]["V2"]
+
+    expect(metadata.version).to eql(2)
+    expect(v2[:modules].length).to eql(expected["modules"].length)
+  end
 
   # it "can decode v3 hex data" do
   #   content = get_metadata_hex(3)
