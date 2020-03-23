@@ -4,6 +4,7 @@ require "pathname"
 require "open-uri"
 
 ROOT = Pathname.new File.expand_path("../../", __FILE__)
+Scale::TypeRegistry.instance.load("kusama", 1054)
 
 def get_metadata_hex(version)
   File.open(File.join(ROOT, "spec", "metadata", "v#{version}", "hex")).read.strip

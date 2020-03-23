@@ -3,8 +3,8 @@ require "scale/version"
 require "substrate_common"
 require "json"
 require "active_support"
-require 'active_support/core_ext/string'
-require 'singleton'
+require "active_support/core_ext/string"
+require "singleton"
 
 require "scale/base"
 require "scale/types"
@@ -30,18 +30,20 @@ module Scale
     include Singleton
     attr_accessor :types
 
-    def initialize
-      @types = load_types
+    def load(spec_name, spec_version)
+      @spec_name = spec_name
+      @spec_version = spec_version
+      @types = load_types(spec_name, spec_version)
+      true
     end
 
-    def get(type_name, chain_spec = "default")
-      @types[chain_spec][type_name]
+    def get(type_name)
+      @types[type_name]
     end
 
     private 
-    def load_types
-      specs = {}
-
+    def load_types(spec_name, spec_version)
+      # hard coded types
       coded_types = Scale::Types
         .constants
         .select { |c| Scale::Types.const_get(c).is_a? Class }
@@ -49,34 +51,39 @@ module Scale
         .to_h
         .transform_values {|type| Scale::Types.constantize(type) }
 
-      default_file = File.join File.expand_path('../..', __FILE__), "lib", "type_registry", "default.json"
-      default_types = load_chain_spec_types(default_file).transform_values do |type|
+      # default spec types
+      default_types = load_chain_spec_types("default", spec_version).transform_values do |type|
         Scale::Types.type_convert(type, coded_types)
       end
-      specs["default"] = coded_types.merge(default_types)
+      default_types = coded_types.merge(default_types)
 
-      # chain specs
-      path = File.join File.expand_path('../..', __FILE__), "lib", "type_registry", "*.json"
-      chain_specs = Dir[path]
-        .reject {|file| file.end_with?("default.json") }
-        .map {|file| [File.basename(file, ".json"), file] }
-        .to_h
-        .transform_values {|file| load_chain_spec_types(file) }
-        .transform_values do |chain_types|
-          chain_types.transform_values do |type|
-            Scale::Types.type_convert(type, specs["default"])
-          end
-        end
-        .transform_values do |chain_types|
-          specs["default"].merge(chain_types)
-        end
+      # chain spec types
+      spec_types = load_chain_spec_types(spec_name, spec_version)
+      spec_types.transform_values do |type|
+        Scale::Types.type_convert(type, default_types)
+      end
 
-      specs.merge(chain_specs)
+      default_types.merge(spec_types)
     end
 
-    def load_chain_spec_types(file)
+    def load_chain_spec_types(spec_name, spec_version)
+      file = File.join File.expand_path("../..", __FILE__), "lib", "type_registry", "#{spec_name}.json"
       json_string = File.open(file).read
-      types = JSON.parse(json_string)["types"]
+      json = JSON.parse(json_string)
+
+      types = {}
+      runtime_id = json["runtime_id"]
+      versioning = json["versioning"] || []
+
+      if runtime_id.nil? || spec_version >= runtime_id
+        types = json["types"]
+      end
+
+      versioning.each do |item|
+        if spec_version >= item["runtime_range"][0] && spec_version <= (item["runtime_range"][1] || 1073741823)
+          types.merge!(item["types"])
+        end
+      end
 
       types.transform_values! do |type|
         if type.class != ::String
@@ -85,6 +92,7 @@ module Scale
           Scale::Types.type_convert(type, types)
         end
       end
+
       types
     end
 
@@ -198,13 +206,8 @@ module Scale
   end
 
   module Types
-    
-    def self.list(chain_spec = "default")
-      TypeRegistry.instance.types[chain_spec].keys
-    end
-
-    def self.get(type_name, chain_spec = "default")
-      TypeRegistry.instance.get(type_name, chain_spec)
+    def self.get(type_name)
+      TypeRegistry.instance.get(type_name)
     end
 
     def self.constantize(type)
