@@ -13,16 +13,15 @@ module Scale
       def self.decode(scale_bytes)
         value = {
           metadata: {
-            V0: {
-              outerEvent: {
-                name: Bytes.decode(scale_bytes).value,
-                events: []
-              },
-              modules: [],
-              outerDispatch: {
-                name: "Call",
-                calls: []
-              }
+            version: 0,
+            outerEvent: {
+              name: Bytes.decode(scale_bytes).value,
+              events: []
+            },
+            modules: [],
+            outerDispatch: {
+              name: "Call",
+              calls: []
             }
           }
         }
@@ -34,9 +33,9 @@ module Scale
 
         sections = Scale::Types.type_of("Vec<MetadataV0Section>").decode(scale_bytes).value.map(&:value)
 
-        value[:metadata][:V0][:outerEvent][:events] = events_modules
-        value[:metadata][:V0][:modules] = modules
-        value[:metadata][:V0][:outerDispatch][:calls] = sections
+        value[:metadata][:outerEvent][:events] = events_modules
+        value[:metadata][:modules] = modules
+        value[:metadata][:outerDispatch][:calls] = sections
 
         result = MetadataV0.new(value)
 

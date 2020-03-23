@@ -16,9 +16,8 @@ module Scale
         value = {
           magicNumber: 1_635_018_093,
           metadata: {
-            V8: {
-              modules: modules.map(&:value)
-            }
+            version: 8,
+            modules: modules.map(&:value)
           }
         }
 

@@ -34,16 +34,16 @@ describe Scale::Types::Metadata do
     hex = get_metadata_hex(0)
     scale_bytes = Scale::Bytes.new(hex)
     metadata = Scale::Types::Metadata.decode(scale_bytes)
-    v0 = metadata.value.value[:metadata][:V0]
+    v = metadata.value.value[:metadata]
 
     expected = get_metadata(0)
 
     expect(metadata.version).to eql(0)
-    expect(v0[:outerEvent][:events].length).to eql(expected["outerEvent"]["events"].length)
-    expect(v0[:modules].length).to eql(expected["modules"].length)
-    expect(v0[:outerDispatch][:calls].length).to eql(expected["outerDispatch"]["calls"].length)
+    expect(v[:outerEvent][:events].length).to eql(expected["outerEvent"]["events"].length)
+    expect(v[:modules].length).to eql(expected["modules"].length)
+    expect(v[:outerDispatch][:calls].length).to eql(expected["outerDispatch"]["calls"].length)
 
-    expect(v0.to_json).to eql(expected.to_json)
+    expect(v.to_json).to eql(expected.to_json)
   end
 
   # Fixed: the v4 metadata hex from polkadot-js/api is not correct
@@ -53,7 +53,7 @@ describe Scale::Types::Metadata do
       hex = get_metadata_hex(i)
       scale_bytes = Scale::Bytes.new(hex)
       metadata = Scale::Types::Metadata.decode scale_bytes
-      v = metadata.value.value[:metadata]["V#{i}".to_sym]
+      v = metadata.value.value[:metadata]
 
       expected = get_metadata(i)["metadata"]["V#{i}"]
 
