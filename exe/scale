@@ -13,19 +13,54 @@ class ScaleCli < Thor
     puts specs.join(", ")
   end
 
-  desc "types CHAIN_SPEC", "list all types implemented for chain"
-  def types(chain_spec = "default")
-    puts Scale::Types.list(chain_spec).join(", ")
+  # result:
+  #   
+  #   scale types darwinia
+  #   =>
+  #   ProposalCategory => Scale::Types::ProposalCategory
+  #   VoteStage => Scale::Types::VoteStage
+  #   TallyType => Scale::Types::TallyType
+  #   ...
+  #
+  #   Count: 279
+  desc "types SPEC_NAME SPEC_VERSION", "list all types implemented for chain"
+  def types(spec_name = "default", spec_version = nil)
+    Scale::TypeRegistry.instance.load(spec_name, spec_version)
+    Scale::Types.list.each_pair do |type_name, type|
+      puts "#{green(type_name)} => #{yellow(type.to_s)}"
+    end
+
+    puts "\nCount: #{Scale::Types.list.length}"
   end
 
-  desc "type TYPE_NAME CHAIN_SPEC", "show type's ruby class"
-  def type(type_name, chain_spec = "default")
-    puts Scale::Types.get(type_name, chain_spec)
+  # exmaples:
+  #
+  #   scale type Compact
+  #   => Scale::Types::Compact
+  #
+  #   scale type SessionKeysPolkadot kusama
+  #   => nil
+  #
+  #   scale type SessionKeysPolkadot kusama 1054
+  #   => Scale::Types::Struct_Of_AccountId_AccountId_AccountId_AccountId_AccountId_70247479160460
+  #
+  #   scale type "UnappliedSlash<AccountId, BalanceOf>"
+  #   => Scale::Types::Struct_Of_AccountId_AccountId_Vec˂UnappliedSlashOther˃_Vec˂AccountId˃_Balance_70145184872260
+  #
+  desc "type TYPE_NAME SPEC_NAME SPEC_VERSION", "show type's ruby class"
+  def type(type_name, spec_name = "default", spec_version = nil)
+    Scale::TypeRegistry.instance.load(spec_name, spec_version)
+    p Scale::Types.get(type_name)
   end
 
-  desc "decode TYPE_NAME HEX CHAIN_SPEC", "decode HEX string using TYPE_NAME"
-  def decode(type_name, hex, chain_spec = "default")
-    type = Scale::Types.get(type_name, chain_spec)
+  # exmaples:
+  #
+  #   scale decode Compact 0x0300000040
+  #   => #<Scale::Types::Compact:0x00007fc86b9d1198 @value=1073741824>
+  desc "decode TYPE_NAME HEX SPEC_NAME SPEC_VERSION", "decode HEX string using TYPE_NAME"
+  def decode(type_name, hex, spec_name = "default", spec_version = nil)
+    Scale::TypeRegistry.instance.load(spec_name, spec_version)
+    type = Scale::Types.get(type_name)
     scale_bytes = Scale::Bytes.new(hex)
     p type.decode(scale_bytes)
   end

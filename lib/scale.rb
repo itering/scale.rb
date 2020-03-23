@@ -30,10 +30,10 @@ module Scale
     include Singleton
     attr_accessor :types
 
-    def load(spec_name, spec_version)
+    def load(spec_name, spec_version = nil)
       @spec_name = spec_name
       @spec_version = spec_version
-      @types = load_types(spec_name, spec_version)
+      @types = load_types(spec_name, spec_version.nil? ? nil : spec_version.to_i)
       true
     end
 
@@ -75,13 +75,15 @@ module Scale
       runtime_id = json["runtime_id"]
       versioning = json["versioning"] || []
 
-      if runtime_id.nil? || spec_version >= runtime_id
+      if runtime_id.nil? || (spec_version && spec_version >= runtime_id)
         types = json["types"]
       end
 
-      versioning.each do |item|
-        if spec_version >= item["runtime_range"][0] && spec_version <= (item["runtime_range"][1] || 1073741823)
-          types.merge!(item["types"])
+      if spec_version
+        versioning.each do |item|
+          if spec_version >= item["runtime_range"][0] && spec_version <= (item["runtime_range"][1] || 1073741823)
+            types.merge!(item["types"])
+          end
         end
       end
 
