@@ -206,6 +206,10 @@ module Scale
   end
 
   module Types
+    def self.list
+      TypeRegistry.instance.types
+    end
+
     def self.get(type_name)
       TypeRegistry.instance.get(type_name)
     end
@@ -300,7 +304,7 @@ module Scale
             include Scale::Types::Set
             items values, 1
           end
-          name = "Set_Of#{values.keys.map(&:camelize).join("_")}_#{klass.object_id}"
+          name = "Set_Of_#{values.keys.map(&:camelize).join("_")}_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         else
           type_name = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
