@@ -346,6 +346,7 @@ def adjust(type)
   return "CompactBalance" if type == "<Balance as HasCompact>::Type"
   return "CompactMoment" if type == "<Moment as HasCompact>::Type"
   return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
+  return "AccountData" if type == "AccountData<Balance>"
   type
 end
 
