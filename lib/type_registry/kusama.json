@@ -1,6 +1,7 @@
 {
-  "runtime_id": 1040,
+  "runtime_id": 1054,
   "types": {
+    "Address": "AccountIdAddress",
     "BlockNumber": "U32",
     "LeasePeriod": "BlockNumber",
     "SessionKeysPolkadot": {
@@ -75,6 +76,107 @@
              ["pgpFingerprint", "Option<H160>"],
              ["image", "Data"],
              ["twitter", "Data"]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [1019, 1042],
+      "types": {
+        "SlashingSpans": {
+          "type": "struct",
+          "type_mapping": [
+             ["spanIndex", "SpanIndex"],
+             ["lastStart", "EraIndex"],
+             ["prior", "Vec<EraIndex>"]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [1043, null],
+      "types": {
+        "SlashingSpans": {
+          "type": "struct",
+          "type_mapping": [
+             ["spanIndex", "SpanIndex"],
+             ["lastStart", "EraIndex"],
+             ["lastNonzeroSlash", "EraIndex"],
+             ["prior", "Vec<EraIndex>"]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [1019, 1045],
+      "types": {
+        "Address": "RawAddress",
+        "StakingLedger<AccountId, BalanceOf>": {
+          "type": "struct",
+          "type_mapping": [
+             ["stash", "AccountId"],
+             ["total", "Compact<Balance>"],
+             ["active", "Compact<Balance>"],
+             ["unlocking", "Vec<UnlockChunk<Balance>>"]
+          ]
+        },
+        "BalanceLock": {
+          "type": "struct",
+          "type_mapping": [
+             ["id", "LockIdentifier"],
+             ["amount", "Balance"],
+             ["until", "BlockNumber"],
+             ["reasons", "WithdrawReasons"]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [1050, null],
+      "types": {
+        "Address": "AccountIdAddress",
+        "StakingLedger<AccountId, BalanceOf>": {
+          "type": "struct",
+          "type_mapping": [
+            ["stash", "AccountId"],
+            ["total", "Compact<Balance>"],
+            ["active", "Compact<Balance>"],
+            ["unlocking", "Vec<UnlockChunk<Balance>>"],
+            ["lastReward", "Option<EraIndex>"]
+          ]
+        },
+        "BalanceLock": {
+          "type": "struct",
+          "type_mapping": [
+             ["id", "LockIdentifier"],
+             ["amount", "Balance"],
+             ["reasons", "Reasons"]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [1019, 1054],
+      "types": {
+        "ReferendumInfo": {
+          "type": "struct",
+          "type_mapping": [
+             ["end", "BlockNumber"],
+             ["proposal", "Proposal"],
+             ["threshold", "VoteThreshold"],
+             ["delay", "BlockNumber"]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [1054, null],
+      "types": {
+        "ReferendumInfo": {
+          "type": "enum",
+          "type_mapping": [
+            ["Ongoing", "ReferendumStatus"],
+            ["Finished", "ReferendumInfoFinished"]
           ]
         }
       }

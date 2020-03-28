@@ -13,7 +13,7 @@ class ScaleCli < Thor
     puts specs.join(", ")
   end
 
-  # result:
+  # exmaples:
   #   
   #   scale types darwinia
   #   =>
@@ -63,6 +63,17 @@ class ScaleCli < Thor
     type = Scale::Types.get(type_name)
     scale_bytes = Scale::Bytes.new(hex)
     p type.decode(scale_bytes)
+  end
+
+  # exmaples:
+  #
+  #   scale encode SessionIndex 2818
+  #   => #<Scale::Types::Compact:0x00007fc86b9d1198 @value=1073741824>
+  desc "encode TYPE_NAME VALUE SPEC_NAME SPEC_VERSION", "encode value"
+  def encode(type_name, value, spec_name = "default", spec_version = nil)
+    Scale::TypeRegistry.instance.load(spec_name, spec_version)
+    type = Scale::Types.get(type_name)
+    p "0x" + type.new(value.to_i).encode
   end
 end
 

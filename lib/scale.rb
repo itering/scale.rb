@@ -34,6 +34,7 @@ module Scale
       @spec_name = spec_name
       @spec_version = spec_version
       @types = load_types(spec_name, spec_version.nil? ? nil : spec_version.to_i)
+
       true
     end
 
@@ -58,12 +59,15 @@ module Scale
       default_types = coded_types.merge(default_types)
 
       # chain spec types
-      spec_types = load_chain_spec_types(spec_name, spec_version)
-      spec_types.transform_values do |type|
-        Scale::Types.type_convert(type, default_types)
+      if spec_name != "default"
+        spec_types = load_chain_spec_types(spec_name, spec_version)
+        spec_types.transform_values do |type|
+          Scale::Types.type_convert(type, default_types)
+        end
+        default_types.merge(spec_types)
+      else
+        default_types
       end
-
-      default_types.merge(spec_types)
     end
 
     def load_chain_spec_types(spec_name, spec_version)

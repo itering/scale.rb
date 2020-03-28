@@ -1,0 +1,12 @@
+/Users/itering/Projects/rb-substrate/scale.rb/target/debug/deps/arrayvec-2f7812822874687e.rmeta: /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/lib.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/maybe_uninit.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/array.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/array_string.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/char.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/errors.rs
+
+/Users/itering/Projects/rb-substrate/scale.rb/target/debug/deps/libarrayvec-2f7812822874687e.rlib: /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/lib.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/maybe_uninit.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/array.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/array_string.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/char.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/errors.rs
+
+/Users/itering/Projects/rb-substrate/scale.rb/target/debug/deps/arrayvec-2f7812822874687e.d: /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/lib.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/maybe_uninit.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/array.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/array_string.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/char.rs /Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/errors.rs
+
+/Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/lib.rs:
+/Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/maybe_uninit.rs:
+/Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/array.rs:
+/Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/array_string.rs:
+/Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/char.rs:
+/Users/itering/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.1/src/errors.rs:

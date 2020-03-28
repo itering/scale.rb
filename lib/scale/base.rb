@@ -80,6 +80,9 @@ module Scale
       end
 
       def encode
+        if value.class != ::Integer
+          raise "#{self.class}'s value must be integer"
+        end
         bytes = value.to_s(16).rjust(self.class::BYTES_LENGTH * 2, "0").scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
         bytes.bytes_to_hex[2..]
       end
@@ -112,7 +115,7 @@ module Scale
           attr_type_strs = []
 
           items.each_pair do |attr_name, attr_type_str|
-            attr_names << attr_name
+            attr_names << attr_name.to_s.gsub("-", "")
             attr_type_strs << attr_type_str
           end
 
