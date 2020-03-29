@@ -30,7 +30,7 @@ module Scale
     include Singleton
     attr_accessor :types
 
-    def load(spec_name, spec_version = nil)
+    def load(spec_name = nil, spec_version = nil)
       @spec_name = spec_name
       @spec_version = spec_version
       @types = load_types(spec_name, spec_version.nil? ? nil : spec_version.to_i)
@@ -39,7 +39,9 @@ module Scale
     end
 
     def get(type_name)
-      @types[type_name]
+      type = @types[type_name]
+      return Scale::Types.type_of(type_name) if type.nil?
+      type
     end
 
     private 
@@ -51,6 +53,8 @@ module Scale
         .map { |type_name| [type_name.to_s, type_name.to_s] }
         .to_h
         .transform_values {|type| Scale::Types.constantize(type) }
+
+      return coded_types if spec_name.nil?
 
       # default spec types
       default_types = load_chain_spec_types("default", spec_version).transform_values do |type|

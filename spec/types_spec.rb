@@ -3,14 +3,6 @@ require_relative "./types_for_test.rb"
 
 module Scale
   module Types
-    describe "hello" do
-      it "should work correctly" do
-        scale_bytes = Scale::Bytes.new("0x45")
-        o = U8.decode scale_bytes
-        expect(o.value).to eql(69)
-        expect(o.encode).to eql("45")
-
-    end
     describe U8 do
       it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0x45")
@@ -197,7 +189,9 @@ module Scale
       it "Vec<BalanceLock> should work correctly" do
         # scale_bytes = Scale::Bytes.new("0x0876657374696e67207326160de7075e035823000000000000017374616b696e67208018179741946c6630a039000000000002")
         scale_bytes = Scale::Bytes.new("0x0c7374616b696e6720a18161b5b58201000000000000000000ffffffff1f706872656c6563740030434cc42501000000000000000000ffffffff1e64656d6f63726163ffffffffffffffffffffffffffffffffc0c0150002")
-        o = Scale::Types.type_of("Vec<BalanceLock>").decode scale_bytes
+        klass = Scale::Types.type_of("Vec<BalanceLock>")
+        puts klass
+        o = klass.decode scale_bytes
         expect(o.value.length).to eql(3)
 
         first_balance_lock = o.value[0]

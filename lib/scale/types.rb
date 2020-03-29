@@ -23,22 +23,31 @@ module Scale
 
     class U8
       include FixedWidthUInt
+      BYTE_LENGTH = 1
     end
 
     class U16
       include FixedWidthUInt
+      BYTE_LENGTH = 2
     end
 
     class U32
       include FixedWidthUInt
+      BYTE_LENGTH = 4
     end
 
     class U64
       include FixedWidthUInt
+      BYTE_LENGTH = 8
     end
 
     class U128
       include FixedWidthUInt
+      BYTE_LENGTH = 16
+    end
+
+    class I8
+      include FixedWidthInt
     end
 
     class I16

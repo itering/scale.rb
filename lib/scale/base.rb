@@ -93,10 +93,10 @@ module Scale
       include SingleValue
 
       module ClassMethods
+        attr_accessor :byte_length
+
         def decode(scale_bytes)
-          bit_length = name[15..].to_i
-          byte_length = bit_length / 8
-          bytes = scale_bytes.get_next_bytes byte_length
+          bytes = scale_bytes.get_next_bytes self::BYTE_LENGTH
           bytes_reversed = bytes.reverse
           hex = bytes_reversed.reduce("0x") { |hex, byte| hex + byte.to_s(16).rjust(2, "0") }
           new(hex.to_i(16))
@@ -111,9 +111,7 @@ module Scale
         if value.class != ::Integer
           raise "#{self.class}'s value must be integer"
         end
-        bit_length = self.class.name[15..].to_i
-        byte_length = bit_length / 8
-        bytes = value.to_s(16).rjust(byte_length * 2, "0").scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
+        bytes = value.to_s(16).rjust(self.class::BYTE_LENGTH * 2, "0").scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
         bytes.bytes_to_hex[2..]
       end
     end
@@ -316,12 +314,11 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
-          class_name = to_s
-          length = class_name[25..]
-          raise "length is wrong: #{length}" unless %w[2 3 4 8 16 20 32 64].include?(length)
-          length = length.to_i
+          byte_length = name[25..]
+          raise "length is wrong: #{byte_length}" unless %w[2 3 4 8 16 20 32 64].include?(byte_length)
+          byte_length = byte_length.to_i
 
-          bytes = scale_bytes.get_next_bytes(length)
+          bytes = scale_bytes.get_next_bytes(byte_length)
           str = bytes.pack("C*").force_encoding("utf-8")
           if str.valid_encoding?
             new str
