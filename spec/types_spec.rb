@@ -1,16 +1,22 @@
 require "scale"
 require_relative "./types_for_test.rb"
-require_relative "./ffi_spec.rb"
 
 module Scale
   module Types
+    describe "hello" do
+      it "should work correctly" do
+        scale_bytes = Scale::Bytes.new("0x45")
+        o = U8.decode scale_bytes
+        expect(o.value).to eql(69)
+        expect(o.encode).to eql("45")
+
+    end
     describe U8 do
       it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0x45")
         o = U8.decode scale_bytes
         expect(o.value).to eql(69)
         expect(o.encode).to eql("45")
-        parse_via_ffi(o.value, U8)
       end
     end
 
@@ -29,7 +35,6 @@ module Scale
         o = U32.decode scale_bytes
         expect(o.value).to eql(16_777_215)
         expect(o.encode).to eql("ffffff00")
-        parse_via_ffi(o.value, U32)
       end
     end
 
@@ -39,7 +44,6 @@ module Scale
         o = U64.decode scale_bytes
         expect(o.value).to eql(14_294_967_296)
         expect(o.encode).to eql("00e40b5403000000")
-        parse_via_ffi(o.value, U64)
       end
     end
 
@@ -52,19 +56,25 @@ module Scale
       end
     end
 
+    describe I16 do
+      it "should work correctly" do
+        scale_bytes = Scale::Bytes.new("0x2efb")
+        o = I16.decode scale_bytes
+        expect(o.value).to eql(-1234)
+      end
+    end
+
     describe Bool do
       it "should work correctly" do
         scale_bytes = Scale::Bytes.new("0x00")
         o = Bool.decode scale_bytes
         expect(o.value).to eql(false)
         expect(o.encode).to eql("00")
-        parse_via_ffi(o.value, Bool)
 
         scale_bytes = Scale::Bytes.new("0x01")
         o = Bool.decode scale_bytes
         expect(o.value).to eql(true)
         expect(o.encode).to eql("01")
-        parse_via_ffi(o.value, Bool)
       end
     end
 
@@ -119,7 +129,6 @@ module Scale
         o = OptionBool.decode scale_bytes
         expect(o.value).to eql(nil)
         expect(o.encode).to eql("00")
-        parse_via_ffi(o.value, OptionBool)
 
         scale_bytes = Scale::Bytes.new("0x01")
         o = OptionBool.decode scale_bytes
@@ -127,7 +136,6 @@ module Scale
         expect(o.encode).to eql("01")
         # Rust SCALE does not implement Optional Booleans conformant to
         # specification yet, so this is commented for now
-        parse_via_ffi(o.value, OptionBool)
 
         scale_bytes = Scale::Bytes.new("0x02")
         o = OptionBool.decode scale_bytes
@@ -135,7 +143,6 @@ module Scale
         expect(o.encode).to eql("02")
         # Rust SCALE does not implement Optional Booleans conformant to
         # specification yet, so this is commented for now
-        parse_via_ffi(o.value, OptionBool)
       end
 
       it "option u32 should work correctly" do
@@ -143,13 +150,11 @@ module Scale
         o = OptionU32.decode scale_bytes
         expect(o.value).to eql(nil)
         expect(o.encode).to eql("00")
-        parse_via_ffi(o.value, OptionU32)
 
         scale_bytes = Scale::Bytes.new("0x01ffffff00")
         o = OptionU32.decode scale_bytes
         expect(o.value.value).to eql(16_777_215)
         expect(o.encode).to eql("01ffffff00")
-        parse_via_ffi(o.value, OptionU32)
       end
 
       it "can be construct form type string" do
@@ -158,7 +163,6 @@ module Scale
         o = type.decode scale_bytes
         expect(o.value.value).to eql(16_777_215)
         expect(o.encode).to eql("01ffffff00")
-        parse_via_ffi(o.value, OptionU32)
 
         scale_bytes = Scale::Bytes.new("0x010c003afe")
         type = Scale::Types.type_of("Option<Vec<U8>>")

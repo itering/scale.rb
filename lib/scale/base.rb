@@ -62,13 +62,41 @@ module Scale
       end
     end
 
+    module FixedWidthInt
+      include SingleValue
+
+      module ClassMethods
+        def decode(scale_bytes)
+          bit_length = to_s[15..].to_i
+          byte_length = bit_length / 8
+          bytes = scale_bytes.get_next_bytes byte_length
+          value = bytes.reverse.bytes_to_hex.to_i(16).to_signed(bit_length)
+          new(value)
+        end
+      end
+
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
+
+      def encode
+        if value.class != ::Integer
+          raise "#{self.class}'s value must be integer"
+        end
+        bit_length = self.class.name[15..].to_i
+        hex = value.to_unsigned(bit_length).to_s(16).hex_to_bytes.reverse.bytes_to_hex
+        hex[2..]
+      end
+    end
+
     module FixedWidthUInt
       include SingleValue
 
       module ClassMethods
         def decode(scale_bytes)
-          class_name = to_s
-          bytes = scale_bytes.get_next_bytes self::BYTES_LENGTH
+          bit_length = name[15..].to_i
+          byte_length = bit_length / 8
+          bytes = scale_bytes.get_next_bytes byte_length
           bytes_reversed = bytes.reverse
           hex = bytes_reversed.reduce("0x") { |hex, byte| hex + byte.to_s(16).rjust(2, "0") }
           new(hex.to_i(16))
@@ -83,7 +111,9 @@ module Scale
         if value.class != ::Integer
           raise "#{self.class}'s value must be integer"
         end
-        bytes = value.to_s(16).rjust(self.class::BYTES_LENGTH * 2, "0").scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
+        bit_length = self.class.name[15..].to_i
+        byte_length = bit_length / 8
+        bytes = value.to_s(16).rjust(byte_length * 2, "0").scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
         bytes.bytes_to_hex[2..]
       end
     end
@@ -287,7 +317,7 @@ module Scale
       module ClassMethods
         def decode(scale_bytes)
           class_name = to_s
-          length = class_name[class_name.length - 1]
+          length = class_name[25..]
           raise "length is wrong: #{length}" unless %w[2 3 4 8 16 20 32 64].include?(length)
           length = length.to_i
 
@@ -307,7 +337,7 @@ module Scale
 
       def encode
         class_name = self.class.to_s
-        length = class_name[class_name.length - 1]
+        length = class_name[25..]
         raise "length is wrong: #{length}" unless %w[2 3 4 8 16 20 32 64].include?(length)
         length = length.to_i
 

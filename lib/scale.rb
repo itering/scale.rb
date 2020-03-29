@@ -361,3 +361,25 @@ end
 def yellow(text)
   "\033[33m#{text}\033[0m"
 end
+
+# https://www.ruby-forum.com/t/question-about-hex-signed-int/125510/4
+# machine bit length:
+#   machine_byte_length = ['foo'].pack('p').size
+#   machine_bit_length = machine_byte_length * 8
+class Integer
+  def to_signed(bit_length)
+    unsigned_mid = 2 ** (bit_length - 1)
+    unsigned_ceiling = 2 ** bit_length
+    (self >= unsigned_mid) ? self - unsigned_ceiling : self
+  end
+
+  def to_unsigned(bit_length)
+    unsigned_mid = 2 ** (bit_length - 1)
+    unsigned_ceiling = 2 ** bit_length 
+    if self >= unsigned_mid || self <= -unsigned_mid
+      raise "out of scope"
+    end
+    return unsigned_ceiling + self if self < 0
+    self
+  end
+end
