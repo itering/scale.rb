@@ -112,7 +112,7 @@ rspec spec/low_level_spec.rb
    19 examples, 0 failures
    ```
 
-4. Or type `./bin/console` to enter the ruby interactive environment and run any decode or encode code
+4. Or, type `./bin/console` to enter the ruby interactive environment and run any decode or encode code
 
    ```shell
    /usr/src/app # ./bin/console
@@ -126,6 +126,17 @@ rspec spec/low_level_spec.rb
    [4] pry(main)>
    ```
 
+5. Or, run command line tool:
+
+   ```shell
+   /usr/src/app # scale types kusama
+   HeadData => Scale::Types::HeadData
+   Conviction => Scale::Types::Conviction
+   EraRewards => Scale::Types::EraRewards
+   ...
+   
+   Count: 303
+   ```
 
 ## Development
 
