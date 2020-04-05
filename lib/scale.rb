@@ -8,6 +8,7 @@ require "singleton"
 
 require "scale/base"
 require "scale/types"
+require "scale/block"
 
 require "metadata/metadata"
 require "metadata/metadata_v0"
@@ -99,7 +100,12 @@ module Scale
         if type.class != ::String
           Scale::Types.constantize(type)
         else
-          Scale::Types.type_convert(type, types)
+          t = Scale::Types.type_convert(type, types)
+          if t.class == ::String
+            Scale::Types.constantize(t)
+          else
+            t
+          end
         end
       end
 
@@ -221,6 +227,7 @@ module Scale
     end
 
     def self.get(type_name)
+      type_name = adjust(type_name)
       TypeRegistry.instance.get(type_name)
     end
 
@@ -335,6 +342,7 @@ def fix(name)
     .gsub("<", "˂").gsub(">", "˃")
     .gsub("(", "⁽").gsub(")", "⁾")
     .gsub(" ", "").gsub(",", "‚")
+    .gsub(":", "։")
 end
 
 def adjust(type)
@@ -349,9 +357,9 @@ def adjust(type)
   return "Compact" if type == "Compact<u32>" || type == "Compact<U32>"
   return "Address" if type == "<Lookup as StaticLookup>::Source"
   return "Vec<Address>" if type == "Vec<<Lookup as StaticLookup>::Source>"
-  return "CompactBalance" if type == "<Balance as HasCompact>::Type"
-  return "CompactBlockNumber" if type == "<BlockNumber as HasCompact>::Type"
-  return "CompactBalance" if type == "<Balance as HasCompact>::Type"
+  return "Compact" if type == "<Balance as HasCompact>::Type"
+  return "Compact" if type == "<BlockNumber as HasCompact>::Type"
+  return "Compact" if type == "Compact<Balance>"
   return "CompactMoment" if type == "<Moment as HasCompact>::Type"
   return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
   return "AccountData" if type == "AccountData<Balance>"

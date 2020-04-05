@@ -217,21 +217,31 @@ module Scale
 
     class Address
       include SingleValue
+      attr_accessor :account_length, :account_index, :account_id, :account_idx
+
       def self.decode(scale_bytes)
-        prefix = scale_bytes.get_next_bytes(1).first
-        value = if prefix == 0xff
-          scale_bytes.get_next_bytes(32).bytes_to_hex
-        elsif prefix == 0xfc
-          scale_bytes.get_next_bytes(2).bytes_to_hex
-        elsif prefix == 0xfd
-          scale_bytes.get_next_bytes(4).bytes_to_hex
-        elsif prefix == 0xfe
-          scale_bytes.get_next_bytes(8).bytes_to_hex
+        account_length = scale_bytes.get_next_bytes(1).first
+
+        if account_length == 0xff # 255
+          account_id = scale_bytes.get_next_bytes(32).bytes_to_hex
+          account_length = account_length.to_s(16)
+          Address.new(account_id)
         else
-          [prefix].bytes_to_hex
+          account_index =
+            if account_length == 0xfc
+              scale_bytes.get_next_bytes(2).bytes_to_hex
+            elsif account_length == 0xfd
+              scale_bytes.get_next_bytes(4).bytes_to_hex
+            elsif account_length == 0xfe
+              scale_bytes.get_next_bytes(8).bytes_to_hex
+            else
+              account_length.to_s(16)
+            end
+          # account_idx = 
+          account_length = account_length.to_s(16)
+          Address.new(account_index)
         end
 
-        Address.new(value)
       end
 
       def encode(ss58=false, addr_type=42)
@@ -257,6 +267,8 @@ module Scale
         end
       end
     end
+
+    class RawAddress < Address; end
 
     class AccountId < H256; end
 
