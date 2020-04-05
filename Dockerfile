@@ -13,6 +13,7 @@ COPY . .
 RUN gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/ && \
     gem install bundler:1.17.3 && \
     bundle config mirror.https://rubygems.org https://gems.ruby-china.com && \
-    bundle install
+    bundle install && \
+    rake install:local
 
 CMD ["sh"]

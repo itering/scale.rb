@@ -235,13 +235,12 @@ module Scale
             elsif account_length == 0xfe
               scale_bytes.get_next_bytes(8).bytes_to_hex
             else
-              account_length.to_s(16)
+              [account_length].bytes_to_hex
             end
           # account_idx = 
           account_length = account_length.to_s(16)
           Address.new(account_index)
         end
-
       end
 
       def encode(ss58=false, addr_type=42)
