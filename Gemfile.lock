@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    scale.rb (0.2.0)
+    scale.rb (0.2.1)
       activesupport (>= 4.0.0)
       json (~> 2.3.0)
       substrate_common.rb (~> 0.1.8)
