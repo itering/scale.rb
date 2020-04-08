@@ -4,7 +4,7 @@ PATH
     scale.rb (0.2.0)
       activesupport (>= 4.0.0)
       json (~> 2.3.0)
-      substrate_common.rb (~> 0.1.7)
+      substrate_common.rb (~> 0.1.8)
       thor (~> 0.20.3)
 
 GEM
@@ -44,13 +44,13 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.0)
-    substrate_common.rb (0.1.7)
+    substrate_common.rb (0.1.8)
       base58
       blake2b
       xxhash
     thor (0.20.3)
     thread_safe (0.3.6)
-    tzinfo (1.2.6)
+    tzinfo (1.2.7)
       thread_safe (~> 0.1)
     xxhash (0.4.0)
     zeitwerk (2.3.0)
