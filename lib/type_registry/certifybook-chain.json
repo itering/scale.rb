@@ -1,0 +1,10 @@
+{
+  "types": {
+    "Address": "AccountId",
+    "LookupSource": "AccountId",
+    "Entity": {
+      "id": "H256",
+      "status": "u8"
+    }
+  }
+}
