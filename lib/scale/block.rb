@@ -9,7 +9,8 @@ module Scale
         Blake2b.hex data, Blake2b::Key.none, 32
       end
 
-      def self.decode(scale_bytes, metadata)
+      def self.decode(scale_bytes)
+        metadata = Scale::TypeRegistry.instance.metadata
         result = {}
 
         extrinsic_length = Compact.decode(scale_bytes).value
@@ -83,11 +84,11 @@ module Scale
           result[:call_index] = scale_bytes.get_next_bytes(2).bytes_to_hex[2..]
 
         else
-          raise "Extrinsics version #{version_info} is not implemented"
+          raise "Extrinsic version #{version_info} is not implemented"
         end
 
         if result[:call_index]
-          call_module, call = metadata.value.call_index[result[:call_index]]
+          call_module, call = metadata.call_index[result[:call_index]]
 
           result[:call_function] = call[:name].downcase
           result[:call_module] = call_module[:name].downcase
@@ -107,24 +108,22 @@ module Scale
         Extrinsic.new result
       end
 
-      def encode(metadata)
-        puts metadata.value.value["modules"]
+      def encode
+        metadata = Scale::TypeRegistry.instance.metadata
+
         result = "04" + self.value[:call_index]
 
-        result = result +
-          self.value[:params].map do |param|
-            param[:type].constantize.new(param[:value]).encode
-          end.join
+        result += self.value[:params].map do |param|
+          param[:type].constantize.new(param[:value]).encode
+        end.join
 
-        result = "0x" + Compact.new(result.length / 2).encode + result
-        return result
+        "0x" + Compact.new(result.length / 2).encode + result
       end
     end
 
     class EventRecord
       include SingleValue
 
-      # 0x0c000000000000001027000001010000010000000400be07e2c28688db5368445c33d32b3c7bcad15dab1ec802ba8cccc1c22b86574f6992da89ff412eaf9bafac4024
       def self.decode(scale_bytes)
         metadata = Scale::TypeRegistry.instance.metadata
 
@@ -137,18 +136,19 @@ module Scale
 
         type = scale_bytes.get_next_bytes(2).bytes_to_hex[2..]
         event = metadata.event_index[type][1]
-        mod = metadata.event_index[type][0]
+        # mod = metadata.event_index[type][0]
 
         result[:params] = []
         event[:args].each do |arg_type|
           value = Scale::Types.get(arg_type).decode(scale_bytes).value
           result[:params] << {
+            name: event[:name],
             type: arg_type,
             value: value
           }
         end
 
-        result[:topics] = Scale::Types.get('Vec<Hash>').decode(scale_bytes).value.map(&:value)
+        result[:topics] = Scale::Types.get("Vec<Hash>").decode(scale_bytes).value.map(&:value)
 
         EventRecord.new(result)
       end

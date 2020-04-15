@@ -4,17 +4,18 @@ ROOT = Pathname.new File.expand_path("../../", __FILE__)
 
 module Scale::Types
   describe Extrinsic do
-    before(:all) { Scale::TypeRegistry.instance.load("kusama", 1045) }
-
-    let(:metadata) {
+    before(:all) {
+      Scale::TypeRegistry.instance.load("kusama", 1045)
       hex = File.open(File.join(ROOT, "spec", "metadata", "v10", "hex")).read.strip
       scale_bytes = Scale::Bytes.new(hex)
-      Scale::Types::Metadata.decode scale_bytes
+      metadata = Scale::Types::Metadata.decode scale_bytes
+      Scale::TypeRegistry.instance.metadata = metadata.value
     }
 
     it "can decode balance transfer payload" do
+
       unsigned_payload = "0xa8040600ff586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409070010a5d4e8"
-      extrinsic = Extrinsic.decode(Scale::Bytes.new(unsigned_payload), metadata)
+      extrinsic = Extrinsic.decode(Scale::Bytes.new(unsigned_payload))
       value = extrinsic.value
 
       expect(value[:call_module]).to eql("balances")
@@ -48,7 +49,7 @@ module Scale::Types
         ]
       }
       extrinsic = Extrinsic.new(value)
-      expect(extrinsic.encode(metadata)).to eql("0xa8040600ff586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409070010a5d4e8")
+      expect(extrinsic.encode).to eql("0xa8040600ff586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409070010a5d4e8")
     end
   end
 end

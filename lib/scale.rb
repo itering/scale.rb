@@ -9,6 +9,7 @@ require "singleton"
 require "scale/base"
 require "scale/types"
 require "scale/block"
+require "substrate_client"
 
 require "metadata/metadata"
 require "metadata/metadata_v0"
@@ -352,6 +353,7 @@ def adjust(type)
     .delete("\n")
     .gsub("EventRecord<Event, Hash>", "EventRecord")
     .gsub(/(u)(\d+)/, 'U\2')
+  return "Bool" if type == "bool"
   return "Null" if type == "()"
   return "String" if type == "Vec<u8>"
   return "Compact" if type == "Compact<u32>" || type == "Compact<U32>"
