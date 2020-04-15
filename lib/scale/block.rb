@@ -124,20 +124,33 @@ module Scale
     class EventRecord
       include SingleValue
 
-      def self.decode(scale_bytes, metadata)
+      # 0x0c000000000000001027000001010000010000000400be07e2c28688db5368445c33d32b3c7bcad15dab1ec802ba8cccc1c22b86574f6992da89ff412eaf9bafac4024
+      def self.decode(scale_bytes)
+        metadata = Scale::TypeRegistry.instance.metadata
+
+        result = {}
         phase = scale_bytes.get_next_bytes(1).first
 
         if phase == 0
-          extrinsic_idx = U32.decode(scale_bytes).value
+          result[:extrinsic_idx] = U32.decode(scale_bytes).value
         end
 
-        type = scale_bytes.get_next_bytes(2).bytes_to_hex
+        type = scale_bytes.get_next_bytes(2).bytes_to_hex[2..]
+        event = metadata.event_index[type][1]
+        mod = metadata.event_index[type][0]
 
+        result[:params] = []
+        event[:args].each do |arg_type|
+          value = Scale::Types.get(arg_type).decode(scale_bytes).value
+          result[:params] << {
+            type: arg_type,
+            value: value
+          }
+        end
 
-      end
+        result[:topics] = Scale::Types.get('Vec<Hash>').decode(scale_bytes).value.map(&:value)
 
-      def encode
-
+        EventRecord.new(result)
       end
     end
 

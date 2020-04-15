@@ -29,7 +29,7 @@ module Scale
 
   class TypeRegistry
     include Singleton
-    attr_accessor :types
+    attr_accessor :types, :metadata
 
     def load(spec_name = nil, spec_version = nil)
       @spec_name = spec_name
