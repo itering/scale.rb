@@ -104,10 +104,40 @@ module Scale
         result[:extrinsic_length] = extrinsic_length
         result[:version_info] = version_info
 
-        result
+        Extrinsic.new result
+      end
+
+      def encode(metadata)
+        puts metadata.value.value["modules"]
+        result = "04" + self.value[:call_index]
+
+        result = result +
+          self.value[:params].map do |param|
+            param[:type].constantize.new(param[:value]).encode
+          end.join
+
+        result = "0x" + Compact.new(result.length / 2).encode + result
+        return result
+      end
+    end
+
+    class EventRecord
+      include SingleValue
+
+      def self.decode(scale_bytes, metadata)
+        phase = scale_bytes.get_next_bytes(1).first
+
+        if phase == 0
+          extrinsic_idx = U32.decode(scale_bytes).value
+        end
+
+        type = scale_bytes.get_next_bytes(2).bytes_to_hex
+
+
       end
 
       def encode
+
       end
     end
 

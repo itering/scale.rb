@@ -37,7 +37,7 @@ module Scale
 
           if m[:events]
             m[:events].each_with_index do |event, index|
-              event[:lookup] = "%02x%02x" % [call_module_index, index]
+              event[:lookup] = "%02x%02x" % [event_module_index, index]
               result.event_index[event[:lookup]] = [m, event]
             end
             event_module_index += 1
