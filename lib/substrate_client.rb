@@ -82,8 +82,7 @@ class SubstrateClient
 
   def get_metadata(block_hash)
     hex = self.state_get_metadata(block_hash)
-    metadata = Scale::Types::Metadata.decode(Scale::Bytes.new(hex))
-    metadata
+    Scale::Types::Metadata.decode(Scale::Bytes.new(hex))
   end
 
   # client.init(0x014e4248dd04a8c0342b603a66df0691361ac58e69595e248219afa7af87bdc7)
@@ -94,7 +93,7 @@ class SubstrateClient
 
     # TODO: uninit raise a exception
     # find the storage item from metadata
-    metadata_modules = metadata[:modules]
+    metadata_modules = metadata.value.value[:modules]
     metadata_module = metadata_modules.detect { |mm| mm[:name] == module_name }
     raise "Module '#{module_name}' not exist" unless metadata_module
     storage_item = metadata_module[:storage][:items].detect { |item| item[:name] == storage_function_name }
@@ -128,7 +127,7 @@ class SubstrateClient
       params,
       hasher,
       hasher2,
-      metadata[:version]
+      metadata.value.value[:version]
     )
 
     result = self.state_get_storage_at(storage_hash, block_hash)
@@ -139,8 +138,29 @@ class SubstrateClient
     puts ex.backtrace
   end
 
+  # call_params:
+  #   { dest: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409", value: 1_000_000_000_000 }
   def compose_call(call_module, call_function, call_params)
-    Scale::Types::Extrinsic
+    call = metadata.get_module_call(call_module, call_function)
+
+    value = {
+      call_index: call[:lookup],
+      call_module: call_module,
+      call_function: call_function,
+      params: []
+    }
+
+    call_params.keys.each_with_index do |call_param_name, i|
+      call_param_value = call_params[call_param_name]
+      value[:params] << {
+        name: call_param_name.to_s,
+        type: call[:args][i][:type],
+        value: call_param_value
+      }
+    end
+
+    puts value
+    Scale::Types::Extrinsic.new(value).encode
   end
 
   class << self

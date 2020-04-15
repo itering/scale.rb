@@ -114,7 +114,7 @@ module Scale
         result = "04" + self.value[:call_index]
 
         result += self.value[:params].map do |param|
-          param[:type].constantize.new(param[:value]).encode
+          Scale::Types.get(param[:type]).new(param[:value]).encode
         end.join
 
         "0x" + Compact.new(result.length / 2).encode + result
