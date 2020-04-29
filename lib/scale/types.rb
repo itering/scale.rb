@@ -791,5 +791,19 @@ module Scale
       )
     end
 
+    class VecH512Length2
+      include SingleValue
+
+      def self.decode(scale_bytes)
+      end
+
+      def encode
+        "0x" + self.value.map do |item|
+          item[2..]
+        end.join
+      end
+    end
+
+
   end
 end

@@ -30,89 +30,55 @@ module Scale
 
   class TypeRegistry
     include Singleton
-    attr_accessor :types, :metadata
+    attr_accessor :types, :versioning
 
-    def load(spec_name = nil, spec_version = nil)
-      @spec_name = spec_name
-      @spec_version = spec_version
-      @types = load_types(spec_name, spec_version.nil? ? nil : spec_version.to_i)
+    def load(spec_name = nil)
+      default_types, _ = load_chain_spec_types("default")
 
-      true
-    end
-
-    def get(type_name)
-      type = @types[type_name]
-      return Scale::Types.type_of(type_name) if type.nil?
-      type
-    end
-
-    private 
-    def load_types(spec_name, spec_version)
-      # hard coded types
-      coded_types = Scale::Types
-        .constants
-        .select { |c| Scale::Types.const_get(c).is_a? Class }
-        .map { |type_name| [type_name.to_s, type_name.to_s] }
-        .to_h
-        .transform_values {|type| Scale::Types.constantize(type) }
-
-      return coded_types if spec_name.nil?
-
-      # default spec types
-      default_types = load_chain_spec_types("default", spec_version).transform_values do |type|
-        Scale::Types.type_convert(type, coded_types)
-      end
-      default_types = coded_types.merge(default_types)
-
-      # chain spec types
-      if spec_name != "default"
-        spec_types = load_chain_spec_types(spec_name, spec_version)
-        spec_types.transform_values do |type|
-          Scale::Types.type_convert(type, default_types)
-        end
-        default_types.merge(spec_types)
+      if spec_name.nil? || spec_name == "default"
+        @types = default_types 
       else
-        default_types
+        spec_types, @versioning = load_chain_spec_types(spec_name)
+        @types = default_types.merge(spec_types)
       end
     end
 
-    def load_chain_spec_types(spec_name, spec_version)
+    def get(type_name, spec_version=nil)
+      all_types = {}.merge(types)
+      if spec_version && versioning
+        versioning.each do |item|
+          if spec_version >= item["runtime_range"][0] && spec_version <= (item["runtime_range"][1] || 1073741823)
+            all_types.merge!(item["types"])
+          end
+        end
+      end
+
+      type = type_traverse(type_name, all_types)
+
+      Scale::Types.constantize(type)
+    end
+
+    def load_chain_spec_types(spec_name)
       file = File.join File.expand_path("../..", __FILE__), "lib", "type_registry", "#{spec_name}.json"
       json_string = File.open(file).read
       json = JSON.parse(json_string)
 
-      types = {}
       runtime_id = json["runtime_id"]
-      versioning = json["versioning"] || []
 
-      if runtime_id.nil? || (spec_version && spec_version >= runtime_id)
-        types = json["types"]
-      end
-
-      if spec_version
-        versioning.each do |item|
-          if spec_version >= item["runtime_range"][0] && spec_version <= (item["runtime_range"][1] || 1073741823)
-            types.merge!(item["types"])
-          end
-        end
-      end
-
-      types.transform_values! do |type|
-        if type.class != ::String
-          Scale::Types.constantize(type)
-        else
-          t = Scale::Types.type_convert(type, types)
-          if t.class == ::String
-            Scale::Types.constantize(t)
-          else
-            t
-          end
-        end
-      end
-
-      types
+      [json["types"], json["versioning"]]
     end
 
+    def type_traverse(type, types)
+      if types.has_key?(type)
+        type_traverse(types[type], types)
+      else
+        if type.class == ::String
+          rename(type)
+        else
+          type
+        end
+      end
+    end
   end
 
   # TODO: == implement
@@ -228,7 +194,7 @@ module Scale
     end
 
     def self.get(type_name)
-      type_name = adjust(type_name)
+      type_name = rename(type_name)
       TypeRegistry.instance.get(type_name)
     end
 
@@ -245,19 +211,6 @@ module Scale
         elsif type["type"] == "set"
           type_of("Set", type["value_list"])
         end
-      end
-    end
-
-    def self.type_convert(type, types)
-      return type if type.class != ::String
-
-      if type =~ /\[u\d+; \d+\]/
-        byte_length = type.scan(/\[u\d+; (\d+)\]/).first.first
-        "VecU8Length#{byte_length}"
-      elsif types.has_key?(type) && types[type] != type
-        type_convert(types[type], types)
-      else
-        adjust(type)
       end
     end
 
@@ -346,7 +299,7 @@ def fix(name)
     .gsub(":", "։")
 end
 
-def adjust(type)
+def rename(type)
   type = type.gsub("T::", "")
     .gsub("<T>", "")
     .gsub("<T as Trait>::", "")
@@ -365,6 +318,12 @@ def adjust(type)
   return "CompactMoment" if type == "<Moment as HasCompact>::Type"
   return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
   return "AccountData" if type == "AccountData<Balance>"
+
+  if type =~ /\[u\d+; \d+\]/
+    byte_length = type.scan(/\[u\d+; (\d+)\]/).first.first
+    return "VecU8Length#{byte_length}"
+  end
+
   type
 end
 

@@ -107,6 +107,13 @@
          ["ktoner", "TokenBalance"],
          ["lottery", "TokenBalance"]
       ]
+    },
+    "DoubleNodeWithMerkleProof": {
+      "type": "struct",
+      "type_mapping": [
+        ["dag_nodes", "VecH512Length2"],
+        ["proof", "Vec<H128>"]
+      ]
     }
   }
 }

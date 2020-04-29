@@ -36,9 +36,10 @@ end
 class SubstrateClient
   attr_accessor :spec_name, :spec_version, :metadata
 
-  def initialize(url)
+  def initialize(urls)
     @url = url
     @request_id = 1
+
   end
 
   # TODO: error
@@ -70,7 +71,7 @@ class SubstrateClient
     methods << "get_storage_at"
   end
 
-  def init(block_hash = nil)
+  def init(block_hash: , block_id: nil)
     block_runtime_version = self.state_get_runtime_version(block_hash)
     @spec_name = block_runtime_version["specName"]
     @spec_version = block_runtime_version["specVersion"]
