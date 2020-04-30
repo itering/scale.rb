@@ -36,10 +36,11 @@ end
 class SubstrateClient
   attr_accessor :spec_name, :spec_version, :metadata
 
-  def initialize(urls)
+  def initialize(url: , spec_name: nil)
     @url = url
     @request_id = 1
-
+    @spec_name = spec_name
+    Scale::TypeRegistry.instance.load(spec_name)
   end
 
   # TODO: error
@@ -54,31 +55,99 @@ class SubstrateClient
     ws_request(@url, payload)
   end
 
-  # ############################
-  # native rpc methods support
-  # ############################
-  def method_missing(method, *args)
-    data = request(SubstrateClient.real_method_name(method), args)
+  def init_runtime(block_hash: nil, block_id: nil)
+    if block_hash.nil? && block_id.nil?
+      raise "Block_hash and block_id should not be nil at the same time"
+    end
+
+    if block_hash.nil? && (not block_id.nil?)
+      block_hash = self.chain_get_block_hash(block_id)
+    end
+
+    # set current runtime spec version
+    runtime_version = self.state_get_runtime_version(block_hash)
+    @spec_version = runtime_version["specVersion"]
+    Scale::TypeRegistry.instance.spec_version = @spec_version
+
+    # set current metadata
+    @metadata = self.get_metadata(block_hash)
+    true
+  end
+
+  def invoke(method, *args)
+    data = request(method, args)
     data["result"]
   end
 
-  # ################################################
-  # custom methods wrapped from native rpc methods
-  # ################################################
+  def rpc_method(method_name)
+    SubstrateClient.real_method_name(method_name.to_s)
+  end
+
   def method_list
     methods = self.rpc_methods["methods"].map(&:underscore)
     methods << "method_list"
     methods << "get_storage_at"
   end
 
-  def init(block_hash: , block_id: nil)
-    block_runtime_version = self.state_get_runtime_version(block_hash)
-    @spec_name = block_runtime_version["specName"]
-    @spec_version = block_runtime_version["specVersion"]
+  # ################################################
+  # origin rpc methods
+  # ################################################
+  def method_missing(method, *args)
+    rpc_method = SubstrateClient.real_method_name(method)
+    invoke rpc_method, *args
+  end
 
-    Scale::TypeRegistry.instance.load(spec_name, spec_version)
-    @metadata = self.get_metadata(block_hash)
-    true
+  def chain_get_head
+    invoke rpc_method(__method__)
+  end
+
+  def chain_get_finalised_head
+    invoke rpc_method(__method__)
+  end
+
+  def chain_get_header(block_hash = nil)
+    if block_hash
+      invoke rpc_method(__method__), block_hash
+    else
+      invoke rpc_method(__method__)
+    end
+  end
+
+  def chain_get_block(block_hash = nil)
+    if block_hash
+      invoke rpc_method(__method__), block_hash
+    else
+      invoke rpc_method(__method__)
+    end
+  end
+
+  def chain_get_block_hash(block_id)
+    invoke rpc_method(__method__), block_id
+  end
+
+  def chain_get_runtime_version(block_hash = nil)
+    if block_hash
+      invoke rpc_method(__method__), block_hash
+    else
+      invoke rpc_method(__method__)
+    end
+  end
+
+  def state_get_metadata(block_hash = nil)
+    if block_hash
+      invoke rpc_method(__method__), block_hash
+    else
+      invoke rpc_method(__method__)
+    end
+  end
+
+
+  # ################################################
+  # custom methods
+  # ################################################
+  def get_block_number(block_hash)
+    header = self.chain_get_header(block_hash)
+    header["number"].to_i(16)
   end
 
   def get_metadata(block_hash)

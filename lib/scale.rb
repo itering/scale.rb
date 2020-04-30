@@ -31,9 +31,10 @@ module Scale
   class TypeRegistry
     include Singleton
     attr_accessor :types, :versioning
+    attr_accessor :spec_version
     attr_accessor :custom_types
 
-    def load(spec_name = nil, custom_types)
+    def load(spec_name = nil, custom_types = nil)
       default_types, _ = load_chain_spec_types("default")
 
       if spec_name.nil? || spec_name == "default"
@@ -43,18 +44,18 @@ module Scale
         @types = default_types.merge(spec_types)
       end
 
-      @custom_types = custom_types.stringify_keys if custom_types.class.name == "Hash"
+      @custom_types = custom_types.stringify_keys if custom_types.nil? && custom_types.class.name == "Hash"
       true
     end
 
-    def get(type_name, spec_version=nil)
+    def get(type_name)
       raise "Types not loaded" if @types.nil?
 
       all_types = {}.merge(@types)
 
-      if spec_version && @versioning
+      if @spec_version && @versioning
         @versioning.each do |item|
-          if spec_version >= item["runtime_range"][0] && spec_version <= (item["runtime_range"][1] || 1073741823)
+          if @spec_version >= item["runtime_range"][0] && @spec_version <= (item["runtime_range"][1] || 1073741823)
             all_types.merge!(item["types"])
           end
         end
