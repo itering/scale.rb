@@ -31,27 +31,36 @@ module Scale
   class TypeRegistry
     include Singleton
     attr_accessor :types, :versioning
+    attr_accessor :custom_types
 
-    def load(spec_name = nil)
+    def load(spec_name = nil, custom_types)
       default_types, _ = load_chain_spec_types("default")
 
       if spec_name.nil? || spec_name == "default"
-        @types = default_types 
+        @types = default_types
       else
         spec_types, @versioning = load_chain_spec_types(spec_name)
         @types = default_types.merge(spec_types)
       end
+
+      @custom_types = custom_types.stringify_keys if custom_types.class.name == "Hash"
+      true
     end
 
     def get(type_name, spec_version=nil)
-      all_types = {}.merge(types)
-      if spec_version && versioning
-        versioning.each do |item|
+      raise "Types not loaded" if @types.nil?
+
+      all_types = {}.merge(@types)
+
+      if spec_version && @versioning
+        @versioning.each do |item|
           if spec_version >= item["runtime_range"][0] && spec_version <= (item["runtime_range"][1] || 1073741823)
             all_types.merge!(item["types"])
           end
         end
       end
+
+      all_types.merge!(@custom_types) if @custom_types
 
       type = type_traverse(type_name, all_types)
 
@@ -354,5 +363,21 @@ class Integer
     end
     return unsigned_ceiling + self if self < 0
     self
+  end
+end
+
+class ::Hash
+  # via https://stackoverflow.com/a/25835016/2257038
+  def stringify_keys
+    h = self.map do |k,v|
+      v_str = if v.instance_of? Hash
+                v.stringify_keys
+              else
+                v
+              end
+
+      [k.to_s, v_str]
+    end
+    Hash[h]
   end
 end
