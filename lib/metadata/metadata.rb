@@ -82,14 +82,14 @@ module Scale
         result[:type] = if is_key_value
                           {
                             Map: {
-                              key: adjust(String.decode(scale_bytes).value),
-                              value: adjust(String.decode(scale_bytes).value),
+                              key: rename(String.decode(scale_bytes).value),
+                              value: rename(String.decode(scale_bytes).value),
                               linked: Bool.decode(scale_bytes).value
                             }
                           }
                         else
                           {
-                            Plain: adjust(String.decode(scale_bytes).value)
+                            Plain: rename(String.decode(scale_bytes).value)
                           }
                         end
 
@@ -116,7 +116,7 @@ module Scale
       def self.decode(scale_bytes)
         result = {}
         result[:name] = String.decode(scale_bytes).value
-        result[:type] = adjust(String.decode(scale_bytes).value)
+        result[:type] = rename(String.decode(scale_bytes).value)
 
         MetadataModuleCallArgument.new(result)
       end

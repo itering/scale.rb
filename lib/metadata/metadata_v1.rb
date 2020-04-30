@@ -93,13 +93,13 @@ module Scale
         if is_key_value
           type = {
             MapType: {
-              key: adjust(Bytes.decode(scale_bytes).value),
-              value: adjust(Bytes.decode(scale_bytes).value)
+              key: rename(Bytes.decode(scale_bytes).value),
+              value: rename(Bytes.decode(scale_bytes).value)
             }
           }
         else
           type = {
-            PlainType: adjust(Bytes.decode(scale_bytes).value)
+            PlainType: rename(Bytes.decode(scale_bytes).value)
           }
         end
 
