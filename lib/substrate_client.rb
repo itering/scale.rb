@@ -157,11 +157,19 @@ class SubstrateClient
   def get_block(block_hash=nil)
     self.init_runtime(block_hash: block_hash)
     block = self.chain_get_block(block_hash)
+
     block["block"]["header"]["number"] = block["block"]["header"]["number"].to_i(16)
+
     block["block"]["extrinsics"].each_with_index do |hex, i|
       scale_bytes = Scale::Bytes.new(hex)
       block["block"]["extrinsics"][i] = Scale::Types::Extrinsic.decode(scale_bytes).value
     end
+
+    block['block']['header']["digest"]["logs"].each_with_index do |hex, i|
+      scale_bytes = Scale::Bytes.new(hex)
+      block['block']['header']["digest"]["logs"][i] = Scale::Types::LogDigest.decode(scale_bytes).value
+    end
+
     block
   end
 

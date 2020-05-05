@@ -152,5 +152,54 @@ module Scale
       end
     end
 
+    # log
+    class Other < Bytes; end
+
+    class AuthoritiesChange 
+      include Vec
+      inner_type "AccountId"
+    end
+
+    class ConsensusEngineId < VecU8Length4; end
+
+    class ChangesTrieRoot < Bytes; end
+
+    class SealV0
+      include Struct
+      items(
+        slot: "U64",
+        signature: "Signature"
+      )
+    end
+
+    class Consensus
+      include Struct
+      items(
+        engine: "ConsensusEngineId",
+        data: "Hex"
+      )
+    end
+
+    class Seal
+      include Struct
+      items(
+        engine: "ConsensusEngineId",
+        data: "Hex"
+      )
+    end
+
+    class PreRuntime
+      include Struct
+      items(
+        engine: "ConsensusEngineId",
+        data: "Hex"
+      )
+    end
+
+    class LogDigest
+      include Enum
+      items %w[Other AuthoritiesChange ChangesTrieRoot SealV0 Consensus Seal PreRuntime]
+    end
+
   end
 end

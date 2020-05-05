@@ -204,7 +204,6 @@ module Scale
     end
 
     def self.get(type_name)
-      type_name = rename(type_name)
       TypeRegistry.instance.get(type_name)
     end
 
@@ -330,8 +329,8 @@ def rename(type)
   return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
   return "AccountData" if type == "AccountData<Balance>"
 
-  if type =~ /\[u\d+; \d+\]/
-    byte_length = type.scan(/\[u\d+; (\d+)\]/).first.first
+  if type =~ /\[U\d+; \d+\]/
+    byte_length = type.scan(/\[U\d+; (\d+)\]/).first.first
     return "VecU8Length#{byte_length}"
   end
 
