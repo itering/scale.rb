@@ -56,12 +56,12 @@ class SubstrateClient
   end
 
   def init_runtime(block_hash: nil, block_id: nil)
-    if block_hash.nil? && block_id.nil?
-      raise "Block_hash and block_id should not be nil at the same time"
-    end
-
-    if block_hash.nil? && (not block_id.nil?)
-      block_hash = self.chain_get_block_hash(block_id)
+    if block_hash.nil? 
+      if not block_id.nil?
+        block_hash = self.chain_get_block_hash(block_id)
+      else
+        block_hash = self.chain_get_head
+      end
     end
 
     # set current runtime spec version
@@ -71,6 +71,7 @@ class SubstrateClient
 
     # set current metadata
     @metadata = self.get_metadata(block_hash)
+    Scale::TypeRegistry.instance.metadata = @metadata.value
     true
   end
 
@@ -153,7 +154,10 @@ class SubstrateClient
     Scale::Types::Metadata.decode(Scale::Bytes.new(hex))
   end
 
-  # client.init(0x014e4248dd04a8c0342b603a66df0691361ac58e69595e248219afa7af87bdc7)
+  def get_block_events(block_hash)
+
+  end
+
   # Plain: client.get_storage("Sudo", "Key")
   # Plain: client.get_storage("Balances", "TotalIssuance")
   # Map: client.get_storage("System", "Account", ["0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"])
@@ -205,9 +209,10 @@ class SubstrateClient
     Scale::Types.get(return_type).decode(Scale::Bytes.new(result))
   end
 
-  # params:
-  #   { dest: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409", value: 1_000_000_000_000 }
-  def compose_call(module_name, call_name, params)
+  # compose_call "Balances", "Transfer", { dest: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409", value: 1_000_000_000_000 }
+  def compose_call(module_name, call_name, params, block_hash=nil)
+    init_runtime(block_hash: block_hash)
+
     call = metadata.get_module_call(module_name, call_name)
 
     value = {

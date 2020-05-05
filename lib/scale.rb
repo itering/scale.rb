@@ -31,7 +31,7 @@ module Scale
   class TypeRegistry
     include Singleton
     attr_accessor :types, :versioning
-    attr_accessor :spec_version
+    attr_accessor :spec_version, :metadata
     attr_accessor :custom_types
 
     def load(spec_name = nil, custom_types = nil)

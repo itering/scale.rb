@@ -109,8 +109,6 @@ module Scale
       end
 
       def encode
-        metadata = Scale::TypeRegistry.instance.metadata
-
         result = "04" + self.value[:call_index]
 
         result += self.value[:params].map do |param|
