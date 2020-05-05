@@ -154,8 +154,15 @@ class SubstrateClient
     Scale::Types::Metadata.decode(Scale::Bytes.new(hex))
   end
 
-  def get_block_events(block_hash)
-
+  def get_block(block_hash=nil)
+    self.init_runtime(block_hash: block_hash)
+    block = self.chain_get_block(block_hash)
+    block["block"]["header"]["number"] = block["block"]["header"]["number"].to_i(16)
+    block["block"]["extrinsics"].each_with_index do |hex, i|
+      scale_bytes = Scale::Bytes.new(hex)
+      block["block"]["extrinsics"][i] = Scale::Types::Extrinsic.decode(scale_bytes).value
+    end
+    block
   end
 
   # Plain: client.get_storage("Sudo", "Key")
@@ -163,7 +170,6 @@ class SubstrateClient
   # Map: client.get_storage("System", "Account", ["0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"])
   # DoubleMap: client.get_storage("ImOnline", "AuthoredBlocks", [2818, "0x749ddc93a65dfec3af27cc7478212cb7d4b0c0357fef35a0163966ab5333b757"])
   def get_storage(module_name, storage_name, params = nil, block_hash = nil)
-    block_hash = self.chain_get_head if block_hash.nil?
     self.init_runtime(block_hash: block_hash)
 
     # find the storage item from metadata

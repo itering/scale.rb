@@ -303,7 +303,7 @@ module Scale
           value /= 1000
         end
 
-        CompactMoment.new Time.at(seconds_since_epoch_integer).to_datetime
+        CompactMoment.new Time.at(value).to_datetime.strftime("%F %T")
       end
     end
 

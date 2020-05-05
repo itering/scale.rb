@@ -238,7 +238,7 @@ module Scale
           name = "#{type_str}_Of_#{inner_type_str.camelize}_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         else
-          raise "#{type_str} not support inner type"
+          raise "#{type_str} not support inner type: #{type_string}"
         end
       elsif type_string.start_with?("(") && type_string.end_with?(")") # tuple
         # TODO: add nested tuple support
@@ -326,6 +326,7 @@ def rename(type)
   return "Compact" if type == "<BlockNumber as HasCompact>::Type"
   return "Compact" if type == "Compact<Balance>"
   return "CompactMoment" if type == "<Moment as HasCompact>::Type"
+  return "CompactMoment" if type == "Compact<Moment>"
   return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
   return "AccountData" if type == "AccountData<Balance>"
 
