@@ -74,19 +74,14 @@ class SubstrateClient
     true
   end
 
-  def invoke(method, *args)
-    data = request(method, args)
+  def invoke(method, *params)
+    # params.reject! { |param| param.nil? }
+    data = request(method, params)
     data["result"]
   end
 
   def rpc_method(method_name)
     SubstrateClient.real_method_name(method_name.to_s)
-  end
-
-  def method_list
-    methods = self.rpc_methods["methods"].map(&:underscore)
-    methods << "method_list"
-    methods << "get_storage_at"
   end
 
   # ################################################
@@ -95,6 +90,10 @@ class SubstrateClient
   def method_missing(method, *args)
     rpc_method = SubstrateClient.real_method_name(method)
     invoke rpc_method, *args
+  end
+
+  def rpc_methods 
+    invoke rpc_method(__method__)
   end
 
   def chain_get_head
@@ -106,19 +105,11 @@ class SubstrateClient
   end
 
   def chain_get_header(block_hash = nil)
-    if block_hash
-      invoke rpc_method(__method__), block_hash
-    else
-      invoke rpc_method(__method__)
-    end
+    invoke rpc_method(__method__), block_hash
   end
 
   def chain_get_block(block_hash = nil)
-    if block_hash
-      invoke rpc_method(__method__), block_hash
-    else
-      invoke rpc_method(__method__)
-    end
+    invoke rpc_method(__method__), block_hash
   end
 
   def chain_get_block_hash(block_id)
@@ -126,25 +117,32 @@ class SubstrateClient
   end
 
   def chain_get_runtime_version(block_hash = nil)
-    if block_hash
-      invoke rpc_method(__method__), block_hash
-    else
-      invoke rpc_method(__method__)
-    end
+    invoke rpc_method(__method__), block_hash
   end
 
   def state_get_metadata(block_hash = nil)
-    if block_hash
-      invoke rpc_method(__method__), block_hash
-    else
-      invoke rpc_method(__method__)
-    end
+    invoke rpc_method(__method__), block_hash
   end
 
+  def state_get_storage(storage_key, block_hash = nil)
+    invoke rpc_method(__method__), storage_key, block_hash
+  end
+
+  def system_name
+    invoke rpc_method(__method__)
+  end
+
+  def system_version
+    invoke rpc_method(__method__)
+  end
 
   # ################################################
-  # custom methods
+  # custom methods based on origin rpc methods
   # ################################################
+  def method_list
+    self.rpc_methods["methods"].map(&:underscore)
+  end
+
   def get_block_number(block_hash)
     header = self.chain_get_header(block_hash)
     header["number"].to_i(16)
@@ -156,18 +154,20 @@ class SubstrateClient
   end
 
   # client.init(0x014e4248dd04a8c0342b603a66df0691361ac58e69595e248219afa7af87bdc7)
-  # Plain: client.get_storage_at("Balances", "TotalIssuance")
-  # Map: client.get_storage_at("System", "Account", ["0x30599dba50b5f3ba0b36f856a761eb3c0aee61e830d4beb448ef94b6ad92be39"])
-  # DoubleMap: client.get_storage_at("ImOnline", "AuthoredBlocks", [2818, "0x749ddc93a65dfec3af27cc7478212cb7d4b0c0357fef35a0163966ab5333b757"])
-  def get_storage_at(module_name, storage_function_name, params = nil)
+  # Plain: client.get_storage("Sudo", "Key")
+  # Plain: client.get_storage("Balances", "TotalIssuance")
+  # Map: client.get_storage("System", "Account", ["0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"])
+  # DoubleMap: client.get_storage("ImOnline", "AuthoredBlocks", [2818, "0x749ddc93a65dfec3af27cc7478212cb7d4b0c0357fef35a0163966ab5333b757"])
+  def get_storage(module_name, storage_name, params = nil, block_hash = nil)
+    block_hash = self.chain_get_head if block_hash.nil?
+    self.init_runtime(block_hash: block_hash)
 
-    # TODO: uninit raise a exception
     # find the storage item from metadata
-    metadata_modules = metadata.value.value[:modules]
+    metadata_modules = metadata.value.value[:metadata][:modules]
     metadata_module = metadata_modules.detect { |mm| mm[:name] == module_name }
     raise "Module '#{module_name}' not exist" unless metadata_module
-    storage_item = metadata_module[:storage][:items].detect { |item| item[:name] == storage_function_name }
-    raise "Storage item '#{storage_function_name}' not exist. \n#{metadata_module.inspect}" unless storage_item
+    storage_item = metadata_module[:storage][:items].detect { |item| item[:name] == storage_name }
+    raise "Storage item '#{storage_name}' not exist. \n#{metadata_module.inspect}" unless storage_item
 
     if storage_item[:type][:Plain]
       return_type = storage_item[:type][:Plain]
@@ -193,50 +193,46 @@ class SubstrateClient
 
     storage_hash = SubstrateClient.generate_storage_hash(
       module_name,
-      storage_function_name,
+      storage_name,
       params,
       hasher,
       hasher2,
-      metadata.value.value[:version]
+      metadata.value.value[:metadata][:version]
     )
 
-    result = self.state_get_storage_at(storage_hash, block_hash)
+    result = self.state_get_storage(storage_hash, block_hash)
     return unless result
-    Scale::Types.get(return_type).decode(Scale::Bytes.new(result)).value
-  rescue => ex
-    puts ex.message
-    puts ex.backtrace
+    Scale::Types.get(return_type).decode(Scale::Bytes.new(result))
   end
 
-  # call_params:
+  # params:
   #   { dest: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409", value: 1_000_000_000_000 }
-  def compose_call(call_module, call_function, call_params)
-    call = metadata.get_module_call(call_module, call_function)
+  def compose_call(module_name, call_name, params)
+    call = metadata.get_module_call(module_name, call_name)
 
     value = {
       call_index: call[:lookup],
-      call_module: call_module,
-      call_function: call_function,
+      module_name: module_name,
+      call_name: call_name,
       params: []
     }
 
-    call_params.keys.each_with_index do |call_param_name, i|
-      call_param_value = call_params[call_param_name]
+    params.keys.each_with_index do |call_param_name, i|
+      param_value = params[call_param_name]
       value[:params] << {
         name: call_param_name.to_s,
         type: call[:args][i][:type],
-        value: call_param_value
+        value: param_value
       }
     end
 
-    puts value
     Scale::Types::Extrinsic.new(value).encode
   end
 
   class << self
-    def generate_storage_hash(storage_module_name, storage_function_name, params = nil, hasher = nil, hasher2 = nil, metadata_version = nil)
+    def generate_storage_hash(module_name, storage_name, params = nil, hasher = nil, hasher2 = nil, metadata_version = nil)
       if metadata_version and metadata_version >= 9
-        storage_hash = Crypto.twox128(storage_module_name) + Crypto.twox128(storage_function_name)
+        storage_hash = Crypto.twox128(module_name) + Crypto.twox128(storage_name)
 
         params&.each_with_index do |param, index|
           if index == 0
@@ -255,7 +251,7 @@ class SubstrateClient
         "0x#{storage_hash}"
       else
         # TODO: add test
-        storage_hash = storage_module_name + " " + storage_function_name
+        storage_hash = module_name + " " + storage_name
 
         unless params.nil?
           params = [params] if params.class != ::Array
