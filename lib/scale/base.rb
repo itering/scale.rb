@@ -123,7 +123,8 @@ module Scale
       module ClassMethods
         def decode(scale_bytes)
           item_values = self::ITEM_TYPE_STRS.map do |item_type_str|
-            Scale::Types.get(item_type_str).decode(scale_bytes)
+            type = Scale::TypeRegistry.instance.get(item_type_str)
+            type.decode(scale_bytes)
           end
 
           value = {}
@@ -197,7 +198,7 @@ module Scale
       module ClassMethods
         def decode(scale_bytes)
           index = scale_bytes.get_next_bytes(1)[0]
-          if const_defined? "ITEM_NAMES"
+          if const_defined? "ITEM_TYPE_STRS"
             item_type_str = self::ITEM_TYPE_STRS[index]
             raise "There is no such member with index #{index} for enum #{self}" if item_type_str.nil?
             value = Scale::Types.get(item_type_str).decode(scale_bytes)
@@ -208,16 +209,20 @@ module Scale
         end
 
         def items(items)
-          attr_names = []
-          attr_type_strs = []
+          if items.class == Hash
+            attr_names = []
+            attr_type_strs = []
 
-          items.each_pair do |attr_name, attr_type_str|
-            attr_names << attr_name
-            attr_type_strs << attr_type_str
+            items.each_pair do |attr_name, attr_type_str|
+              attr_names << attr_name
+              attr_type_strs << attr_type_str
+            end
+
+            const_set(:ITEM_NAMES, attr_names)
+            const_set(:ITEM_TYPE_STRS, attr_type_strs)
+          elsif items.class == Array
+            const_set(:ITEM_TYPE_STRS, items)
           end
-
-          const_set(:ITEM_NAMES, attr_names)
-          const_set(:ITEM_TYPE_STRS, attr_type_strs)
         end
 
         def values(*values)
