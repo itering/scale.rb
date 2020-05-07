@@ -5,7 +5,7 @@ ENV BUILD_PACKAGES curl-dev build-base
 RUN echo "http://mirrors.ustc.edu.cn/alpine/v3.11/main/" > /etc/apk/repositories && \
     apk update && \
     apk upgrade && \
-    apk add git $BUILD_PACKAGES
+    apk add git curl $BUILD_PACKAGES
 
 WORKDIR /usr/src/app
 
@@ -14,6 +14,10 @@ RUN gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org
     gem install bundler:1.17.3 && \
     bundle config mirror.https://rubygems.org https://gems.ruby-china.com && \
     bundle install && \
-    rake install:local
+    rake install:local && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    source $HOME/.cargo/env && \
+    export RUSTFLAGS='-C target-feature=-crt-static' && \
+    make
 
 CMD ["sh"]
