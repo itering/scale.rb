@@ -162,12 +162,12 @@ class SubstrateClient
 
     block["block"]["extrinsics"].each_with_index do |hex, i|
       scale_bytes = Scale::Bytes.new(hex)
-      block["block"]["extrinsics"][i] = Scale::Types::Extrinsic.decode(scale_bytes).value
+      block["block"]["extrinsics"][i] = Scale::Types::Extrinsic.decode(scale_bytes).to_human
     end
 
     block['block']['header']["digest"]["logs"].each_with_index do |hex, i|
       scale_bytes = Scale::Bytes.new(hex)
-      block['block']['header']["digest"]["logs"][i] = Scale::Types::LogDigest.decode(scale_bytes).value
+      block['block']['header']["digest"]["logs"][i] = Scale::Types::LogDigest.decode(scale_bytes).to_human
     end
 
     block

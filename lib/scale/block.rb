@@ -117,6 +117,10 @@ module Scale
 
         "0x" + Compact.new(result.length / 2).encode + result
       end
+
+      def to_human
+        @value
+      end
     end
 
     class EventRecord

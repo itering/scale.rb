@@ -11,6 +11,20 @@ module Scale
       def ==(other)
         value == other.value
       end
+
+      def to_human
+        if @value.class == ::Hash
+          @value.transform_values do |v|
+            v.to_human
+          end
+        elsif @value.class == ::Array
+          @value.map do |v|
+            v.to_human
+          end
+        else
+          @value
+        end
+      end
     end
 
     # value: one of nil, false, true, scale object
@@ -117,7 +131,6 @@ module Scale
         bytes.bytes_to_hex[2..]
       end
     end
-
 
     module Struct
       include SingleValue
@@ -243,6 +256,14 @@ module Scale
           index + value.encode
         else
           self.class::VALUES.index(value).to_s(16).rjust(2, "0")
+        end
+      end
+
+      def to_human
+        if self.class.const_defined? "ITEM_TYPE_STRS"
+          @value.to_human
+        else
+          @value
         end
       end
     end
