@@ -96,7 +96,9 @@ module Scale
         attr_accessor :byte_length
 
         def decode(scale_bytes)
-          bytes = scale_bytes.get_next_bytes self::BYTE_LENGTH
+          bit_length = to_s[15..].to_i
+          byte_length = bit_length / 8
+          bytes = scale_bytes.get_next_bytes byte_length
           bytes_reversed = bytes.reverse
           hex = bytes_reversed.reduce("0x") { |hex, byte| hex + byte.to_s(16).rjust(2, "0") }
           new(hex.to_i(16))
