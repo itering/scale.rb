@@ -15,11 +15,19 @@ module Scale
       def to_human
         if @value.class == ::Hash
           @value.transform_values do |v|
-            v.to_human
+            if v.class.included_modules.include?(SingleValue)
+              v.to_human
+            else
+              v
+            end
           end
         elsif @value.class == ::Array
           @value.map do |v|
-            v.to_human
+            if v.class.included_modules.include?(SingleValue)
+              v.to_human
+            else
+              v
+            end
           end
         else
           @value
