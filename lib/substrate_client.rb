@@ -4,55 +4,54 @@ require "json"
 require "active_support"
 require "active_support/core_ext/string"
 
-def ws_request(url, payload)
-  result = nil
-
-  EM.run do
-    ws = Faye::WebSocket::Client.new(url)
-
-    ws.on :open do |event|
-      # p [:open]
-      ws.send(payload.to_json)
-    end
-
-    ws.on :message do |event|
-      # p [:message, event.data]
-      if event.data.include?("jsonrpc")
-        result = JSON.parse event.data
-        ws.close(3001, "data received")
-        EM.stop
-      end
-    end
-
-    ws.on :close do |event|
-      # p [:close, event.code, event.reason]
-      ws = nil
-    end
-  end
-
-  result
-end
 
 class SubstrateClient
   attr_accessor :spec_name, :spec_version, :metadata
+  attr_reader :ws
 
   def initialize(url: , spec_name: nil)
     @url = url
     @request_id = 1
     @spec_name = spec_name
     Scale::TypeRegistry.instance.load(spec_name)
+
+    init_ws
   end
 
-  # TODO: error
-  def request(method, params)
+  def request(method, params, callback=nil, subscription_callback=nil)
     payload = {
       "jsonrpc" => "2.0",
       "method" => method,
       "params" => params,
       "id" => @request_id
     }
+    if callback.nil? && subscription_callback.nil?
+
+      data = ws_request(@url, payload)
+      @request_id += 1
+      return data 
+
+    elsif callback.nil? && (not subscription_callback.nil?)
+
+      @callbacks[@request_id] = Proc.new { |data|
+        if data["result"]
+          @subscription_callbacks[data["result"]] = subscription_callback
+        elsif data["error"]
+          subscription_callback.call data["error"]
+        else
+          subscription_callback.call nil
+        end
+      }
+
+    elsif (not callback.nil?) && subscription_callback.nil?
+
+      @callbacks[@request_id] = callback
+    else
+      raise "one of callback and subscription_callback must be nil"
+    end
+
+    @ws.send(payload.to_json)
     @request_id += 1
-    ws_request(@url, payload)
   end
 
   def init_runtime(block_hash: nil, block_id: nil)
@@ -135,6 +134,10 @@ class SubstrateClient
 
   def system_version
     invoke rpc_method(__method__)
+  end
+
+  def chain_subscribe_new_head(&callback)
+    request rpc_method(__method__), [], nil, callback
   end
 
   # ################################################
@@ -293,6 +296,81 @@ class SubstrateClient
 
   end
 
+  private
+  def init_ws
+    Thread.new do
+      EM.run do
+        start_connection
+      end
+    end
+
+    Thread.new do
+      loop do
+        if @ws && @ws.ready_state == 3
+          puts "try to reconnect"
+          start_connection
+        end
+
+        sleep(3)
+      end
+    end
+  end
+
+  def start_connection
+    @callbacks = {}
+    @subscription_callbacks = {}
+
+    @ws = Faye::WebSocket::Client.new(@url)
+    @ws.on :message do |event|
+      # p [:message, event.data]
+      if event.data.include?("jsonrpc")
+        begin
+          data = JSON.parse event.data
+
+          if data["result"] || data["error"]
+            @callbacks[data["id"]].call data
+            @callbacks.delete(data["id"])
+          else
+            @subscription_callbacks[data["params"]["subscription"]].call data
+          end
+
+        rescue => ex
+          puts ex.message
+          puts ex.backtrace.join("\n")
+        end
+      end
+    end
+  end
 
 end
 
+def ws_request(url, payload)
+  queue = Queue.new
+
+  ws = Faye::WebSocket::Client.new(url)
+
+  ws.on :open do |event|
+    # p [:open]
+    ws.send(payload.to_json)
+  end
+
+  ws.on :message do |event|
+    # p [:message, event.data]
+    ws.close(3001, "data received")
+    # result = event.data
+    queue << event.data
+  end
+
+  ws.on :close do |event|
+    # p [:close, event.code, event.reason]
+    ws = nil
+  end
+
+  result = queue.pop
+
+  if result.include?("jsonrpc")
+    return JSON.parse result
+  else
+    return nil
+  end
+end
