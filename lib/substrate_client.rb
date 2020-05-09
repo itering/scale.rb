@@ -27,12 +27,14 @@ class SubstrateClient
     }
     if callback.nil? && subscription_callback.nil?
 
+      # sync ws request
       data = ws_request(@url, payload)
       @request_id += 1
       return data 
 
     elsif callback.nil? && (not subscription_callback.nil?)
 
+      # async subscription
       @callbacks[@request_id] = Proc.new { |data|
         if data["result"]
           @subscription_callbacks[data["result"]] = subscription_callback
@@ -45,9 +47,13 @@ class SubstrateClient
 
     elsif (not callback.nil?) && subscription_callback.nil?
 
+      # async ws request
       @callbacks[@request_id] = callback
+
     else
+
       raise "one of callback and subscription_callback must be nil"
+
     end
 
     @ws.send(payload.to_json)
@@ -140,6 +146,10 @@ class SubstrateClient
     request rpc_method(__method__), [], nil, callback
   end
 
+  def chain_subscribe_finalised_heads(&callback)
+    request rpc_method(__method__), [], nil, callback
+  end
+
   # ################################################
   # custom methods based on origin rpc methods
   # ################################################
@@ -174,6 +184,47 @@ class SubstrateClient
     end
 
     block
+  end
+
+  def get_block_events(block_hash)
+    self.init_runtime(block_hash: block_hash)
+
+    storage_key =  "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7"
+    events_data = state_get_storage storage_key, block_hash
+
+    scale_bytes = Scale::Bytes.new(events_data)
+    Scale::Types.get("Vec<EventRecord>").decode(scale_bytes).to_human
+  end
+
+  def subscribe_block_events(&callback)
+    self.chain_subscribe_finalised_heads do |data|
+
+      block_number = data["params"]["result"]["number"].to_i(16) - 1
+      block_hash = data["params"]["result"]["parentHash"]
+
+      EM.defer(
+
+        proc {
+          events = get_block_events block_hash
+          { block_number: block_number, events: events }
+        },
+
+        proc { |result| 
+          begin
+            callback.call result
+          rescue => ex
+            puts "-------------"
+            puts ex.message
+            puts ex.backtrace.join("\n")
+          end
+        },
+
+        proc { |e|
+          p e
+        }
+
+      )
+    end
   end
 
   # Plain: client.get_storage("Sudo", "Key")

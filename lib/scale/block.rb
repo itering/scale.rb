@@ -142,7 +142,7 @@ module Scale
 
         result[:params] = []
         event[:args].each do |arg_type|
-          value = Scale::Types.get(arg_type).decode(scale_bytes).value
+          value = Scale::Types.get(arg_type).decode(scale_bytes).to_human
           result[:params] << {
             name: event[:name],
             type: arg_type,
