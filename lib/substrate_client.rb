@@ -6,6 +6,8 @@ require "active_support/core_ext/string"
 
 
 class SubstrateClient
+  class RpcError < StandardError; end
+
   attr_accessor :spec_name, :spec_version, :metadata
   attr_reader :ws
 
@@ -18,46 +20,30 @@ class SubstrateClient
     init_ws
   end
 
-  def request(method, params, callback=nil, subscription_callback=nil)
+  def request(method, params, subscription_callback=nil)
+    queue = Queue.new
+
     payload = {
       "jsonrpc" => "2.0",
       "method" => method,
       "params" => params,
       "id" => @request_id
     }
-    if callback.nil? && subscription_callback.nil?
 
-      # sync ws request
-      data = ws_request(@url, payload)
-      @request_id += 1
-      return data 
-
-    elsif callback.nil? && (not subscription_callback.nil?)
-
-      # async subscription
-      @callbacks[@request_id] = Proc.new { |data|
-        if data["result"]
-          @subscription_callbacks[data["result"]] = subscription_callback
-        elsif data["error"]
-          subscription_callback.call data["error"]
-        else
-          subscription_callback.call nil
-        end
-      }
-
-    elsif (not callback.nil?) && subscription_callback.nil?
-
-      # async ws request
-      @callbacks[@request_id] = callback
-
-    else
-
-      raise "one of callback and subscription_callback must be nil"
-
-    end
-
+    @callbacks[@request_id] = proc { |data| queue << data }
     @ws.send(payload.to_json)
     @request_id += 1
+    data = queue.pop
+
+    if not subscription_callback.nil? && data["result"]
+      @subscription_callbacks[data["result"]] = subscription_callback
+    end
+
+    if data["error"]
+      raise RpcError, data["error"]
+    else
+      data["result"]
+    end
   end
 
   def init_runtime(block_hash: nil, block_id: nil)
@@ -82,8 +68,7 @@ class SubstrateClient
 
   def invoke(method, *params)
     # params.reject! { |param| param.nil? }
-    data = request(method, params)
-    data["result"]
+    request(method, params)
   end
 
   def rpc_method(method_name)
@@ -142,12 +127,44 @@ class SubstrateClient
     invoke rpc_method(__method__)
   end
 
-  def chain_subscribe_new_head(&callback)
-    request rpc_method(__method__), [], nil, callback
+  def chain_subscribe_all_heads(&callback)
+    request rpc_method(__method__), [], callback
   end
 
-  def chain_subscribe_finalised_heads(&callback)
-    request rpc_method(__method__), [], nil, callback
+  def chain_unsubscribe_all_heads(subscription)
+    invoke rpc_method(__method__), subscription
+  end
+
+  def chain_subscribe_new_heads(&callback)
+    request rpc_method(__method__), [], callback
+  end
+
+  def chain_unsubscribe_new_heads(subscription)
+    invoke rpc_method(__method__), subscription
+  end
+
+  def chain_subscribe_finalized_heads(&callback)
+    request rpc_method(__method__), [], callback
+  end
+
+  def chain_unsubscribe_finalized_heads(subscription)
+    invoke rpc_method(__method__), subscription
+  end
+
+  def state_subscribe_runtime_version(&callback)
+    request rpc_method(__method__), [], callback
+  end
+
+  def state_unsubscribe_runtime_version(subscription)
+    invoke rpc_method(__method__), subscription
+  end
+
+  def state_subscribe_storage(keys, &callback)
+    request rpc_method(__method__), [keys], callback
+  end
+
+  def state_unsubscribe_storage(subscription)
+    invoke rpc_method(__method__), subscription
   end
 
   # ################################################
@@ -213,14 +230,13 @@ class SubstrateClient
           begin
             callback.call result
           rescue => ex
-            puts "-------------"
             puts ex.message
             puts ex.backtrace.join("\n")
           end
         },
 
         proc { |e|
-          p e
+          puts e
         }
 
       )
@@ -279,7 +295,7 @@ class SubstrateClient
 
   # compose_call "Balances", "Transfer", { dest: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409", value: 1_000_000_000_000 }
   def compose_call(module_name, call_name, params, block_hash=nil)
-    init_runtime(block_hash: block_hash)
+    self.init_runtime(block_hash: block_hash)
 
     call = metadata.get_module_call(module_name, call_name)
 
@@ -378,11 +394,13 @@ class SubstrateClient
         begin
           data = JSON.parse event.data
 
-          if data["result"] || data["error"]
+          if data["params"]
+            if @subscription_callbacks[data["params"]["subscription"]]
+              @subscription_callbacks[data["params"]["subscription"]].call data
+            end
+          else
             @callbacks[data["id"]].call data
             @callbacks.delete(data["id"])
-          else
-            @subscription_callbacks[data["params"]["subscription"]].call data
           end
 
         rescue => ex
@@ -393,35 +411,4 @@ class SubstrateClient
     end
   end
 
-end
-
-def ws_request(url, payload)
-  queue = Queue.new
-
-  ws = Faye::WebSocket::Client.new(url)
-
-  ws.on :open do |event|
-    # p [:open]
-    ws.send(payload.to_json)
-  end
-
-  ws.on :message do |event|
-    # p [:message, event.data]
-    ws.close(3001, "data received")
-    # result = event.data
-    queue << event.data
-  end
-
-  ws.on :close do |event|
-    # p [:close, event.code, event.reason]
-    ws = nil
-  end
-
-  result = queue.pop
-
-  if result.include?("jsonrpc")
-    return JSON.parse result
-  else
-    return nil
-  end
 end
