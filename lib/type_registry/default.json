@@ -35,13 +35,6 @@
          ["balance", "Balance"]
       ]
     },
-    "ReferendumInfo<BlockNumber, Hash, Balance>": {
-      "type": "enum",
-      "type_mapping": [
-        ["Ongoing", "ReferendumStatus"],
-        ["Finished", "ReferendumInfoFinished"]
-      ]
-    },
     "ReferendumInfoFinished": {
       "type": "struct",
       "type_mapping": [
@@ -65,6 +58,13 @@
          ["threshold", "VoteThreshold"],
          ["delay", "BlockNumber"],
          ["tally", "Tally"]
+      ]
+    },
+    "ReferendumInfo": {
+      "type": "enum",
+      "type_mapping": [
+        ["Ongoing", "ReferendumStatus"],
+        ["Finished", "ReferendumInfoFinished"]
       ]
     },
     "VotingDirectVote": {
@@ -247,7 +247,8 @@
       "type": "enum",
       "value_list": [
         "Normal",
-        "Operational"
+        "Operational",
+        "Mandatory"
       ]
     },
     "DispatchInfo": {
@@ -338,6 +339,7 @@
     "MomentOf": "Moment",
     "MoreAttestations": "Null",
     "Multiplier": "u64",
+    "CallHash": "H256",
     "Timepoint": {
       "type": "struct",
       "type_mapping": [
@@ -364,7 +366,7 @@
     "PhantomData": "Null",
     "sp_std::marker::PhantomData<(AccountId, Event)>": "PhantomData",
     "Reporter": "AccountId",
-    "OffenceDetails<AccountId, IdentificationTuple>": {
+    "OffenceDetails": {
       "type": "struct",
       "type_mapping": [
          ["offender", "Offender"],
@@ -583,7 +585,8 @@
          ["blockNumber", "BlockNumber"],
          ["networkState", "OpaqueNetworkState"],
          ["sessionIndex", "SessionIndex"],
-         ["authorityIndex", "AuthIndex"]
+         ["authorityIndex", "AuthIndex"],
+         ["validatorsLen", "u32"]
       ]
     },
     "RewardDestination": {
@@ -836,6 +839,164 @@
         ["locked", "Balance"],
         ["perBlock", "Balance"],
         ["startingBlock", "BlockNumber"]
+      ]
+    },
+    "NominatorIndex": "u32",
+    "ValidatorIndex": "u16",
+    "PerU16": "u16",
+    "OffchainAccuracy": "PerU16",
+    "CompactScore": {
+      "type": "struct",
+        "type_mapping": [
+          ["validatorIndex", "ValidatorIndex"],
+          ["offchainAccuracy", "OffchainAccuracy"]
+        ]
+    },
+    "CompactAssignments": {
+      "type": "struct",
+        "type_mapping": [
+          ["votes1", "Vec<(NominatorIndex, ValidatorIndex)>"],
+          ["votes2", "Vec<(NominatorIndex, [CompactScore; 1], ValidatorIndex)>"],
+          ["votes3", "Vec<(NominatorIndex, [CompactScore; 2], ValidatorIndex)>"],
+          ["votes4", "Vec<(NominatorIndex, [CompactScore; 3], ValidatorIndex)>"],
+          ["votes5", "Vec<(NominatorIndex, [CompactScore; 4], ValidatorIndex)>"],
+          ["votes6", "Vec<(NominatorIndex, [CompactScore; 5], ValidatorIndex)>"],
+          ["votes7", "Vec<(NominatorIndex, [CompactScore; 6], ValidatorIndex)>"],
+          ["votes8", "Vec<(NominatorIndex, [CompactScore; 7], ValidatorIndex)>"],
+          ["votes9", "Vec<(NominatorIndex, [CompactScore; 8], ValidatorIndex)>"],
+          ["votes10", "Vec<(NominatorIndex, [CompactScore; 9], ValidatorIndex)>"],
+          ["votes11", "Vec<(NominatorIndex, [CompactScore; 10], ValidatorIndex)>"],
+          ["votes12", "Vec<(NominatorIndex, [CompactScore; 11], ValidatorIndex)>"],
+          ["votes13", "Vec<(NominatorIndex, [CompactScore; 12], ValidatorIndex)>"],
+          ["votes14", "Vec<(NominatorIndex, [CompactScore; 13], ValidatorIndex)>"],
+          ["votes15", "Vec<(NominatorIndex, [CompactScore; 14], ValidatorIndex)>"],
+          ["votes16", "Vec<(NominatorIndex, [CompactScore; 15], ValidatorIndex)>"]
+        ]
+    },
+    "DeferredOffenceOf": {
+      "type": "struct",
+        "type_mapping": [
+          ["offences", "Vec<OffenceDetails>"],
+          ["perc", "Vec<Perbill>"],
+          ["session", "SessionIndex"]
+        ]
+    },
+    "Statement": {
+      "type": "enum",
+      "type_mapping": [
+        ["Never", "Null"],
+        ["Candidate", "Hash"],
+        ["Valid", "Hash"],
+        ["Invalid", "Hash"]
+      ]
+    },
+    "ValidatorSignature": "Signature",
+    "DoubleVoteReportStatement": {
+      "type": "struct",
+      "type_mapping": [
+        ["statement", "Statement"],
+        ["signature", "ValidatorSignature"]
+      ]
+    },
+    "DoubleVoteReportProof": {
+      "type": "struct",
+      "type_mapping": [
+        ["session", "SessionIndex"],
+        ["trieNodes", "Vec<Bytes>"]
+      ]
+    },
+    "SigningContext": {
+      "type": "struct",
+      "type_mapping": [
+        ["sessionIndex", "SessionIndex"],
+        ["parentHash", "Hash"]
+      ]
+    },
+    "DoubleVoteReport": {
+      "type": "struct",
+      "type_mapping": [
+        ["identity", "ValidatorId"],
+        ["first", "DoubleVoteReportStatement"],
+        ["second", "DoubleVoteReportStatement"],
+        ["proof", "DoubleVoteReportProof"],
+        ["signingContext", "SigningContext"]
+      ]
+    },
+    "ElectionCompute": {
+      "type": "enum",
+        "value_list": [
+          "OnChain",
+          "Signed",
+          "Authority"
+        ]
+    },
+    "ElectionResult": {
+      "type": "struct",
+      "type_mapping": [
+        ["compute", "ElectionCompute"],
+        ["slotStake", "Balance"],
+        ["electedStashes", "Vec<AccountId>"],
+        ["exposures", "Vec<(AccountId, Exposure)>"]
+      ]
+    },
+    "ElectionStatus": {
+      "type": "enum",
+      "type_mapping": [
+        ["Close", "Null"],
+        ["Open", "BlockNumber"]
+      ]
+    },
+    "Phase": {
+      "type": "enum",
+      "type_mapping": [
+        ["ApplyExtrinsic", "u32"],
+        ["Finalization", "Null"],
+        ["Initialization", "Null"]
+      ]
+    },
+    "PhragmenScore": "[u128; 3]",
+    "PreimageStatusAvailable": {
+      "type": "struct",
+      "type_mapping": [
+        ["data", "Bytes"],
+        ["provider", "AccountId"],
+        ["deposit", "Balance"],
+        ["since", "BlockNumber"],
+        ["expiry", "Option<BlockNumber>"]
+      ]
+    },
+    "PreimageStatus": {
+      "type": "enum",
+      "type_mapping": [
+        ["Missing", "BlockNumber"],
+        ["Available", "PreimageStatusAvailable"]
+      ]
+    },
+    "Randomness": "Hash",
+    "MaybeRandomness": "Option<Randomness>",
+    "schnorrkel::Randomness": "Hash",
+    "schnorrkel::RawVRFOutput": "[u8; 32]",
+    "TaskAddress": {
+      "type": "struct",
+      "type_mapping": [
+        ["blockNumber", "BlockNumber"],
+        ["index", "u32"]
+      ]
+    },
+    "ValidationCode": "Bytes",
+    "ParaPastCodeMeta": {
+      "type": "struct",
+      "type_mapping": [
+        ["upgrade_times", "Vec<BlockNumber>"],
+        ["last_pruned", "Option<BlockNumber>"]
+      ]
+    },
+    "ModuleId": "LockIdentifier",
+    "RuntimeDbWeight": {
+      "type": "struct",
+      "type_mapping": [
+        ["read", "Weight"],
+        ["write", "Weight"]
       ]
     }
   }
