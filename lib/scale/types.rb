@@ -41,6 +41,10 @@ module Scale
       include FixedWidthUInt
     end
 
+    class U256
+      include FixedWidthUInt
+    end
+
     class I8
       include FixedWidthInt
     end
