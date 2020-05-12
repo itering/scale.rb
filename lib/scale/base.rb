@@ -135,7 +135,8 @@ module Scale
         if value.class != ::Integer
           raise "#{self.class}'s value must be integer"
         end
-        bytes = value.to_s(16).rjust(self.class::BYTE_LENGTH * 2, "0").scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
+        byte_length = self.class.name[15..].to_i / 8
+        bytes = value.to_s(16).rjust(byte_length * 2, "0").scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
         bytes.bytes_to_hex[2..]
       end
     end
