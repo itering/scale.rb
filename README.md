@@ -79,10 +79,13 @@ examples in `exec/scale`
 rspec
 ```
 
-To run only low level format tests, call
+To run single test file:
 
-```
-rspec spec/low_level_spec.rb
+```bash
+rspec spec/types_spec.rb
+rspec spec/extrinsic_spec.rb
+rspec spec/metadata_spec.rb
+rspec spec/types_ffi_spec.rb
 ```
 
 

@@ -89,9 +89,8 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
-          bit_length = to_s[15..].to_i
-          byte_length = bit_length / 8
-          bytes = scale_bytes.get_next_bytes byte_length
+          bytes = scale_bytes.get_next_bytes self::BYTE_LENGTH
+          bit_length = bytes.length.to_i * 8
           value = bytes.reverse.bytes_to_hex.to_i(16).to_signed(bit_length)
           new(value)
         end
@@ -105,7 +104,7 @@ module Scale
         if value.class != ::Integer
           raise "#{self.class}'s value must be integer"
         end
-        bit_length = self.class.name[15..].to_i
+        bit_length = self.class::BYTE_LENGTH * 8
         hex = value.to_unsigned(bit_length).to_s(16).hex_to_bytes.reverse.bytes_to_hex
         hex[2..]
       end
@@ -118,9 +117,7 @@ module Scale
         attr_accessor :byte_length
 
         def decode(scale_bytes)
-          bit_length = to_s[15..].to_i
-          byte_length = bit_length / 8
-          bytes = scale_bytes.get_next_bytes byte_length
+          bytes = scale_bytes.get_next_bytes self::BYTE_LENGTH
           bytes_reversed = bytes.reverse
           hex = bytes_reversed.reduce("0x") { |hex, byte| hex + byte.to_s(16).rjust(2, "0") }
           new(hex.to_i(16))
@@ -135,7 +132,7 @@ module Scale
         if value.class != ::Integer
           raise "#{self.class}'s value must be integer"
         end
-        byte_length = self.class.name[15..].to_i / 8
+        byte_length = self.class::BYTE_LENGTH
         bytes = value.to_s(16).rjust(byte_length * 2, "0").scan(/.{2}/).reverse.map {|hex| hex.to_i(16) }
         bytes.bytes_to_hex[2..]
       end
@@ -233,7 +230,7 @@ module Scale
         end
 
         def items(items)
-          if items.class == Hash
+          if items.class == ::Hash
             attr_names = []
             attr_type_strs = []
 
@@ -244,7 +241,7 @@ module Scale
 
             const_set(:ITEM_NAMES, attr_names)
             const_set(:ITEM_TYPE_STRS, attr_type_strs)
-          elsif items.class == Array
+          elsif items.class == ::Array
             const_set(:ITEM_TYPE_STRS, items)
           end
         end
@@ -285,7 +282,8 @@ module Scale
           number = Scale::Types::Compact.decode(scale_bytes).value
           items = []
           number.times do
-            item = Scale::Types.get(self::INNER_TYPE_STR).decode(scale_bytes)
+            type = Scale::Types.get(self::INNER_TYPE_STR)
+            item = type.decode(scale_bytes)
             items << item
           end
           raw ? items : new(items)
@@ -315,7 +313,7 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
-          value = "Scale::Types::U#{self::BYTES_LENGTH * 8}".constantize.decode(scale_bytes).value
+          value = "Scale::Types::U#{self::BYTE_LENGTH * 8}".constantize.decode(scale_bytes).value
           return new [] unless value || value <= 0
 
           result = self::ITEMS.select { |_, mask| value & mask > 0 }.keys
@@ -332,7 +330,7 @@ module Scale
         def items(items, bytes_length = 1)
           raise "byte length is wrong: #{bytes_length}" unless [1, 2, 4, 8, 16].include?(bytes_length)
           const_set(:ITEMS, items)
-          const_set(:BYTES_LENGTH, bytes_length)
+          const_set(:BYTE_LENGTH, bytes_length)
         end
       end
 
@@ -342,7 +340,7 @@ module Scale
 
       def encode
         value = self.class::ITEMS.select { |key, _| self.value.include?(key) }.values.sum
-        "Scale::Types::U#{self.class::BYTES_LENGTH * 8}".constantize.new(value).encode
+        "Scale::Types::U#{self.class::BYTE_LENGTH * 8}".constantize.new(value).encode
       end
     end
 

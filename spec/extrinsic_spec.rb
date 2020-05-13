@@ -22,11 +22,11 @@ module Scale::Types
       expect(value[:call_function]).to eql("transfer")
 
       expect(value[:params][0][:name]).to eql("dest")
-      expect(value[:params][0][:type]).to eql("Scale::Types::RawAddress")
+      expect(value[:params][0][:type]).to eql("<T::Lookup as StaticLookup>::Source")
       expect(value[:params][0][:value]).to eql("0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409")
 
       expect(value[:params][1][:name]).to eql("value")
-      expect(value[:params][1][:type]).to eql("Scale::Types::Compact")
+      expect(value[:params][1][:type]).to eql("Compact<T::Balance>")
       expect(value[:params][1][:value]).to eql(1_000_000_000_000)
     end
 
@@ -38,12 +38,12 @@ module Scale::Types
         params: [
           {
             name: "dest",
-            type: "Scale::Types::RawAddress",
+            type: "<T::Lookup as StaticLookup>::Source",
             value: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409"
           },
           {
             name: "value",
-            type: "Scale::Types::Compact",
+            type: "Compact<T::Balance>",
             value: 1_000_000_000_000
           }
         ]
@@ -52,14 +52,14 @@ module Scale::Types
       expect(extrinsic.encode).to eql("0xa8040600ff586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409070010a5d4e8")
     end
 
-    it "can encode to transfer payload 2" do
-      client = SubstrateClient.new("wss://cc3-5.kusama.network/")
-      client.init
+    # it "can encode to transfer payload 2" do
+      # client = SubstrateClient.new("wss://cc3-5.kusama.network/")
+      # client.init
 
-      call_params = { dest: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409", value: 1_000_000_000_000 }
-      payload = client.compose_call("balances", "transfer", call_params)
-      expect(payload).to eql("0xa8040400ff586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409070010a5d4e8")
-    end
+      # call_params = { dest: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409", value: 1_000_000_000_000 }
+      # payload = client.compose_call("balances", "transfer", call_params)
+      # expect(payload).to eql("0xa8040400ff586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409070010a5d4e8")
+    # end
   end
 
 end

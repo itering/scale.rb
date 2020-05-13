@@ -2,7 +2,9 @@ require "scale"
 require_relative "./types.rb"
 
 describe Scale::Types do
-  before(:all) { Scale::TypeRegistry.instance.load }
+  before(:all) { 
+    Scale::TypeRegistry.instance.load
+  }
 
   it "can correctly encode and decode U8" do
     scale_bytes = Scale::Bytes.new("0x45")
@@ -180,7 +182,7 @@ describe Scale::Types do
   it "can correctly decode and encode Vec<BalanceLock>" do
     # scale_bytes = Scale::Bytes.new("0x0876657374696e67207326160de7075e035823000000000000017374616b696e67208018179741946c6630a039000000000002")
     scale_bytes = Scale::Bytes.new("0x0c7374616b696e6720a18161b5b58201000000000000000000ffffffff1f706872656c6563740030434cc42501000000000000000000ffffffff1e64656d6f63726163ffffffffffffffffffffffffffffffffc0c0150002")
-    klass = Scale::Types.type_of("Vec<BalanceLock>")
+    klass = Scale::Types.get("Vec<Scale::Types::BalanceLock>")
     o = klass.decode scale_bytes
     expect(o.value.length).to eql(3)
 

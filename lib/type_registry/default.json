@@ -545,17 +545,6 @@
       ]
     },
     "WinningData": "Vec<WinningDataEntry>",
-    "WithdrawReasons": {
-      "type": "set",
-      "value_type": "u64",
-      "value_list": {
-        "TransactionPayment": 1,
-        "Transfer": 2,
-        "Reserve": 4,
-        "Fee": 8,
-        "Tip": 16
-      }
-    },
     "Index": "U32",
     "Kind": "[u8; 16]",
     "Nominations": {

@@ -23,46 +23,57 @@ module Scale
 
     class U8
       include FixedWidthUInt
+      BYTE_LENGTH = 1
     end
 
     class U16
       include FixedWidthUInt
+      BYTE_LENGTH = 2
     end
 
     class U32
       include FixedWidthUInt
+      BYTE_LENGTH = 4
     end
 
     class U64
       include FixedWidthUInt
+      BYTE_LENGTH = 8
     end
 
     class U128
       include FixedWidthUInt
+      BYTE_LENGTH = 16
     end
 
     class U256
       include FixedWidthUInt
+      BYTE_LENGTH = 32
     end
 
     class I8
       include FixedWidthInt
+      BYTE_LENGTH = 1
     end
 
     class I16
       include FixedWidthInt
+      BYTE_LENGTH = 2
     end
 
     class I32
       include FixedWidthInt
+      BYTE_LENGTH = 4
     end
 
     class I64
       include FixedWidthInt
+      BYTE_LENGTH = 8
     end
 
     class I128
       include FixedWidthInt
+      BYTE_LENGTH = 16
     end
 
     class Compact
