@@ -93,11 +93,11 @@ rspec spec/types_ffi_spec.rb
 
 1. update to latest image
 
-   `docker pull itering/scale`
+   `docker pull itering/scale:latest`
 
 2. Run image:
 
-   `docker run -it itering/scale`
+   `docker run -it itering/scale:latest`
 
    This  will enter the container with a linux shell opened. 
 
