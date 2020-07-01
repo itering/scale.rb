@@ -29,21 +29,28 @@ module Scale
 
   class TypeRegistry
     include Singleton
-    attr_accessor :types, :versioning
-    attr_accessor :spec_version, :metadata
-    attr_accessor :custom_types
+    attr_reader :spec_name, :types, :versioning, :custom_types
+    attr_accessor :spec_version
+    attr_accessor :metadata
 
-    def load(spec_name = nil, custom_types = nil)
-      default_types, _ = load_chain_spec_types("default")
+    def load(spec_name: nil, custom_types: nil)
+      @spec_name = nil
+      @types = nil
+      @versioning = nil
+      @custom_types = nil
+
+      default_types, _, _ = load_chain_spec_types("default")
 
       if spec_name.nil? || spec_name == "default"
+        @spec_name = "default"
         @types = default_types
       else
-        spec_types, @versioning = load_chain_spec_types(spec_name)
+        @spec_name = spec_name
+        spec_types, @versioning, @spec_version = load_chain_spec_types(spec_name)
         @types = default_types.merge(spec_types)
       end
 
-      @custom_types = custom_types.stringify_keys if custom_types.nil? && custom_types.class.name == "Hash"
+      self.custom_types = custom_types
       true
     end
 
@@ -67,27 +74,33 @@ module Scale
       Scale::Types.constantize(type)
     end
 
-    def load_chain_spec_types(spec_name)
-      file = File.join File.expand_path("../..", __FILE__), "lib", "type_registry", "#{spec_name}.json"
-      json_string = File.open(file).read
-      json = JSON.parse(json_string)
-
-      runtime_id = json["runtime_id"]
-
-      [json["types"], json["versioning"]]
+    def custom_types=(custom_types)
+      @custom_types = custom_types.stringify_keys if (not custom_types.nil?) && custom_types.class.name == "Hash"
     end
 
-    def type_traverse(type, types)
-      if types.has_key?(type)
-        type_traverse(types[type], types)
-      else
-        if type.class == ::String
-          rename(type)
+    private
+
+      def load_chain_spec_types(spec_name)
+        file = File.join File.expand_path("../..", __FILE__), "lib", "type_registry", "#{spec_name}.json"
+        json_string = File.open(file).read
+        json = JSON.parse(json_string)
+
+        runtime_id = json["runtime_id"]
+
+        [json["types"], json["versioning"], runtime_id]
+      end
+
+      def type_traverse(type, types)
+        if types.has_key?(type)
+          type_traverse(types[type], types)
         else
-          type
+          if type.class == ::String
+            rename(type)
+          else
+            type
+          end
         end
       end
-    end
   end
 
   # TODO: == implement
