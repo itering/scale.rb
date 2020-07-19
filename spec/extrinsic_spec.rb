@@ -6,7 +6,8 @@ ROOT = Pathname.new File.expand_path("../../", __FILE__)
 module Scale::Types
   describe Extrinsic do
     before(:all) {
-      Scale::TypeRegistry.instance.load("kusama", 1045)
+      Scale::TypeRegistry.instance.load(spec_name: "kusama")
+      Scale::TypeRegistry.instance.spec_version = 1045
       hex = File.open(File.join(ROOT, "spec", "metadata", "v10", "hex")).read.strip
       scale_bytes = Scale::Bytes.new(hex)
       metadata = Scale::Types::Metadata.decode scale_bytes
