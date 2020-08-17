@@ -88,7 +88,7 @@ module Scale
       def self.decode(scale_bytes)
         result = {
           name: String.decode(scale_bytes).value,
-          docs: Scale::Types.type_of("Vec<String>").decode(scale_bytes).value.map(&:value)
+          documentation: Scale::Types.type_of("Vec<String>").decode(scale_bytes).value.map(&:value)
         }
 
         MetadataModuleError.new(result)

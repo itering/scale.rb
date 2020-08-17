@@ -96,9 +96,10 @@ module Scale
           # decode params
           result[:params_raw] = scale_bytes.get_remaining_bytes.bytes_to_hex
           result[:params] = call[:args].map do |arg|
-            type = Scale::Types.get(arg[:type])
-            arg_obj = type.decode(scale_bytes)
-            {name: arg[:name], type: arg[:type], scale_type: type, value: arg_obj.value }
+            type = arg[:type]
+            scale_type = Scale::Types.get(type)
+            obj = scale_type.decode(scale_bytes)
+            {name: arg[:name], type: type, scale_type: scale_type, value: obj.value }
           end
         end
 

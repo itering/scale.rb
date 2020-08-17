@@ -129,7 +129,7 @@ module Scale
       def self.decode(scale_bytes)
         id = U16.decode(scale_bytes).value
         name = Bytes.decode(scale_bytes).value
-        args = Scale::Types.type_of("Vec<MetadataModuleCallArgument>").decode(scale_bytes).value.map(&:value)
+        args = Scale::Types.type_of("Vec<MetadataV0ModuleCallArgument>").decode(scale_bytes).value.map(&:value)
         documentation = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
         MetadataV0ModuleFunction.new({
           id: id,
@@ -140,14 +140,14 @@ module Scale
       end
     end
 
-    class MetadataModuleCallArgument
+    class MetadataV0ModuleCallArgument
       include SingleValue
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
         type = Bytes.decode(scale_bytes).value
 
-        MetadataModuleCallArgument.new({name: name, type: type})
+        MetadataV0ModuleCallArgument.new({name: name, type: type})
       end
     end
 

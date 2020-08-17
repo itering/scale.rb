@@ -92,26 +92,26 @@ module Scale
 
         if is_key_value
           type = {
-            MapType: {
-              key: rename(Bytes.decode(scale_bytes).value),
-              value: rename(Bytes.decode(scale_bytes).value)
+            Map: {
+              key: Bytes.decode(scale_bytes).value,
+              value: Bytes.decode(scale_bytes).value
             }
           }
         else
           type = {
-            PlainType: rename(Bytes.decode(scale_bytes).value)
+            Plain: Bytes.decode(scale_bytes).value
           }
         end
 
         fallback = Hex.decode(scale_bytes).value
-        docs = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value
+        docs = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
 
         MetadataV1ModuleStorage.new({
           name: name,
           modifier: modifier,
           type: type,
-          default: fallback,
-          docs: docs
+          fallback: fallback,
+          documentation: docs
         })
       end
     end

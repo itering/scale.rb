@@ -92,7 +92,7 @@ module Scale
           name: String.decode(scale_bytes).value,
           type: String.decode(scale_bytes).value, # convert
           value: Hex.decode(scale_bytes).value,
-          docs: Scale::Types.type_of("Vec<String>").decode(scale_bytes).value.map(&:value)
+          documentation: Scale::Types.type_of("Vec<String>").decode(scale_bytes).value.map(&:value)
         }
         MetadataV6ModuleConstants.new result
       end
