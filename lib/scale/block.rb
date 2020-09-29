@@ -124,6 +124,24 @@ module Scale
       end
     end
 
+    class Phase
+      include Enum
+      items isApplyExtrinsic: "Bool", asApplyExtrinsic: "U32", isFinalization: "Bool", isInitialization: "Bool"
+    end
+
+    class EventRecords
+      include SingleValue
+      
+      def self.decode(scale_bytes)
+
+        length = Compact.decode(scale_bytes).value
+
+        length.times do |i|
+          ev = EventRecord.decode(scale_bytes)
+        end
+      end
+    end
+
     class EventRecord
       include SingleValue
 

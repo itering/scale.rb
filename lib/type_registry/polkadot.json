@@ -1,9 +1,10 @@
 {
-  "runtime_id": 23,
+  "runtime_id": 18,
   "types": {
     "Address": "AccountIdAddress",
     "BlockNumber": "U32",
     "LeasePeriod": "BlockNumber",
+    "Weight": "u64",
     "SessionKeysPolkadot": {
       "type": "struct",
       "type_mapping": [
@@ -15,11 +16,20 @@
       ]
     },
     "Keys": "SessionKeysPolkadot",
+    "DispatchInfo": {
+      "type": "struct",
+      "type_mapping": [
+         ["weight", "Weight"],
+         ["class", "DispatchClass"],
+         ["paysFee", "Pays"]
+      ]
+    },
     "ProxyType": {
       "type": "enum",
       "value_list": [
         "Any",
         "NonTransfer",
+        "Governance",
         "Staking",
         "SudoBalances",
         "IdentityJudgement"
@@ -28,7 +38,7 @@
   },
   "versioning": [
     {
-      "runtime_range": [3, 22],
+      "runtime_range": [0, 12],
       "types": {
         "OpenTip": {
           "type": "struct",
@@ -43,7 +53,7 @@
       }
     },
     {
-      "runtime_range": [23, null],
+      "runtime_range": [13, null],
       "types": {
         "OpenTip": {
           "type": "struct",
@@ -57,6 +67,18 @@
              ["findersFee", "bool"]
           ]
         }
+      }
+    },
+    {
+      "runtime_range": [0, 22],
+      "types": {
+        "CompactAssignments": "CompactAssignmentsTo257"
+      }
+    },
+    {
+      "runtime_range": [23, null],
+      "types": {
+        "CompactAssignments": "CompactAssignmentsFrom258"
       }
     }
   ]

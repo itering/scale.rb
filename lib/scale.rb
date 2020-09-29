@@ -336,6 +336,7 @@ def rename(type)
   return "Compact" if type == "<Balance as HasCompact>::Type"
   return "Compact" if type == "<BlockNumber as HasCompact>::Type"
   return "Compact" if type == "Compact<Balance>"
+  return "Compact" if type == "Compact<BlockNumber>"
   return "CompactMoment" if type == "<Moment as HasCompact>::Type"
   return "CompactMoment" if type == "Compact<Moment>"
   return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"

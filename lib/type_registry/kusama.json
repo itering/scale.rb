@@ -1,5 +1,5 @@
 {
-  "runtime_id": 1062,
+  "runtime_id": 2023,
   "types": {
     "Address": "AccountIdAddress",
     "BlockNumber": "U32",
@@ -15,7 +15,26 @@
          ["parachains", "AccountId"]
       ]
     },
-    "Keys": "SessionKeysPolkadot"
+    "Keys": "SessionKeysPolkadot",
+    "DispatchInfo": {
+      "type": "struct",
+      "type_mapping": [
+         ["weight", "Weight"],
+         ["class", "DispatchClass"],
+         ["paysFee", "Pays"]
+      ]
+    },
+    "ProxyType": {
+      "type": "enum",
+      "value_list": [
+        "Any",
+        "NonTransfer",
+        "Governance",
+        "Staking",
+        "IdentityJudgement"
+      ]
+    },
+    "CompactAssignments": "CompactAssignmentsFrom258"
   },
   "versioning": [
     {
@@ -112,15 +131,7 @@
       "runtime_range": [1019, 1045],
       "types": {
         "Address": "RawAddress",
-        "StakingLedger<AccountId, BalanceOf>": {
-          "type": "struct",
-          "type_mapping": [
-             ["stash", "AccountId"],
-             ["total", "Compact<Balance>"],
-             ["active", "Compact<Balance>"],
-             ["unlocking", "Vec<UnlockChunk<Balance>>"]
-          ]
-        },
+        "StakingLedger": "StakingLedgerTo223",
         "BalanceLock": {
           "type": "struct",
           "type_mapping": [
@@ -133,17 +144,47 @@
       }
     },
     {
-      "runtime_range": [1050, null],
+      "runtime_range": [1050, 1056],
       "types": {
         "Address": "AccountIdAddress",
-        "StakingLedger<AccountId, BalanceOf>": {
+        "StakingLedger": "StakingLedgerTo240",
+        "BalanceLock": {
           "type": "struct",
           "type_mapping": [
-            ["stash", "AccountId"],
-            ["total", "Compact<Balance>"],
-            ["active", "Compact<Balance>"],
-            ["unlocking", "Vec<UnlockChunk<Balance>>"],
-            ["lastReward", "Option<EraIndex>"]
+             ["id", "LockIdentifier"],
+             ["amount", "Balance"],
+             ["reasons", "Reasons"]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [1057, null],
+      "types": {
+        "Address": "AccountIdAddress",
+        "StakingLedger": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "stash",
+              "AccountId"
+            ],
+            [
+              "total",
+              "Compact<Balance>"
+            ],
+            [
+              "active",
+              "Compact<Balance>"
+            ],
+            [
+              "unlocking",
+              "Vec<UnlockChunk>"
+            ],
+            [
+              "claimedRewards",
+              "Vec<EraIndex>"
+            ]
           ]
         },
         "BalanceLock": {
@@ -195,7 +236,7 @@
       }
     },
     {
-      "runtime_range": [1019, 1058],
+      "runtime_range": [1019, 1061],
       "types": {
         "Heartbeat": {
           "type": "struct",
@@ -204,6 +245,14 @@
              ["networkState", "OpaqueNetworkState"],
              ["sessionIndex", "SessionIndex"],
              ["authorityIndex", "AuthIndex"]
+          ]
+        },
+        "DispatchInfo": {
+          "type": "struct",
+          "type_mapping": [
+             ["weight", "Weight"],
+             ["class", "DispatchClass"],
+             ["paysFee", "bool"]
           ]
         }
       }
@@ -220,7 +269,59 @@
              ["authorityIndex", "AuthIndex"],
              ["validatorsLen", "u32"]
           ]
+        },
+        "DispatchInfo": {
+          "type": "struct",
+          "type_mapping": [
+             ["weight", "Weight"],
+             ["class", "DispatchClass"],
+             ["paysFee", "Pays"]
+          ]
         }
+      }
+    },
+    {
+      "runtime_range": [1019, 2012],
+      "types": {
+        "OpenTip": {
+          "type": "struct",
+          "type_mapping": [
+             ["reason", "Hash"],
+             ["who", "AccountId"],
+             ["finder", "Option<OpenTipFinder>"],
+             ["closes", "Option<BlockNumber>"],
+             ["tips", "Vec<OpenTipTip>"]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [2013, null],
+      "types": {
+        "OpenTip": {
+          "type": "struct",
+          "type_mapping": [
+             ["reason", "Hash"],
+             ["who", "AccountId"],
+             ["finder", "AccountId"],
+             ["deposit", "Balance"],
+             ["closes", "Option<BlockNumber>"],
+             ["tips", "Vec<OpenTipTip>"],
+             ["findersFee", "bool"]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [1019, 2022],
+      "types": {
+        "CompactAssignments": "CompactAssignmentsTo257"
+      }
+    },
+    {
+      "runtime_range": [2023, null],
+      "types": {
+        "CompactAssignments": "CompactAssignmentsFrom258"
       }
     }
   ]
