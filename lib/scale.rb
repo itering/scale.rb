@@ -91,7 +91,7 @@ module Scale
       end
 
       def type_traverse(type, types)
-        if types.has_key?(type)
+        if types.has_key?(type) && types[type] != type
           type_traverse(types[type], types)
         else
           if type.class == ::String

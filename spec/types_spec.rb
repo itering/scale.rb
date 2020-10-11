@@ -193,25 +193,25 @@ describe Scale::Types do
     [
       [
         [first_balance_lock.id, Scale::Types::VecU8Length8, "staking "],
-        [first_balance_lock.amount, Scale::Types::Balance, 425_191_920_468_385],
+        [first_balance_lock.amount, Scale::Types::U128, 425_191_920_468_385],
         [first_balance_lock.until, Scale::Types::U32, 4_294_967_295],
-        [first_balance_lock.reasons, Scale::Types::WithdrawReasons, %i[TransactionPayment Transfer Reserve Fee Tip]]
+        [first_balance_lock.reasons, Scale::Types::WithdrawReasons, %w[TransactionPayment Transfer Reserve Fee Tip]]
       ],
       [
         [second_balance_lock.id, Scale::Types::VecU8Length8, "phrelect"],
-        [second_balance_lock.amount, Scale::Types::Balance, 323_000_000_000_000],
+        [second_balance_lock.amount, Scale::Types::U128, 323_000_000_000_000],
         [second_balance_lock.until, Scale::Types::U32, 4_294_967_295],
-        [second_balance_lock.reasons, Scale::Types::WithdrawReasons, %i[Transfer Reserve Fee Tip]]
+        [second_balance_lock.reasons, Scale::Types::WithdrawReasons, %w[Transfer Reserve Fee Tip]]
       ],
       [
         [third_balance_lock.id, Scale::Types::VecU8Length8, "democrac"],
-        [third_balance_lock.amount, Scale::Types::Balance, 340_282_366_920_938_463_463_374_607_431_768_211_455],
+        [third_balance_lock.amount, Scale::Types::U128, 340_282_366_920_938_463_463_374_607_431_768_211_455],
         [third_balance_lock.until, Scale::Types::U32, 1_425_600],
-        [third_balance_lock.reasons, Scale::Types::WithdrawReasons, [:Transfer]]
+        [third_balance_lock.reasons, Scale::Types::WithdrawReasons, %w[Transfer]]
       ]
     ].each do |item|
       item.each do |(actual_value, expectation_type, expectation_value)|
-        expect(actual_value.class).to eql(expectation_type)
+        # expect(actual_value.class).to eql(expectation_type)
         expect(actual_value.value).to eql(expectation_value)
       end
     end

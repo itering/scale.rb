@@ -1,16 +1,16 @@
 PATH
   remote: .
   specs:
-    scale.rb (0.2.6)
+    scale.rb (0.2.7)
       activesupport (>= 4.0.0)
       json (~> 2.3.0)
-      substrate_common.rb (~> 0.1.8)
+      substrate_common.rb (~> 0.1.9)
       thor (~> 0.19.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (6.0.3.1)
+    activesupport (6.0.3.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
@@ -44,7 +44,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.0)
-    substrate_common.rb (0.1.8)
+    substrate_common.rb (0.1.9)
       base58
       blake2b
       xxhash
@@ -53,7 +53,7 @@ GEM
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     xxhash (0.4.0)
-    zeitwerk (2.3.0)
+    zeitwerk (2.4.0)
 
 PLATFORMS
   ruby
