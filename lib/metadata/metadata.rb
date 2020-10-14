@@ -6,7 +6,7 @@ module Scale
       def self.decode(scale_bytes)
         bytes = scale_bytes.get_next_bytes(4)
         if bytes.bytes_to_utf8 == "meta"
-          metadata_version = Scale::Types.type_of("Enum", %w[MetadataV0 MetadataV1 MetadataV2 MetadataV3 MetadataV4 MetadataV5 MetadataV6 MetadataV7 MetadataV8 MetadataV9 MetadataV10 MetadataV11]).decode(scale_bytes).value
+          metadata_version = Scale::Types.type_of("Enum", %w[MetadataV0 MetadataV1 MetadataV2 MetadataV3 MetadataV4 MetadataV5 MetadataV6 MetadataV7 MetadataV8 MetadataV9 MetadataV10 MetadataV11 MetadataV12]).decode(scale_bytes).value
           metadata = Metadata.new "Scale::Types::#{metadata_version}".constantize.decode(scale_bytes)
           metadata.version = metadata_version[9..].to_i
         else

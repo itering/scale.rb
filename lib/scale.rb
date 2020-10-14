@@ -23,6 +23,7 @@ require "metadata/metadata_v8"
 require "metadata/metadata_v9"
 require "metadata/metadata_v10"
 require "metadata/metadata_v11"
+require "metadata/metadata_v12"
 
 module Scale
   class Error < StandardError; end
