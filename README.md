@@ -10,7 +10,7 @@ This is a SCALE codec library implemented in ruby language for general use. It c
 
 This work is the prerequisite of our subsequent series of projects. We hope to familiarize and quickly access Polkadot and Substrate through ruby. We plan to develop the back end of our applications in ruby language, and then interact with nodes or synchronize data through this library.
 
-Please refer to the [official doc](https://substrate.dev/docs/en/overview/low-level-data-format) for more details about SCALE low-level data format.
+Please refer to the [official doc](https://substrate.dev/docs/en/knowledgebase/advanced/codec) for more details about SCALE low-level data format.
 
 Because the feature of ruby 2.6 is used, the ruby version is required to be >= 2.6. it will be compatible with older ruby versions when released.
 
