@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    scale.rb (0.2.9)
+    scale.rb (0.2.10)
       activesupport (>= 4.0.0)
       json (~> 2.3.0)
       substrate_common.rb (~> 0.1.9)
@@ -53,7 +53,7 @@ GEM
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     xxhash (0.4.0)
-    zeitwerk (2.4.0)
+    zeitwerk (2.4.1)
 
 PLATFORMS
   ruby

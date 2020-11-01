@@ -92,14 +92,11 @@ module Scale
       end
 
       def type_traverse(type, types)
+        type = rename(type) if type.class == ::String
         if types.has_key?(type) && types[type] != type
           type_traverse(types[type], types)
         else
-          if type.class == ::String
-            rename(type)
-          else
-            type
-          end
+          type
         end
       end
   end
