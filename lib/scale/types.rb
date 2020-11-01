@@ -225,59 +225,71 @@ module Scale
       end
     end
 
-    class Address
+    class GenericAddress
       include SingleValue
-      attr_accessor :account_length, :account_index, :account_id, :account_idx
 
+      # https://github.com/paritytech/substrate/wiki/External-Address-Format-(SS58)
+      # base58encode ( concat ( <address-type>, <address>, <checksum> ) )
+      #                                         ^^^^^^^^^
+      # the <address> is 32 byte account id or 1, 2, 4, 8 byte account index
+      # scale_bytes: account length byte  + <address>'s bytes
       def self.decode(scale_bytes)
         account_length = scale_bytes.get_next_bytes(1).first
 
-        if account_length == 0xff # 255
+        if account_length == 0xff # 32 bytes address(Public key)
           account_id = scale_bytes.get_next_bytes(32).bytes_to_hex
-          account_length = account_length.to_s(16)
-          Address.new(account_id)
+          account_length = [account_length].bytes_to_hex
+
+          Address.new({
+            account_id: account_id,
+            account_length: account_length
+          })
         else
           account_index =
-            if account_length == 0xfc
+            if account_length == 0xfc # 2 bytes address(account index)
               scale_bytes.get_next_bytes(2).bytes_to_hex
-            elsif account_length == 0xfd
+            elsif account_length == 0xfd # 4 bytes address(account index)
               scale_bytes.get_next_bytes(4).bytes_to_hex
-            elsif account_length == 0xfe
+            elsif account_length == 0xfe # 8 bytes address(account index)
               scale_bytes.get_next_bytes(8).bytes_to_hex
             else
               [account_length].bytes_to_hex
             end
-          # account_idx = 
-          account_length = account_length.to_s(16)
-          Address.new(account_index)
+          # TODO: add account_idx 
+          account_length = [account_length].bytes_to_hex
+
+          Address.new({
+            account_index: account_index,
+            account_length: account_length
+          })
         end
       end
 
-      def encode(ss58=false, addr_type=42)
-        if value.start_with?("0x")
-          if ss58 === true
-            ::Address.encode(value, addr_type)
-          else
-            prefix = if value.length == 66
-              "ff"
-            elsif value.length == 6
-              "fc"
-            elsif value.length == 10
-              "fd"
-            elsif value.length == 18
-              "fe"
-            else
-              ""
-            end
-            "#{prefix}#{value[2..]}"
-          end
+      def encode
+        if self.value[:account_id]
+          "#{self.value[:account_length][2..]}#{self.value[:account_id][2..]}"
         else
-          raise "Format error"
+          "#{self.value[:account_length][2..]}#{self.value[:account_index][2..]}"
         end
       end
     end
 
-    class RawAddress < Address; end
+    class Address < GenericAddress; end
+
+    class RawAddress < GenericAddress; end
+
+    class AccountIdAddress < GenericAddress
+      def self.decode(scale_bytes)
+        AccountIdAddress.new({
+          account_id: AccountId.decode(scale_bytes).value,
+          account_length: "0xff"
+        })
+      end
+
+      def encode
+        "ff#{self.value[:account_id][2..]}"
+      end
+    end
 
     class AccountId < H256; end
 

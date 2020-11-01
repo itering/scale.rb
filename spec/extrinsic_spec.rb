@@ -25,7 +25,7 @@ module Scale::Types
 
       expect(value[:params][0][:name]).to eql("dest")
       expect(value[:params][0][:type]).to eql("<T::Lookup as StaticLookup>::Source")
-      expect(value[:params][0][:value]).to eql("0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409")
+      expect(value[:params][0][:value][:account_id]).to eql("0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409")
 
       expect(value[:params][1][:name]).to eql("value")
       expect(value[:params][1][:type]).to eql("Compact<T::Balance>")
@@ -41,7 +41,7 @@ module Scale::Types
           {
             name: "dest",
             type: "<T::Lookup as StaticLookup>::Source",
-            value: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409"
+            value: { account_id: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409", account_length: "0xff" }
           },
           {
             name: "value",
