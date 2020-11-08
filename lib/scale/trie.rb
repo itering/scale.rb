@@ -38,8 +38,6 @@ module Scale
 
             ### partial decoding
             partial_bytes = scale_bytes.get_next_bytes((nibble_count + (NIBBLE_PER_BYTE - 1)) / NIBBLE_PER_BYTE)
-            # Calculate the number of needed padding a array of nibble count.
-            partial_padding = nibble_count % NIBBLE_PER_BYTE
 
             ### value
             count = Compact.decode(scale_bytes).value
@@ -48,8 +46,8 @@ module Scale
             return TrieNode.new({
               node_type: "leaf",
               partial: {
-                partial_bytes: partial_bytes, 
-                partial_padding: partial_padding
+                bytes: partial_bytes, 
+                padding: padding
               },
               value_bytes: value_bytes,
             })
@@ -66,8 +64,6 @@ module Scale
 
             ### partial decoding
             partial_bytes = scale_bytes.get_next_bytes((nibble_count + (NIBBLE_PER_BYTE - 1)) / NIBBLE_PER_BYTE)
-            # Calculate the number of needed padding a array of nibble count.
-            partial_padding = nibble_count % NIBBLE_PER_BYTE
 
             ### value decoding
             if v == 0b11 << 6 # has value
@@ -104,8 +100,8 @@ module Scale
             result = TrieNode.new({
               node_type: "branch",
               partial: {
-                partial_bytes: partial_bytes, 
-                partial_padding: partial_padding
+                bytes: partial_bytes, 
+                padding: padding
               },
               children: children
             })
