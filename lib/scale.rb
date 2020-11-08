@@ -9,6 +9,7 @@ require "singleton"
 require "scale/base"
 require "scale/types"
 require "scale/block"
+require "scale/trie"
 
 require "metadata/metadata"
 require "metadata/metadata_v0"
