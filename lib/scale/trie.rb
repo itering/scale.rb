@@ -46,10 +46,10 @@ module Scale
             return TrieNode.new({
               node_type: "leaf",
               partial: {
-                bytes: partial_bytes, 
+                hex: partial_bytes.bytes_to_hex, 
                 padding: padding
               },
-              value_bytes: value_bytes,
+              value: value_bytes.bytes_to_hex
             })
           elsif v == 0b10 << 6 || v == 0b11 << 6 # branch without mask || branch with mask
             nibble_count = decode_size.call
@@ -84,7 +84,7 @@ module Scale
                   children[i] = hash
                 else
                   inline = scale_bytes.get_next_bytes count
-                  children[i] = inline
+                  children[i] = inline.bytes_to_hex
                 end
               end
             end
@@ -100,13 +100,13 @@ module Scale
             result = TrieNode.new({
               node_type: "branch",
               partial: {
-                bytes: partial_bytes, 
+                hex: partial_bytes.bytes_to_hex, 
                 padding: padding
               },
               children: children
             })
 
-            result[:value_bytes] if value_bytes
+            result[:value] = value_bytes.bytes_to_hex if value_bytes
 
             return result
           else
