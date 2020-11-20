@@ -10,6 +10,7 @@ module Scale
       NIBBLE_SIZE_BOUND = 65535
 
       def self.decode(scale_bytes)
+        hash = "0x#{Crypto::blake2_256(scale_bytes.bytes)}"
         first = scale_bytes.get_next_bytes(1).first
         if first == EMPTY
           TrieNode.new({})
@@ -44,6 +45,7 @@ module Scale
             value_bytes = scale_bytes.get_next_bytes(count)
 
             return TrieNode.new({
+              hash: hash,
               node_type: "leaf",
               partial: {
                 hex: partial_bytes.bytes_to_hex, 
@@ -80,8 +82,8 @@ module Scale
               if has_child
                 count = Compact.decode(scale_bytes).value
                 if count == 32
-                  hash = H256.decode(scale_bytes).value
-                  children[i] = hash
+                  h = H256.decode(scale_bytes).value
+                  children[i] = h
                 else
                   inline = scale_bytes.get_next_bytes count
                   children[i] = inline.bytes_to_hex
@@ -98,6 +100,7 @@ module Scale
             # end
 
             result = TrieNode.new({
+              hash: hash,
               node_type: "branch",
               partial: {
                 hex: partial_bytes.bytes_to_hex, 
@@ -115,7 +118,54 @@ module Scale
 
         end
       end
+
+      def self.check(root, proof, key)
+        key = Key.new(key)
+
+        nodes = proof.map {|node_data| 
+          node = TrieNode::decode(Scale::Bytes.new(node_data)).value
+          [node[:hash], node]
+        }.to_h
+
+        self.do_check(root, nodes, key)
+      end
+
+      private
+      def self.do_check(hash, nodes, key)
+        if node = nodes[hash]
+          if node[:children]
+            position = key.next_nibble(node[:partial][:hex], node[:partial][:padding]).to_i(16)
+            child = node[:children][position]
+            return self.do_check(child, nodes, key)
+          else
+            return node[:value]
+          end
+        else
+          raise "Fail"
+        end
+      end
     end
 
+  end
+end
+
+class Key
+  def initialize(value)
+    @value = value[2..] if value.start_with?("0x")
+    @offset = 0
+  end
+
+  def next_nibble(partial, padding)
+    partial = partial[2..] if partial.start_with?("0x")
+    partial = partial[1..] if padding
+
+    new_offset = @offset + partial.length
+    if partial == @value[@offset...new_offset]
+      nibble = @value[new_offset]
+      @offset = new_offset + 1
+      return nibble
+    else
+      raise "Fail"
+    end
   end
 end
