@@ -75,6 +75,15 @@ class ScaleCli < Thor
     type = Scale::Types.get(type_name)
     p "0x" + type.new(value.to_i).encode
   end
+
+  desc "check_read_proof ROOT PROOF STORAGE_KEY", "check read proof and output leaf's value"
+  def check_read_proof(root, proof, storage_key)
+    Scale::TypeRegistry.instance.load
+    proof = proof.split(",").map(&:strip)
+    
+    value = Scale::Types::TrieNode::check(root, proof, storage_key)
+    p value
+  end
 end
 
 ScaleCli.start(ARGV)
