@@ -36,8 +36,13 @@ module Scale
 
   class TypeRegistry
     include Singleton
-    attr_reader :spec_name, :types, :versioning, :custom_types
-    attr_accessor :spec_version
+
+    # init by load, and will not change
+    attr_reader :spec_name, :types
+    attr_reader :versioning, :custom_types # optional
+
+    # will change by different spec version
+    attr_accessor :spec_version # optional
     attr_accessor :metadata
 
     def load(spec_name: nil, custom_types: nil)
@@ -48,13 +53,18 @@ module Scale
 
       default_types, _, _ = load_chain_spec_types("default")
 
-      if spec_name.nil? || spec_name == "default"
+      if spec_name
+        begin
+          @spec_name = spec_name
+          spec_types, @versioning, @spec_version = load_chain_spec_types(spec_name)
+          @types = default_types.merge(spec_types)
+        rescue => ex
+          puts "There is no types json file of name: #{spec_name}"
+          @types = default_types
+        end
+      else
         @spec_name = "default"
         @types = default_types
-      else
-        @spec_name = spec_name
-        spec_types, @versioning, @spec_version = load_chain_spec_types(spec_name)
-        @types = default_types.merge(spec_types)
       end
 
       self.custom_types = custom_types
