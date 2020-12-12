@@ -26,6 +26,11 @@ require "metadata/metadata_v10"
 require "metadata/metadata_v11"
 require "metadata/metadata_v12"
 
+require "substrate_client"
+require "logger"
+require "helper"
+require 'kontena-websocket-client'
+
 module Scale
   class Error < StandardError; end
 
