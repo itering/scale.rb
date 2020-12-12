@@ -22,12 +22,13 @@ class SubstrateClient
   class RpcError < StandardError; end
   class RpcTimeout < StandardError; end
 
-  attr_accessor :metadata
+  attr_reader :metadata
   attr_reader :spec_name, :spec_version
 
   def initialize(url)
     @url = url
     @request_id = 1
+    @metadata_cache = {}
   end
 
   def request(method, params)
@@ -60,9 +61,20 @@ class SubstrateClient
     registry.spec_version = spec_version
 
     # set current metadata
-    @metadata = self.get_metadata(block_hash)
-    registry.metadata = @metadata.value
+    metadata = @metadata_cache[spec_version]
+    if metadata.nil?
+      metadata = self.get_metadata(block_hash)
+      @metadata_cache[spec_version] = metadata
+    end
+
+    @metadata = metadata
+    registry.metadata = metadata.value
+
     true
+  end
+
+  def get_metadata_from_cache(spec_version)
+
   end
 
   def invoke(method, *params)
