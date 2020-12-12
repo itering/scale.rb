@@ -2,7 +2,6 @@ require "scale"
 
 
 client = SubstrateClient.new("ws://127.0.0.1:9944/")
-client.init
 metadata = client.get_metadata nil
 
 the_module = metadata.get_module("CertificateModule")
@@ -23,7 +22,7 @@ puts "CertificateModule storages:"
 puts "---------------------------------------"
 puts the_module[:storage][:items]
 
-# Scale::TypeRegistry.instance.metadata = metadata.value
+# Scale::TypeRegistry.instance.metadata = metadata
 # puts metadata.value.event_index["0400"][1]
 # puts metadata.value.event_index["0401"][1]
 # puts metadata.value.event_index["0402"][1]

@@ -68,7 +68,7 @@ class SubstrateClient
     end
 
     @metadata = metadata
-    registry.metadata = metadata.value
+    registry.metadata = metadata
 
     true
   end

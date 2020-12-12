@@ -11,7 +11,7 @@ module Scale::Types
       hex = File.open(File.join(ROOT, "spec", "metadata", "v10", "hex")).read.strip
       scale_bytes = Scale::Bytes.new(hex)
       metadata = Scale::Types::Metadata.decode scale_bytes
-      Scale::TypeRegistry.instance.metadata = metadata.value
+      Scale::TypeRegistry.instance.metadata = metadata
     }
 
     it "can decode balance transfer payload" do

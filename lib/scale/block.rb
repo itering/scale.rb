@@ -10,7 +10,7 @@ module Scale
       end
 
       def self.decode(scale_bytes)
-        metadata = Scale::TypeRegistry.instance.metadata
+        metadata = Scale::TypeRegistry.instance.metadata.value
         result = {}
 
         extrinsic_length = Compact.decode(scale_bytes).value
@@ -146,7 +146,7 @@ module Scale
       include SingleValue
 
       def self.decode(scale_bytes)
-        metadata = Scale::TypeRegistry.instance.metadata
+        metadata = Scale::TypeRegistry.instance.metadata.value
 
         result = {}
         phase = scale_bytes.get_next_bytes(1).first
