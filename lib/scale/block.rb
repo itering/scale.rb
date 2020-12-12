@@ -24,9 +24,6 @@ module Scale
           if contains_transaction
             address = Scale::Types.get("Address").decode(scale_bytes)
             result[:address] = address.value
-            result[:account_length] = address.account_length
-            result[:account_id] = address.account_id
-            result[:account_index] = address.account_index
             result[:signature] = Scale::Types.get("Signature").decode(scale_bytes).value
             result[:nonce] = Scale::Types.get("Compact").decode(scale_bytes).value
             result[:era] = Scale::Types.get("Era").decode(scale_bytes).value
@@ -39,9 +36,6 @@ module Scale
           if contains_transaction
             address = Scale::Types.get("Address").decode(scale_bytes)
             result[:address] = address.value
-            result[:account_length] = address.account_length
-            result[:account_id] = address.account_id
-            result[:account_index] = address.account_index
             result[:signature] = Scale::Types.get("Signature").decode(scale_bytes).value
             result[:era] = Scale::Types.get("Era").decode(scale_bytes).value
             result[:nonce] = Scale::Types.get("Compact").decode(scale_bytes).value
@@ -55,9 +49,6 @@ module Scale
           if contains_transaction
             address = Scale::Types.get("Address").decode(scale_bytes)
             result[:address] = address.value
-            result[:account_length] = address.account_length
-            result[:account_id] = address.account_id
-            result[:account_index] = address.account_index
             result[:signature] = Scale::Types.get("Signature").decode(scale_bytes).value
             result[:era] = Scale::Types.get("Era").decode(scale_bytes).value
             result[:nonce] = Scale::Types.get("Compact").decode(scale_bytes).value
@@ -69,16 +60,11 @@ module Scale
         elsif version_info == "0x04" || version_info == "0x84"
 
           if contains_transaction
-            address = Scale::Types.get("Address").decode(scale_bytes)
-            result[:address] = address.value
-            result[:account_length] = address.account_length
-            result[:account_id] = address.account_id
-            result[:account_index] = address.account_index
-            result[:signature_version] = Scale::Types.get("U8").decode(scale_bytes).value
-            result[:signature] = Scale::Types.get("Signature").decode(scale_bytes).value
-            result[:era] = Scale::Types.get("Era").decode(scale_bytes).value
-            result[:nonce] = Scale::Types.get("Compact").decode(scale_bytes).value
-            result[:tip] = Scale::Types.get("Compact").decode(scale_bytes).value
+            result[:address] = Scale::Types.get("Address").decode(scale_bytes).value
+            result[:signature] = scale::types.get("MultiSignature").decode(scale_bytes).value
+            result[:era] = scale::types.get("era").decode(scale_bytes).value
+            result[:nonce] = scale::types.get("compact").decode(scale_bytes).value
+            result[:tip] = scale::types.get("compact").decode(scale_bytes).value
             result[:extrinsic_hash] = generate_hash(scale_bytes.bytes)
           end
           result[:call_index] = scale_bytes.get_next_bytes(2).bytes_to_hex[2..]
