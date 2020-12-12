@@ -257,13 +257,9 @@ module Scale
 
       def encode
         if self.class.const_defined? "ITEM_NAMES"
-          if self.value.class != ::Hash || self.value.keys.length != 1
-            raise "Bad Data"
-          end
-          name_str = value.keys.first.to_s
-          index = self.class::ITEM_NAMES.index(name_str)
-          value_encode = Scale::Types.get(self.class::ITEM_TYPE_STRS[index]).new(value.values.first).encode
-          index = index.to_s(16).rjust(2, "0") + value_encode
+          value_type_str = value.class.to_s.split("::").last.to_s
+          index = self.class::ITEM_TYPE_STRS.index(value_type_str).to_s(16).rjust(2, "0")
+          index + value.encode
         else
           self.class::VALUES.index(value).to_s(16).rjust(2, "0")
         end
