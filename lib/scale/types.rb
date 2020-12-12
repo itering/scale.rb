@@ -570,34 +570,42 @@ module Scale
 
     class VecU8Length2
       include VecU8FixedLength
+      BYTE_LENGTH = 2
     end
 
     class VecU8Length3
       include VecU8FixedLength
+      BYTE_LENGTH = 3
     end
 
     class VecU8Length4
       include VecU8FixedLength
+      BYTE_LENGTH = 4
     end
 
     class VecU8Length8
       include VecU8FixedLength
+      BYTE_LENGTH = 8
     end
 
     class VecU8Length16
       include VecU8FixedLength
+      BYTE_LENGTH = 16
     end
 
     class VecU8Length20
       include VecU8FixedLength
+      BYTE_LENGTH = 20
     end
 
     class VecU8Length32
       include VecU8FixedLength
+      BYTE_LENGTH = 32
     end
 
     class VecU8Length64
       include VecU8FixedLength
+      BYTE_LENGTH = 64
     end
 
     class BalanceLock

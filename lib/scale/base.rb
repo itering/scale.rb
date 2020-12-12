@@ -353,9 +353,8 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
-          byte_length = name[25..]
-          raise "length is wrong: #{byte_length}" unless %w[2 3 4 8 16 20 32 64].include?(byte_length)
-          byte_length = byte_length.to_i
+          byte_length = self::BYTE_LENGTH
+          raise "#{self.name} byte length is wrong: #{byte_length}" unless %w[2 3 4 8 16 20 32 64].include?(byte_length.to_s)
 
           bytes = scale_bytes.get_next_bytes(byte_length)
           str = bytes.pack("C*").force_encoding("utf-8")
@@ -372,12 +371,10 @@ module Scale
       end
 
       def encode
-        class_name = self.class.to_s
-        length = class_name[25..]
-        raise "length is wrong: #{length}" unless %w[2 3 4 8 16 20 32 64].include?(length)
-        length = length.to_i
+        byte_length = self.class::BYTE_LENGTH
+        raise "#{self.class.name}'s byte length is wrong: #{byte_length}" unless %w[2 3 4 8 16 20 32 64].include?(byte_length.to_s)
 
-        if value.start_with?("0x") && value.length == (length * 2 + 2)
+        if value.start_with?("0x") && value.length == (byte_length * 2 + 2)
           value[2..]
         else
           bytes = value.unpack("C*")
