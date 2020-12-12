@@ -175,17 +175,17 @@ module Scale
       end
     end
 
-    # log
-    class Other < Bytes; end
-
     class AuthoritiesChange 
       include Vec
       inner_type "AccountId"
     end
 
-    class ConsensusEngineId < VecU8Length4; end
+    class GenericConsensusEngineId < VecU8Length4; end
 
     class ChangesTrieRoot < Bytes; end
+
+    # log
+    class Other < Bytes; end
 
     class SealV0
       include Struct
