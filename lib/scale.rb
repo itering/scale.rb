@@ -59,7 +59,7 @@ module Scale
           spec_types, @versioning, @spec_version = load_chain_spec_types(spec_name)
           @types = default_types.merge(spec_types)
         rescue => ex
-          puts "There is no types json file of name: #{spec_name}"
+          puts "There is no types json file named #{spec_name}"
           @types = default_types
         end
       else
