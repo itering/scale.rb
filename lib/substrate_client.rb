@@ -63,7 +63,8 @@ class SubstrateClient
     # set current metadata
     metadata = @metadata_cache[spec_version]
     if metadata.nil?
-      metadata = self.get_metadata(block_hash)
+      hex = self.state_getMetadata(block_hash)
+      metadata = Scale::Types::Metadata.decode(Scale::Bytes.new(hex))
       @metadata_cache[spec_version] = metadata
     end
 
@@ -101,8 +102,8 @@ class SubstrateClient
   end
 
   def get_metadata(block_hash=nil)
-    hex = self.state_getMetadata(block_hash)
-    Scale::Types::Metadata.decode(Scale::Bytes.new(hex))
+    self.init_types_and_metadata(block_hash)
+    @metadata
   end
 
   def get_block(block_hash=nil)
