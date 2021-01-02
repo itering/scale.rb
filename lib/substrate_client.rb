@@ -133,15 +133,12 @@ class SubstrateClient
     self.init_types_and_metadata(block_hash)
 
     storage_key, return_type = SubstrateClient::Helper.generate_storage_key_from_metadata(@metadata, module_name, storage_name, params)
+    data = self.state_getStorage(storage_key, block_hash)
+    return unless data
 
-    result = self.state_getStorage(storage_key, block_hash)
-    return unless result
-
-    storage = self.metadata.get_module_storage(module_name, storage_name)
-    bytes = result.hex_to_bytes
-    bytes = bytes.unshift(1) if storage[:modifier] == "Optional"
-
-    Scale::Types.get(return_type).decode(Scale::Bytes.new(bytes))
+    bytes = Scale::Bytes.new(data)
+    type = Scale::Types.get(return_type)
+    type.decode(bytes)
   end
 
   def generate_storage_key(module_name, storage_name, params = nil, block_hash = nil)

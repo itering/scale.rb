@@ -358,7 +358,7 @@ def rename(type)
   return "AccountData" if type == "AccountData<Balance>"
 
   if type =~ /\[U\d+; \d+\]/
-    byte_length = type.scan(/\[U\d+; (\d+)\]/).first.first
+    byte_length = type.scan(/\[U\d+; (\d+)\]/).first.first.to_i
     return "VecU8Length#{byte_length}"
   end
 
