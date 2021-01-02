@@ -136,7 +136,12 @@ class SubstrateClient
 
     result = self.state_getStorage(storage_key, block_hash)
     return unless result
-    Scale::Types.get(return_type).decode(Scale::Bytes.new(result))
+
+    storage = self.metadata.get_module_storage(module_name, storage_name)
+    bytes = result.hex_to_bytes
+    bytes = bytes.unshift(1) if storage[:modifier] == "Optional"
+
+    Scale::Types.get(return_type).decode(Scale::Bytes.new(bytes))
   end
 
   def generate_storage_key(module_name, storage_name, params = nil, block_hash = nil)
