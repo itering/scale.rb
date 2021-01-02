@@ -78,7 +78,8 @@ module Scale
 
       if @spec_version && @versioning
         @versioning.each do |item|
-          if @spec_version >= item["runtime_range"][0] && @spec_version <= (item["runtime_range"][1] || 1073741823)
+          if @spec_version >= item["runtime_range"][0] && 
+              ( item["runtime_range"][1].nil? || @spec_version <= item["runtime_range"][1] )
             all_types.merge!(item["types"])
           end
         end
