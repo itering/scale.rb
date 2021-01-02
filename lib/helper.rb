@@ -32,8 +32,9 @@ class SubstrateClient::Helper
         raise NotImplementedError
       end
 
+      storage_prefix = metadata_module[:storage][:prefix]
       storage_key = generate_storage_key(
-        module_name,
+        storage_prefix.nil? ? module_name : storage_prefix,
         storage_name,
         params,
         hasher,
