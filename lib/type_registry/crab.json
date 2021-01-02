@@ -486,32 +486,6 @@
         ]
       ]
     },
-    "EthereumRelayHeaderParcel": {
-      "type": "struct",
-      "type_mapping": [
-        [
-          "header",
-          "EthereumHeader"
-        ],
-        [
-          "mmr_root",
-          "H256"
-        ]
-      ]
-    },
-    "EthereumRelayProofs": {
-      "type": "struct",
-      "type_mapping": [
-        [
-          "ethash_proof",
-          "Vec<EthashProof>"
-        ],
-        [
-          "mmr_proof",
-          "Vec<H256>"
-        ]
-      ]
-    },
     "OtherSignature": {
       "type": "enum",
       "type_mapping": [
@@ -540,106 +514,6 @@
       ]
     },
     "AddressT": "[u8; 20]",
-    "MerkleMountainRangeRootLog": {
-      "type": "struct",
-      "type_mapping": [
-        [
-          "prefix",
-          "[u8; 4]"
-        ],
-        [
-          "mmr_root",
-          "Hash"
-        ]
-      ]
-    },
-    "RelayHeaderId": "EthereumBlockNumber",
-    "RelayHeaderParcel": "EthereumRelayHeaderParcel",
-    "RelayProofs": "EthereumRelayProofs",
-    "RelayAffirmationId": {
-      "type": "struct",
-      "type_mapping": [
-        [
-          "game_id",
-          "EthereumBlockNumber"
-        ],
-        [
-          "round",
-          "u32"
-        ],
-        [
-          "index",
-          "u32"
-        ]
-      ]
-    },
-    "RelayAffirmationT": {
-      "type": "struct",
-      "type_mapping": [
-        [
-          "relayer",
-          "AccountId"
-        ],
-        [
-          "relay_header_parcels",
-          "EthereumRelayHeaderParcel"
-        ],
-        [
-          "bond",
-          "Balance"
-        ],
-        [
-          "maybe_extended_relay_affirmation_id",
-          "Option<RelayAffirmationId>"
-        ],
-        [
-          "verified",
-          "bool"
-        ]
-      ]
-    },
-    "RelayVotingState": {
-      "type": "struct",
-      "type_mapping": [
-        [
-          "ayes",
-          "Vec<AccountId>"
-        ],
-        [
-          "nays",
-          "Vec<AccountId>"
-        ]
-      ]
-    },
-    "ProxyType": {
-      "type": "enum",
-      "type_mapping": [
-        [
-          "Any",
-          "Null"
-        ],
-        [
-          "NonTransfer",
-          "Null"
-        ],
-        [
-          "Governance",
-          "Null"
-        ],
-        [
-          "Staking",
-          "Null"
-        ],
-        [
-          "IdentityJudgement",
-          "Null"
-        ],
-        [
-          "EthereumBridge",
-          "Null"
-        ]
-      ]
-    },
     "BalancesRuntimeDispatchInfo": {
       "type": "struct",
       "type_mapping": [
@@ -658,5 +532,398 @@
         ]
       ]
     }
-  }
+  },
+  "versioning": [
+    {
+      "runtime_range": [
+        20,
+        28
+      ],
+      "types": {
+        "MerkleMountainRangeRootLog": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "prefix",
+              "[u8; 4]"
+            ],
+            [
+              "mmr_root",
+              "Hash"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [
+        29,
+        30
+      ],
+      "types": {
+        "EcdsaMessage": "[u8; 32]",
+        "RelayAuthoritySigner": "EthereumAddress",
+        "RelayAuthorityMessage": "EcdsaMessage",
+        "RelayAuthoritySignature": "EcdsaSignature",
+        "Term": "u32",
+        "RelayAuthorityT": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "account_id",
+              "AccountId"
+            ],
+            [
+              "signer",
+              "Signer"
+            ],
+            [
+              "stake",
+              "Balance"
+            ],
+            [
+              "term",
+              "BlockNumber"
+            ]
+          ]
+        },
+        "MMRRoot": "Hash",
+        "MerkleMountainRangeRootLog": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "prefix",
+              "[u8; 4]"
+            ],
+            [
+              "parent_mmr_root",
+              "Hash"
+            ]
+          ]
+        },
+        "EthereumRelayHeaderParcel": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "header",
+              "EthereumHeader"
+            ],
+            [
+              "parent_mmr_root",
+              "H256"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [
+        25,
+        30
+      ],
+      "types": {
+        "RelayProofs": "EthereumRelayProofs"
+      }
+    },
+    {
+      "runtime_range": [
+        24,
+        30
+      ],
+      "types": {
+        "RelayVotingState": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "ayes",
+              "Vec<AccountId>"
+            ],
+            [
+              "nays",
+              "Vec<AccountId>"
+            ]
+          ]
+        },
+        "ProxyType": {
+          "type": "enum",
+          "type_mapping": [
+            [
+              "Any",
+              "Null"
+            ],
+            [
+              "NonTransfer",
+              "Null"
+            ],
+            [
+              "Governance",
+              "Null"
+            ],
+            [
+              "Staking",
+              "Null"
+            ],
+            [
+              "IdentityJudgement",
+              "Null"
+            ],
+            [
+              "EthereumBridge",
+              "Null"
+            ]
+          ]
+        },
+        "RelayHeaderId": "EthereumBlockNumber",
+        "RelayHeaderParcel": "EthereumRelayHeaderParcel",
+        "RelayAffirmationId": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "game_id",
+              "EthereumBlockNumber"
+            ],
+            [
+              "round",
+              "u32"
+            ],
+            [
+              "index",
+              "u32"
+            ]
+          ]
+        },
+        "RelayAffirmationT": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "relayer",
+              "AccountId"
+            ],
+            [
+              "relay_header_parcels",
+              "EthereumRelayHeaderParcel"
+            ],
+            [
+              "bond",
+              "Balance"
+            ],
+            [
+              "maybe_extended_relay_affirmation_id",
+              "Option<RelayAffirmationId>"
+            ],
+            [
+              "verified",
+              "bool"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "runtime_range": [
+        24,
+        24
+      ],
+      "types": {
+        "RelayProofs": "EthereumRelayProof"
+      }
+    },
+    {
+      "runtime_range": [
+        20,
+        22
+      ],
+      "types": {
+        "EthereumHeaderBrief": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "total_difficulty",
+              "U256"
+            ],
+            [
+              "parent_hash",
+              "H256"
+            ],
+            [
+              "number",
+              "EthereumBlockNumber"
+            ],
+            [
+              "relayer",
+              "AccountId"
+            ]
+          ]
+        },
+        "EthereumHeaderThingWithProof": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "header",
+              "EthereumHeader"
+            ],
+            [
+              "ethash_proof",
+              "Vec<EthashProof>"
+            ],
+            [
+              "mmr_root",
+              "H256"
+            ],
+            [
+              "mmr_proof",
+              "Vec<H256>"
+            ]
+          ]
+        },
+        "ConfirmedEthereumHeaderInfo": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "header",
+              "EthereumHeader"
+            ],
+            [
+              "mmr_root",
+              "H256"
+            ]
+          ]
+        },
+        "EthereumHeaderThing": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "header",
+              "EthereumHeader"
+            ],
+            [
+              "mmr_root",
+              "H256"
+            ]
+          ]
+        },
+        "Round": "u64",
+        "TcHeaderThingWithProof": "EthereumHeaderThingWithProof",
+        "TcHeaderThing": "EthereumHeaderThing",
+        "TcBlockNumber": "u64",
+        "TcHeaderHash": "H256",
+        "GameId": "TcBlockNumber",
+        "RelayProposalT": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "relayer",
+              "AccountId"
+            ],
+            [
+              "bonded_proposal",
+              "Vec<(Balance, TcHeaderThing)>"
+            ],
+            [
+              "extend_from_header_hash",
+              "Option<TcHeaderHash>"
+            ]
+          ]
+        }
+      }
+    },
+
+    {
+      "runtime_range": [
+        23,
+        30
+      ],
+      "types": {
+        "EthereumRelayProofs": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "ethash_proof",
+              "Vec<EthashProof>"
+            ],
+            [
+              "mmr_proof",
+              "Vec<H256>"
+            ]
+          ]
+        }
+      }
+    },
+
+    {
+      "runtime_range": [
+        23,
+        28
+      ],
+      "types": {
+        "EthereumRelayHeaderParcel": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "header",
+              "EthereumHeader"
+            ],
+            [
+              "mmr_root",
+              "H256"
+            ]
+          ]
+        }
+      }
+    },
+
+    {
+      "runtime_range": [
+        23,
+        23
+      ],
+      "types": {
+        "RelayHeaderId": "Vec<u8>",
+        "RelayHeaderParcel": "Vec<u8>",
+        "RelayAffirmationId": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "relay_header_id",
+              "Vec<u8>"
+            ],
+            [
+              "round",
+              "u32"
+            ],
+            [
+              "index",
+              "u32"
+            ]
+          ]
+        },
+        "RelayAffirmationT": {
+          "type": "struct",
+          "type_mapping": [
+            [
+              "relayer",
+              "AccountId"
+            ],
+            [
+              "relay_header_parcels",
+              "Vec<u8>"
+            ],
+            [
+              "bond",
+              "Balance"
+            ],
+            [
+              "maybe_extended_relay_affirmation_id",
+              "Option<Vec<u8>>"
+            ],
+            [
+              "verified",
+              "bool"
+            ]
+          ]
+        },
+        "RelayProofs": "Vec<u8>"
+      }
+    }
+  ]
 }
