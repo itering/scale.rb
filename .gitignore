@@ -9,3 +9,4 @@
 /.rakeTasks
 /.idea
 /target
+.DS_Store
