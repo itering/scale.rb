@@ -35,6 +35,16 @@ module Scale
           end
         end
       end
+
+      def get_module_storage(module_name, storage_name)
+        the_module = get_module(module_name)
+        if the_module[:storage].class == Array
+          storages = the_module[:storage]
+        else
+          storages = the_module[:storage][:items]
+        end
+        storages.find {|storage| storage[:name] == storage_name}
+      end
     end
 
     class MetadataModule
@@ -67,6 +77,10 @@ module Scale
         end
 
         MetadataModule.new(result)
+      end
+
+      def get_storage(storage_name)
+        self.value[:storage].find { |storage| storage[:name].downcase == storage_name.downcase }
       end
     end
 
