@@ -608,6 +608,16 @@ module Scale
       BYTE_LENGTH = 64
     end
 
+    class VecU8Length128
+      include VecU8FixedLength
+      BYTE_LENGTH = 128
+    end
+
+    class VecU8Length256
+      include VecU8FixedLength
+      BYTE_LENGTH = 256
+    end
+
     class BalanceLock
       include Struct
       items(
