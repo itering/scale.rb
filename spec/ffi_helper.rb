@@ -13,6 +13,9 @@ module Rust
   attach_function :parse_bool, %i[pointer int bool], :void
   attach_function :parse_opt_u32, %i[pointer int uint32 bool], :void
   attach_function :parse_opt_bool, %i[pointer int bool bool], :void
+
+  attach_function :assert_storage_key_for_value, %i[pointer int pointer int pointer int], :void
+  attach_function :assert_storage_key_for_map_black2128concat, %i[pointer int pointer int pointer int pointer int], :void
 end
 
 def parse_type(key)
@@ -63,5 +66,10 @@ def parse_via_ffi(value, encoding)
   parse_type(encoding).call(vec_c, value)
 end
 
+def u8_array_to_pointer(arr)
+  pointer = FFI::MemoryPointer.new(:int8, arr.size)
+  pointer.write_array_of_int8 arr
+  pointer
+end
 # everything beyond this point should ultimately be moved to types_spec.rb or
 # removed

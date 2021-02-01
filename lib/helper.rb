@@ -45,6 +45,7 @@ class SubstrateClient::Helper
     end
 
     def generate_storage_key(module_name, storage_name, params = nil, hasher = nil, hasher2 = nil, metadata_version = nil)
+      metadata_version = 12 if metadata_version.nil?
       if metadata_version and metadata_version >= 9
         storage_key = Crypto.twox128(module_name) + Crypto.twox128(storage_name)
 
@@ -57,7 +58,11 @@ class SubstrateClient::Helper
             raise "Unexpected third parameter for storage call"
           end
 
-          param_key = param.hex_to_bytes
+          param_key = if param.class == String && param.start_with?("0x")
+            param.hex_to_bytes
+          else
+            param.encode().hex_to_bytes
+          end
           param_hasher = "Twox128" if param_hasher.nil?
           storage_key += Crypto.send(param_hasher.underscore, param_key)
         end
