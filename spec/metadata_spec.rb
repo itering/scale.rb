@@ -13,7 +13,7 @@ end
 
 def get_metadata(version)
   content = File.open(File.join(ROOT, "spec", "metadata", "v#{version}", "expect.json")).read.strip
-  JSON.parse(content).deep_symbolize_keys!
+  JSON.parse(content, symbolize_names: true)
 end
 
 describe Scale::Types::Metadata do

@@ -146,7 +146,7 @@ describe Scale::Types do
 
     scale_bytes = Scale::Bytes.new("0x010c003afe")
     klass = Scale::Types.type_of("Option<Vec<U8>>")
-    expect(klass.name).to start_with("Scale::Types::Option_Of_Vec˂U8˃")
+    expect(klass.name).to start_with("Scale::Types::Option˂Vec˂U8˃˃")
     o = klass.decode scale_bytes
     expect(o.value.value.map(&:value)).to eql([0, 58, 254])
     expect(o.encode).to eql("010c003afe")

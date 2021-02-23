@@ -2,8 +2,6 @@ require "scale/version"
 
 require "substrate_common"
 require "json"
-require "active_support"
-require "active_support/core_ext/string"
 require "singleton"
 
 require "scale/base"
@@ -30,6 +28,24 @@ require "substrate_client"
 require "logger"
 require "helper"
 require 'kontena-websocket-client'
+
+class String
+  def upcase_first
+    self.sub(/\S/, &:upcase)
+  end
+
+  def camelize
+    self.split('_').collect(&:upcase_first).join
+  end
+
+  def underscore
+    self.gsub(/::/, '/').
+    gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+    gsub(/([a-z\d])([A-Z])/,'\1_\2').
+    tr("-", "_").
+    downcase
+  end
+end
 
 module Scale
   class Error < StandardError; end
@@ -261,7 +277,7 @@ module Scale
             include Scale::Types.type_of(type_str)
             inner_type inner_type_str
           end
-          name = "#{type_str}_Of_#{inner_type_str.camelize}_#{klass.object_id}"
+          name = "#{type_str}<#{inner_type_str.camelize}>_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         else
           raise "#{type_str} not support inner type: #{type_string}"
