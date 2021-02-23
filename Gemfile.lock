@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    scale.rb (0.2.15)
+    scale.rb (0.2.16)
       json (~> 2.3.0)
       kontena-websocket-client (~> 0.1.1)
       substrate_common.rb (~> 0.1.10)
