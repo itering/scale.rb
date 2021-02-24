@@ -1,7 +1,7 @@
 
 def ws_request(url, payload)
   result = nil
-  Kontena::Websocket::Client.connect(url, {}) do |client|
+  Kontena::Websocket::Client.connect(url) do |client|
     client.send(payload.to_json)
 
     client.read do |message|
