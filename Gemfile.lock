@@ -5,7 +5,6 @@ PATH
       json (~> 2.3.0)
       kontena-websocket-client (~> 0.1.1)
       substrate_common.rb (~> 0.1.10)
-      thor (~> 0.19.0)
 
 GEM
   remote: https://rubygems.org/
@@ -40,7 +39,6 @@ GEM
       base58
       blake2b
       xxhash
-    thor (0.19.4)
     websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
