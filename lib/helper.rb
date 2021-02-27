@@ -108,15 +108,17 @@ class SubstrateClient::Helper
     def decode_block(block)
       block["block"]["header"]["number"] = block["block"]["header"]["number"].to_i(16)
 
+      block["block"]["extrinsics_decoded"] = []
       block["block"]["extrinsics"].each_with_index do |hex, i|
         scale_bytes = Scale::Bytes.new(hex)
-        block["block"]["extrinsics"][i] = Scale::Types::Extrinsic.decode(scale_bytes).to_human
+        block["block"]["extrinsics_decoded"][i] = Scale::Types::Extrinsic.decode(scale_bytes).to_human
       end
 
+      block['block']['header']["digest"]["logs_decoded"] = []
       block['block']['header']["digest"]["logs"].each_with_index do |hex, i|
         scale_bytes = Scale::Bytes.new(hex)
         log = Scale::Types::LogDigest.decode(scale_bytes).to_human
-        block['block']['header']["digest"]["logs"][i] = log
+        block['block']['header']["digest"]["logs_decoded"][i] = log
       end
 
       block
