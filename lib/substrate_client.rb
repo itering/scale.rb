@@ -122,7 +122,11 @@ class SubstrateClient
     events_data = state_getStorage storage_key, block_hash
 
     scale_bytes = Scale::Bytes.new(events_data)
-    Scale::Types.get("Vec<EventRecord>").decode(scale_bytes).to_human
+    decoded = Scale::Types.get("Vec<EventRecord>").decode(scale_bytes).to_human
+    {
+      raw: events_data,
+      decoded: decoded
+    }
   end
 
   # Plain: client.get_storage("Sudo", "Key")
