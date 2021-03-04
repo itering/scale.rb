@@ -1,6 +1,7 @@
 require "scale/version"
 
-require "substrate_common"
+require "common"
+
 require "json"
 require "singleton"
 
@@ -208,7 +209,7 @@ module Scale
       types.each do |name, body|
         if body.class == String
           target_type = "Scale::Types::#{body}"
-          klass = Class.new(target_type.constantize) do
+          klass = Class.new(target_type.constantize2) do
           end
         elsif body.class == Hash
           if body["type"] == "struct"
@@ -332,7 +333,7 @@ module Scale
         else
           type_name = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
           begin
-            type_name.constantize
+            type_name.constantize2
           rescue NameError => e
             puts "#{type_string} is not defined"
           end

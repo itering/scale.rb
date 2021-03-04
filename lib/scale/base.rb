@@ -313,7 +313,7 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
-          value = "Scale::Types::U#{self::BYTE_LENGTH * 8}".constantize.decode(scale_bytes).value
+          value = "Scale::Types::U#{self::BYTE_LENGTH * 8}".constantize2.decode(scale_bytes).value
           return new [] unless value || value <= 0
 
           result = self::ITEMS.select { |_, mask| value & mask > 0 }.keys
@@ -340,7 +340,7 @@ module Scale
 
       def encode
         value = self.class::ITEMS.select { |key, _| self.value.include?(key) }.values.sum
-        "Scale::Types::U#{self.class::BYTE_LENGTH * 8}".constantize.new(value).encode
+        "Scale::Types::U#{self.class::BYTE_LENGTH * 8}".constantize2.new(value).encode
       end
     end
 

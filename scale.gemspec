@@ -33,11 +33,13 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "substrate_common.rb", "~> 0.1.10"
+  spec.add_dependency "blake2b"
+  spec.add_dependency "xxhash"
+  spec.add_dependency "base58"
   spec.add_dependency "json", "~> 2.3.0"
   spec.add_dependency "kontena-websocket-client", "~> 0.1.1"
 
-  spec.add_development_dependency "bundler", "~> 1.17"
+  spec.add_development_dependency "bundler"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.2"
