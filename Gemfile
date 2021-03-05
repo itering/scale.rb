@@ -4,3 +4,5 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
 # Specify your gem's dependencies in scale.gemspec
 gemspec
+
+gem "kontena-websocket-client", github: "wuminzhe/kontena-websocket-client", branch: "master"
