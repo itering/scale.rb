@@ -1,20 +1,30 @@
+require "faye/websocket"
+require "eventmachine"
 
 def ws_request(url, payload)
   result = nil
-  Kontena::Websocket::Client.connect(url) do |client|
-    client.send(payload.to_json)
 
-    client.read do |message|
-      result = JSON.parse message
-      client.close(1000)
+  EM.run do
+    ws = Faye::WebSocket::Client.new(url)
+
+    ws.on :open do |event|
+      ws.send(payload.to_json)
+    end
+
+    ws.on :message do |event|
+      if event.data.include?("jsonrpc")
+        result = JSON.parse event.data
+        ws.close(3001, "data received")
+        EM.stop
+      end
+    end
+
+    ws.on :close do |event|
+      ws = nil
     end
   end
 
-  return result
-rescue Kontena::Websocket::CloseError => e
-  raise SubstrateClient::WebsocketError, e.reason
-rescue Kontena::Websocket::Error => e
-  raise SubstrateClient::WebsocketError, e.reason
+  result
 end
 
 class SubstrateClient

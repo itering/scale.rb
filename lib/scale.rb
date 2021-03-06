@@ -28,7 +28,6 @@ require "metadata/metadata_v12"
 require "substrate_client"
 require "logger"
 require "helper"
-require 'kontena-websocket-client'
 
 class String
   def upcase_first
