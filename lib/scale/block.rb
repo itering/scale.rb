@@ -141,9 +141,13 @@ module Scale
           result[:extrinsic_idx] = U32.decode(scale_bytes).value
         end
 
-        type = scale_bytes.get_next_bytes(2).bytes_to_hex[2..]
-        event = metadata.event_index[type][1]
-        # mod = metadata.event_index[type][0]
+        index = scale_bytes.get_next_bytes(2).bytes_to_hex[2..]
+        event = metadata.event_index[index][1]
+        the_module = metadata.event_index[index][0]
+
+        result[:event_index] = index
+        result[:event_metadata] = event
+        result[:module_metadata] = the_module
 
         result[:params] = []
         event[:args].each do |arg_type|
