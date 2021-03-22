@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "blake2b"
+  spec.add_dependency "blake2b_rs", "~> 0.1.2"
   spec.add_dependency "xxhash"
   spec.add_dependency "base58"
   spec.add_dependency "json", "~> 2.3.0"
@@ -43,5 +43,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.2"
-  spec.add_development_dependency "ffi", "~> 1.12"
+  spec.add_development_dependency "ffi", "~> 1.15.0"
 end
