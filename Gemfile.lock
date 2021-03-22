@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    scale.rb (0.2.16)
+    scale.rb (0.2.17)
       base58
       blake2b_rs (~> 0.1.2)
       faye-websocket
