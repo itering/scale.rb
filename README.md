@@ -37,7 +37,9 @@ Or install it yourself as:
 ```ruby
 require "scale"
 
-Scale::TypeRegistry.instance.load
+Scale::TypeRegistry.instance.load # default
+# Scale::TypeRegistry.instance.load spec_name: "pangolin"
+# Scale::TypeRegistry.instance.load spec_name: "kusama"
 
 # decode a compact integer
 scale_bytes = Scale::Bytes.new("0x1501") # create scale_bytes object from scale encoded hex string
@@ -63,6 +65,15 @@ p o.encode # "1501"
 type = Scale::Types::get("Vec<U8>")
 o = type.new([Scale::Types::U8.new(0), Scale::Types::U8.new(1)])
 p o.encode # "080001"
+```
+
+3. client
+```ruby
+require "scale"
+
+client = SubstrateClient.new "wss://pangolin-rpc.darwinia.network"
+client.get_storage("EthereumRelay", "ConfirmedHeaderParcels", [0])
+
 ```
 Please go to `spec` dir for more examples.
 
