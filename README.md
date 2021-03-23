@@ -37,6 +37,8 @@ Or install it yourself as:
 ```ruby
 require "scale"
 
+Scale::TypeRegistry.instance.load
+
 # decode a compact integer
 scale_bytes = Scale::Bytes.new("0x1501") # create scale_bytes object from scale encoded hex string
 o = Scale::Types::Compact.decode(scale_bytes) # use scale type to decode scale_bytes object
@@ -52,6 +54,8 @@ assert_eq o.value, [Scale::Types::U8.new(0), Scale::Types::U8.new(1)]
 
 ```ruby
 require "scale"
+
+Scale::TypeRegistry.instance.load
 
 o = Scale::Types::Compact.new(69)
 p o.encode # "1501"
