@@ -247,7 +247,9 @@ module Scale
     end
 
     def self.get(type_name)
-      TypeRegistry.instance.get(type_name)
+      type = TypeRegistry.instance.get(type_name)
+      raise "Type '#{type_name}' not exist" if type.nil?
+      type
     end
 
     def self.constantize(type)

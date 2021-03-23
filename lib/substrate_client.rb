@@ -145,6 +145,8 @@ class SubstrateClient
 
     storage_key, return_type = SubstrateClient::Helper.generate_storage_key_from_metadata(@metadata, module_name, storage_name, params)
     data = self.state_getStorage(storage_key, block_hash)
+    puts "---------------"
+    puts data
     return unless data
 
     bytes = Scale::Bytes.new(data)

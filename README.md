@@ -41,6 +41,11 @@ require "scale"
 scale_bytes = Scale::Bytes.new("0x1501") # create scale_bytes object from scale encoded hex string
 o = Scale::Types::Compact.decode(scale_bytes) # use scale type to decode scale_bytes object
 p o.value # 69
+
+#
+type = Scale::Types::get("Vec<U8>")
+o = type.decode(Scale::Bytes.new("0x080001"))
+assert_eq o.value, [Scale::Types::U8.new(0), Scale::Types::U8.new(1)]
 ```
 
 2. encode
@@ -50,6 +55,10 @@ require "scale"
 
 o = Scale::Types::Compact.new(69)
 p o.encode # "1501"
+
+type = Scale::Types::get("Vec<U8>")
+o = type.new([Scale::Types::U8.new(0), Scale::Types::U8.new(1)])
+p o.encode # "080001"
 ```
 Please go to `spec` dir for more examples.
 
