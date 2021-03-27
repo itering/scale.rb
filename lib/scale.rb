@@ -274,13 +274,32 @@ module Scale
         type_str = type_strs.first
         inner_type_str = type_strs.last
 
-        if type_str == "Vec" || type_str == "Option"
-          klass = Class.new do
-            include Scale::Types.type_of(type_str)
-            inner_type inner_type_str
+        if type_str == "Vec"
+          name = "#{type_str}<#{inner_type_str.camelize2}>"
+          name = fix(name)
+
+          if !Scale::Types.const_defined?(name)
+            klass = Class.new do
+              include Scale::Types::Vec
+              inner_type inner_type_str
+            end
+            Scale::Types.const_set name, klass
+          else
+            Scale::Types.const_get name
           end
-          name = "#{type_str}<#{inner_type_str.camelize2}>_#{klass.object_id}"
-          Scale::Types.const_set fix(name), klass
+        elsif type_str == "Option"
+          name = "#{type_str}<#{inner_type_str.camelize2}>"
+          name = fix(name)
+
+          if !Scale::Types.const_defined?(name)
+            klass = Class.new do
+              include Scale::Types::Option
+              inner_type inner_type_str
+            end
+            Scale::Types.const_set name, klass
+          else
+            Scale::Types.const_get name
+          end
         else
           raise "#{type_str} not support inner type: #{type_string}"
         end
@@ -297,12 +316,17 @@ module Scale
           type_str.strip.tr(";", ",")
         end
 
-        klass = Class.new do
-          include Scale::Types::Tuple
-          inner_types *type_strs
+        name = "TupleOf#{type_strs.map(&:camelize2).join("")}"
+        name = fix(name)
+        if !Scale::Types.const_defined?(name)
+          klass = Class.new do
+            include Scale::Types::Tuple
+            inner_types *type_strs
+          end
+          Scale::Types.const_set name, klass
+        else
+          Scale::Types.const_get name
         end
-        name = "Tuple_Of_#{type_strs.map(&:camelize2).join("_")}_#{klass.object_id}"
-        Scale::Types.const_set fix(name), klass
       else
         if type_string == "Enum"
           # TODO: combine values to items
@@ -345,12 +369,20 @@ module Scale
 
 end
 
+# def fix(name)
+#   name
+#     .gsub("<", "˂").gsub(">", "˃")
+#     .gsub("(", "⁽").gsub(")", "⁾")
+#     .gsub(" ", "").gsub(",", "‚")
+#     .gsub(":", "։")
+# end
+
 def fix(name)
   name
-    .gsub("<", "˂").gsub(">", "˃")
-    .gsub("(", "⁽").gsub(")", "⁾")
-    .gsub(" ", "").gsub(",", "‚")
-    .gsub(":", "։")
+    .gsub("<", "").gsub(">", "")
+    .gsub("(", "").gsub(")", "")
+    .gsub(" ", "").gsub(",", "")
+    .gsub(":", "")
 end
 
 def rename(type)
