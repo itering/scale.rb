@@ -844,6 +844,15 @@ module Scale
       end
     end
 
+    class GenericBlock
+      include SingleValue
+
+      def self.decode(scale_bytes)
+      end
+
+      def encode
+      end
+    end
 
   end
 end

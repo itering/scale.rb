@@ -1,6 +1,6 @@
 {
   "types": {
-    "Balance": "u128",
+    "Balance": "128",
     "BalanceOf": "Balance",
     "Block": "GenericBlock",
     "Call": "GenericCall",
@@ -228,7 +228,7 @@
         ]
       ]
     },
-    "RefCount": "u8",
+    "RefCount": "u32",
     "Moment": "u64",
     "AccountData": {
       "type": "struct",
@@ -259,7 +259,7 @@
           "Index"
         ],
         [
-          "refcount",
+          "c",
           "RefCount"
         ],
         [

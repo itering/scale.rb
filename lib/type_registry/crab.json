@@ -441,6 +441,7 @@
     }
   ],
   "types": {
+    "Balance": "u64",
     "Address": "AccountId",
     "LookupSource": "AccountId",
     "BalanceLock": {
