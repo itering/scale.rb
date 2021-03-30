@@ -325,7 +325,7 @@ module Scale
           value /= 1000
         end
 
-        CompactMoment.new Time.at(value).to_datetime.strftime("%F %T")
+        CompactMoment.new Time.at(value).strftime("%F %T")
       end
     end
 
