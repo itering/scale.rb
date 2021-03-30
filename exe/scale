@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+require "thor"
+require "scale"
+
+class ScaleCli < Thor
+  desc "list-types WS_ENDPOINT ", "list all types in metadata"
+  def list_types(ws)
+    client = SubstrateClient.new ws
+    metadata = client.get_metadata.value.to_human.to_json
+    metadata = JSON.parse(metadata)
+
+    types = []
+    metadata["metadata"]["modules"].each do |m|
+      if m["storage"]
+        m["storage"]["items"].each do |storage|
+          type = storage["type"]
+          if type["Plain"]
+            types << type["Plain"].gsub("\n ", "").gsub("\n", "")
+          elsif type["Map"]
+            types << type["Map"]["key"].gsub("\n", "")
+            types << type["Map"]["value"].gsub("\n", "")
+          end
+        end
+      end
+
+      if m["calls"]
+        m["calls"].each do |call|
+          call["args"].each do |arg|
+            types << arg["type"].gsub("\n", "")
+          end
+        end
+      end
+
+      if m["events"]
+        m["events"].each do |event|
+          event["args"].each do |arg|
+            types << arg.gsub("\n", "")
+          end
+        end
+      end
+    end
+
+    types.uniq!
+    puts types
+  end
+end
+
+ScaleCli.start(ARGV)

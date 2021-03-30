@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "base58"
   spec.add_dependency "json", "~> 2.3.0"
   spec.add_dependency "faye-websocket"
+  spec.add_dependency "thor", '~> 1.0'
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "pry"
