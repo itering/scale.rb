@@ -1,6 +1,6 @@
 {
   "types": {
-    "Balance": "128",
+    "Balance": "u128",
     "BalanceOf": "Balance",
     "Block": "GenericBlock",
     "Call": "GenericCall",

@@ -242,6 +242,10 @@ module Scale
   end
 
   module Types
+    class << self
+      attr_accessor :debug
+    end
+    
     def self.list
       TypeRegistry.instance.types
     end
@@ -460,3 +464,5 @@ class ::Hash
     Hash[h]
   end
 end
+
+Scale::Types.debug = false

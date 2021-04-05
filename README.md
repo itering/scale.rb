@@ -41,6 +41,9 @@ Scale::TypeRegistry.instance.load # default
 # Scale::TypeRegistry.instance.load spec_name: "pangolin"
 # Scale::TypeRegistry.instance.load spec_name: "kusama"
 
+# print hex changes if you set debug to true, default is false
+Scale::Types.debug = true
+
 # decode a compact integer
 scale_bytes = Scale::Bytes.new("0x1501") # create scale_bytes object from scale encoded hex string
 o = Scale::Types::Compact.decode(scale_bytes) # use scale type to decode scale_bytes object

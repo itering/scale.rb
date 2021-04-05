@@ -33,6 +33,17 @@ module Scale
           @value
         end
       end
+
+      module ClassMethods
+        def inherited(child)
+          child.const_set(:TYPE_NAME, child.name)
+        end
+      end
+
+      def self.included(base)
+        base.extend(ClassMethods)
+        base.const_set(:TYPE_NAME, base.name)
+      end
     end
 
     # value: one of nil, false, true, scale object
@@ -41,19 +52,24 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
+          puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           byte = scale_bytes.get_next_bytes(1)
           if byte == [0]
+            puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
             new(nil)
           elsif byte == [1]
             if self::INNER_TYPE_STR == "boolean"
+              puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
               new(false)
             else
               # big process
               value = Scale::Types.get(self::INNER_TYPE_STR).decode(scale_bytes)
+              puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
               new(value)
             end
           elsif byte == [2]
             if self::INNER_TYPE_STR == "boolean"
+              puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
               new(true)
             else
               raise "bad data"
@@ -89,9 +105,11 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
+          puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           bytes = scale_bytes.get_next_bytes self::BYTE_LENGTH
           bit_length = bytes.length.to_i * 8
           value = bytes.reverse.bytes_to_hex.to_i(16).to_signed(bit_length)
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           new(value)
         end
       end
@@ -117,10 +135,15 @@ module Scale
         attr_accessor :byte_length
 
         def decode(scale_bytes)
+          puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           bytes = scale_bytes.get_next_bytes self::BYTE_LENGTH
           bytes_reversed = bytes.reverse
           hex = bytes_reversed.reduce("0x") { |hex, byte| hex + byte.to_s(16).rjust(2, "0") }
-          new(hex.to_i(16))
+          result = new(hex.to_i(16))
+
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
+
+          result
         end
       end
 
@@ -142,9 +165,14 @@ module Scale
       include SingleValue
       # new(1.to_u32, U32(69))
       module ClassMethods
+        def inherited(child)
+          child.const_set(:TYPE_NAME, child.name)
+        end
+
         def decode(scale_bytes)
+          puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           item_values = self::ITEM_TYPE_STRS.map do |item_type_str|
-            type = Scale::TypeRegistry.instance.get(item_type_str)
+            type = Scale::Types.get(item_type_str)
             type.decode(scale_bytes)
           end
 
@@ -157,6 +185,7 @@ module Scale
           value.each_pair do |attr, val|
             result.send "#{attr}=", val
           end
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           result
         end
 
@@ -177,6 +206,7 @@ module Scale
 
       def self.included(base)
         base.extend ClassMethods
+        base.const_set(:TYPE_NAME, base.name)
       end
 
       def encode
@@ -193,9 +223,11 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
+          puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           values = self::TYPE_STRS.map do |type_str|
             Scale::Types.get(type_str).decode(scale_bytes)
           end
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           new(values)
         end
 
@@ -218,6 +250,7 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
+          puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           index = scale_bytes.get_next_bytes(1)[0]
           if const_defined? "ITEM_TYPE_STRS"
             item_type_str = self::ITEM_TYPE_STRS[index]
@@ -226,7 +259,9 @@ module Scale
           else
             value = self::VALUES[index]
           end
-          new(value)
+          result = new(value)
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
+          result
         end
 
         def items(items)
@@ -279,6 +314,7 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes, raw = false)
+          puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           number = Scale::Types::Compact.decode(scale_bytes).value
           items = []
           number.times do
@@ -286,6 +322,7 @@ module Scale
             item = type.decode(scale_bytes)
             items << item
           end
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           raw ? items : new(items)
         end
 
@@ -313,10 +350,12 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
+          puts "  BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           value = "Scale::Types::U#{self::BYTE_LENGTH * 8}".constantize2.decode(scale_bytes).value
           return new [] unless value || value <= 0
 
           result = self::ITEMS.select { |_, mask| value & mask > 0 }.keys
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           new result
         end
 
@@ -349,14 +388,17 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
+          puts "  BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           byte_length = self::BYTE_LENGTH
           raise "#{self.name} byte length is wrong: #{byte_length}" unless %w[2 3 4 8 16 20 32 64 128 256].include?(byte_length.to_s)
 
           bytes = scale_bytes.get_next_bytes(byte_length)
           str = bytes.pack("C*").force_encoding("utf-8")
           if str.valid_encoding?
+            puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
             new str
           else
+            puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
             new bytes.bytes_to_hex
           end
         end

@@ -6,10 +6,13 @@ module Scale
       BYTES_LENGTH = 1
 
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         bytes = scale_bytes.get_next_bytes(self::BYTES_LENGTH)
         if bytes == [0]
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           Bool.new(false)
         elsif bytes == [1]
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           Bool.new(true)
         else
           raise "Bad data"
@@ -80,6 +83,7 @@ module Scale
       include SingleValue
 
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         first_byte = scale_bytes.get_next_bytes(1)[0]
         first_byte_in_bin = first_byte.to_s(2).rjust(8, "0")
 
@@ -113,6 +117,7 @@ module Scale
               .to_i(16)
           end
 
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         Compact.new(value)
       end
 
@@ -141,6 +146,7 @@ module Scale
       include SingleValue
 
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         length = Scale::Types::Compact.decode(scale_bytes).value
         bytes = scale_bytes.get_next_bytes(length)
 
@@ -148,8 +154,10 @@ module Scale
         # => "Café"
         str = bytes.pack("C*").force_encoding("utf-8")
         if str.valid_encoding?
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           Bytes.new str
         else
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           Bytes.new bytes.bytes_to_hex
         end
       end
@@ -171,8 +179,10 @@ module Scale
       include SingleValue
 
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         length = Scale::Types::Compact.decode(scale_bytes).value
         hex_string = scale_bytes.get_next_bytes(length).bytes_to_hex
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         Hex.new(hex_string)
       end
     end
@@ -180,8 +190,10 @@ module Scale
     class String
       include SingleValue
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         length = Scale::Types::Compact.decode(scale_bytes).value
         bytes = scale_bytes.get_next_bytes(length)
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         String.new bytes.pack("C*").force_encoding("utf-8")
       end
     end
@@ -189,7 +201,9 @@ module Scale
     class H160
       include SingleValue
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         bytes = scale_bytes.get_next_bytes(20)
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         H160.new(bytes.bytes_to_hex)
       end
 
@@ -202,7 +216,9 @@ module Scale
     class H256
       include SingleValue
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         bytes = scale_bytes.get_next_bytes(32)
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         H256.new(bytes.bytes_to_hex)
       end
 
@@ -215,7 +231,9 @@ module Scale
     class H512
       include SingleValue
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         bytes = scale_bytes.get_next_bytes(64)
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         H512.new(bytes.bytes_to_hex)
       end
 
@@ -234,12 +252,14 @@ module Scale
       # the <address> is 32 byte account id or 1, 2, 4, 8 byte account index
       # scale_bytes: account length byte  + <address>'s bytes
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         account_length = scale_bytes.get_next_bytes(1).first
 
         if account_length == 0xff # 32 bytes address(Public key)
           account_id = scale_bytes.get_next_bytes(32).bytes_to_hex
           account_length = [account_length].bytes_to_hex
 
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           Address.new({
             account_id: account_id,
             account_length: account_length
@@ -258,6 +278,7 @@ module Scale
           # TODO: add account_idx 
           account_length = [account_length].bytes_to_hex
 
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           Address.new({
             account_index: account_index,
             account_length: account_length
@@ -280,10 +301,14 @@ module Scale
 
     class AccountIdAddress < GenericAddress
       def self.decode(scale_bytes)
-        AccountIdAddress.new({
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
+        result = AccountIdAddress.new({
           account_id: AccountId.decode(scale_bytes).value,
           account_length: "0xff"
         })
+
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
+        result
       end
 
       def encode
@@ -304,12 +329,15 @@ module Scale
     class Era
       include SingleValue
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         byte = scale_bytes.get_next_bytes(1).bytes_to_hex
-        if byte == "0x00"
+        result = if byte == "0x00"
           Era.new byte
         else
           Era.new byte + scale_bytes.get_next_bytes(1).bytes_to_hex()[2..]
         end
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
+        result
       end
     end
 
@@ -320,11 +348,13 @@ module Scale
     class CompactMoment
       include SingleValue
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         value = Compact.decode(scale_bytes).value
         if value > 10000000000
           value /= 1000
         end
 
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         CompactMoment.new Time.at(value).strftime("%F %T")
       end
     end
@@ -632,7 +662,9 @@ module Scale
       include SingleValue
 
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         bytes = scale_bytes.get_next_bytes(20)
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         EthereumAddress.new(bytes.bytes_to_hex)
       end
 
@@ -649,8 +681,10 @@ module Scale
       include SingleValue
 
       def self.decode(scale_bytes)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         bytes = scale_bytes.get_next_bytes(65)
         EcdsaSignature.new(bytes.bytes_to_hex)
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
       end
 
       def encode
@@ -758,7 +792,11 @@ module Scale
     class VoteOutcome
       include SingleValue
       def self.decode(scale_bytes)
-        new(scale_bytes.get_next_bytes(32))
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
+        result = new(scale_bytes.get_next_bytes(32))
+        
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
+        result
       end
     end
 
@@ -799,6 +837,7 @@ module Scale
       include SingleValue
 
       def self.decode(scale_bytes, metadata, chain_spec)
+        puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         call_index = scale_bytes.get_next_bytes(2).bytes_to_hex[2..]
         call_module, call = metadata.value.call_index[call_index]
 
@@ -807,6 +846,7 @@ module Scale
           {name: arg[:name], type: arg[:type], value: arg_obj.encode, value_raw: arg_obj.value}
         end
 
+        puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         self.new({
           call_index: call_index, 
           call_function: call[:name],
