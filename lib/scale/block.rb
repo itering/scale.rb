@@ -5,8 +5,8 @@ module Scale
       include SingleValue
       # attr_accessor :address, :signature, :nonce, :era, :extrinsic_hash, :call_index, :params_raw, :params
 
-      def self.generate_hash(data)
-        Blake2b.hex data, Blake2b::Key.none, 32
+      def self.generate_hash(bytes)
+        Crypto.blake2_256 bytes
       end
 
       def self.decode(scale_bytes)
