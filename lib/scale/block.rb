@@ -61,10 +61,10 @@ module Scale
 
           if contains_transaction
             result[:address] = Scale::Types.get("Address").decode(scale_bytes).value
-            result[:signature] = scale::types.get("MultiSignature").decode(scale_bytes).value
-            result[:era] = scale::types.get("era").decode(scale_bytes).value
-            result[:nonce] = scale::types.get("compact").decode(scale_bytes).value
-            result[:tip] = scale::types.get("compact").decode(scale_bytes).value
+            result[:signature] = Scale::Types.get("MultiSignature").decode(scale_bytes).value
+            result[:era] = Scale::Types.get("Era").decode(scale_bytes).value
+            result[:nonce] = Scale::Types.get("Compact").decode(scale_bytes).value
+            result[:tip] = Scale::Types.get("Compact").decode(scale_bytes).value
             result[:extrinsic_hash] = generate_hash(scale_bytes.bytes)
           end
           result[:call_index] = scale_bytes.get_next_bytes(2).bytes_to_hex[2..]
