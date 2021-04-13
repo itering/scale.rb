@@ -15,7 +15,10 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     export RUSTFLAGS='-C target-feature=-crt-static' && \
     make
 
-RUN gem install bundler:1.17.3 && \
+ENV RUSTFLAGS='-C target-feature=-crt-static'
+ENV PATH=/root/.cargo/bin:$PATH
+
+RUN gem install bundler:2.2.13 && \
     bundle install && \
     rake install:local
 
