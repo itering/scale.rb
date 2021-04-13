@@ -19,7 +19,7 @@ Because the feature of ruby 2.6 is used, the ruby version is required to be >= 2
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'scale.rb', '0.2.18'
+gem 'scale.rb', '0.2.19'
 ```
 
 And then execute:
