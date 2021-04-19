@@ -172,7 +172,7 @@ RSpec.describe SubstrateClient do
   it "can get decoded storage" do 
     account = @client.get_storage "System", "Account", ["0x50be873393f9e3f5705d8b573729cd35b080e5f9029534e8b848371a9cdecc1e"], "0xedf6ff93fb6dd1c00b96dafb576e01975e85710ff3b0eea7244e576579f28388"
 
-    expect_result = {"nonce"=>0, "refcount"=>2, "data"=>{"free"=>6351289252252238217216, "reserved"=>0, "miscFrozen"=>8375057176854528000, "feeFrozen"=>8375057176854528000}}
+    expect_result = {"c"=>2, "data"=>{"feeFrozen"=>499192308000, "free"=>378566339746251, "miscFrozen"=>499192308000, "reserved"=>0}, "nonce"=>0}
     expect(account.to_human).to eq(expect_result)
   end
 end
