@@ -259,9 +259,8 @@ module Scale
           else
             value = self::VALUES[index]
           end
-          result = new(value)
           puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
-          result
+          new(value)
         end
 
         def items(items)
