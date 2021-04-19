@@ -316,6 +316,17 @@ module Scale
       end
     end
 
+    class GenericMultiAddress
+      include Enum
+      items(
+        Id: "AccountId",
+        Index: "Compact",
+        Raw: "Hex",
+        Address32: "H256",
+        Address20: "H160"
+      )
+    end
+
     class AccountId < H256; end
 
     class Balance < U128; end

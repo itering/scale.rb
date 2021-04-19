@@ -13,6 +13,7 @@
     "Fixed64": "u64",
     "Fixed128": "u128",
     "AccountIdOf": "AccountId",
+    "MultiAddress": "GenericMultiAddress",
     "AccountVoteSplit": {
       "type": "struct",
       "type_mapping": [
