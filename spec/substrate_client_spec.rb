@@ -71,7 +71,7 @@ RSpec.describe SubstrateClient do
 
   it "can get block by hash" do 
     block = @client.chain_getBlock("0x860e0ed04bd1b2a1efa70c9db13cc73f830d7e14204680316db52f05fd91ba37")
-    expect(block.keys).to eq(["block", "justification"])
+    expect(block.keys).to eq(["block", "justifications"])
   end
 
   it "can get block hash by id" do
