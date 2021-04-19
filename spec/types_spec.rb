@@ -317,5 +317,23 @@ describe Scale::Types do
     expect(o.value).to eql("0x374656d343041636")
     expect(o.encode).to eql("374656d343041636")
   end
+
+  it "can correctly decode and encode MultiAddress" do
+    o = Scale::Types::GenericMultiAddress.decode Scale::Bytes.new("0x00f6a299ecbfec56e238b5feedfb4cba567d2902af5d946eaf05e3badf05790e45")
+    expect(o.value.class.name).to eql("Scale::Types::AccountId")
+    expect(o.value.value).to eql("0xf6a299ecbfec56e238b5feedfb4cba567d2902af5d946eaf05e3badf05790e45")
+    expect(o.encode).to eql("00f6a299ecbfec56e238b5feedfb4cba567d2902af5d946eaf05e3badf05790e45")
+
+
+    o = Scale::Types::GenericMultiAddress.decode Scale::Bytes.new("0x0467f89207abe6e1b093befd84a48f033137659292")
+    expect(o.value.class.name).to eql("Scale::Types::H160")
+    expect(o.value.value).to eql("0x67f89207abe6e1b093befd84a48f033137659292")
+    expect(o.encode).to eql("0467f89207abe6e1b093befd84a48f033137659292")
+
+    o = Scale::Types::GenericMultiAddress.decode Scale::Bytes.new("0x02b4111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
+    expect(o.value.class.name).to eql("Scale::Types::Hex")
+    expect(o.value.value).to eql("0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
+    expect(o.encode).to eql("02b4111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
+  end
 end
 
