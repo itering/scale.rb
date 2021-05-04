@@ -14,8 +14,9 @@ module Rust
   attach_function :parse_opt_u32, %i[pointer int uint32 bool], :void
   attach_function :parse_opt_bool, %i[pointer int bool bool], :void
 
-  attach_function :assert_storage_key_for_value, %i[pointer int pointer int pointer int], :void
-  attach_function :assert_storage_key_for_map_black2128concat, %i[pointer int pointer int pointer int pointer int], :void
+  attach_function :get_storage_key_for_value, %i[string string], :string
+  attach_function :get_storage_key_for_map, %i[string string pointer int string], :string
+  attach_function :get_storage_key_for_double_map, %i[string string pointer int string pointer int string], :string
 end
 
 def parse_type(key)

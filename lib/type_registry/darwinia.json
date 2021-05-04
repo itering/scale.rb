@@ -1,5 +1,31 @@
 {
   "types": {
+    "EthereumRelayHeaderParcel": {
+      "type": "struct",
+      "type_mapping": [
+        [
+          "header",
+          "EthereumHeader"
+        ],
+        [
+          "mmr_root",
+          "H256"
+        ]
+      ]
+    },
+    "EthereumRelayProofs": {
+      "type": "struct",
+      "type_mapping": [
+        [
+          "ethash_proof",
+          "Vec<EthashProof>"
+        ],
+        [
+          "mmr_proof",
+          "Vec<H256>"
+        ]
+      ]
+    },
     "Address": "AccountId",
     "LookupSource": "AccountId",
     "BalanceLock": {

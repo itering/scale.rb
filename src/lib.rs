@@ -1,9 +1,14 @@
 extern crate parity_scale_codec;
 use std::slice;
-use parity_scale_codec::{Encode, Decode};
+use parity_scale_codec::Decode;
 use frame_support::Twox128;
+use frame_support::Twox64Concat;
+use frame_support::Identity;
 use frame_support::Blake2_128Concat;
 use frame_support::StorageHasher;
+
+use libc::c_char;
+use std::ffi::{CStr, CString};
 
 fn to_u8_vec(v_pointer: *const u8, len: usize) -> Vec<u8> {
 	let data_slice = unsafe {
@@ -11,6 +16,38 @@ fn to_u8_vec(v_pointer: *const u8, len: usize) -> Vec<u8> {
 		slice::from_raw_parts(v_pointer, len)
 	};
 	data_slice.to_vec()
+}
+
+fn to_string(str_p: *const c_char) -> String {
+	let s = unsafe {
+		assert!(!str_p.is_null());
+		CStr::from_ptr(str_p)
+	};
+
+	s.to_str().unwrap().to_string()
+}
+
+fn v8_vec_to_pointer(key: Vec<u8>) -> *const c_char {
+	let key = CString::new(hex::encode(key)).unwrap();
+	let result = key.as_ptr();
+	std::mem::forget(key);
+	result
+}
+
+fn gen_param_hash(param_pointer: *const u8, param_len: usize, param_hasher: *const c_char) -> Vec<u8> {
+	let param_hasher = to_string(param_hasher);
+	let param_hasher = param_hasher.as_str();
+	let param = to_u8_vec(param_pointer, param_len);
+
+	if param_hasher == "blake2_128_concat" {
+		Blake2_128Concat::hash(&param).to_vec()
+	} else if param_hasher == "twox64_concat" {
+		Twox64Concat::hash(&param).to_vec()
+	} else if param_hasher == "identity" {
+		Identity::hash(&param).to_vec()
+	} else {
+		panic!("Not supported hasher type")
+	} 
 }
 
 fn decode_from_raw_parts<T: Decode + PartialEq + std::fmt::Debug>(v_pointer: *const u8, len: usize) -> T {
@@ -61,33 +98,51 @@ pub extern fn parse_opt_bool(v_pointer: *const u8, len: usize, inner_value: bool
 }
 
 #[no_mangle]
-pub extern fn assert_storage_key_for_value(
-	mv_pointer: *const u8, mv_len: usize, 
-	sv_pointer: *const u8, sv_len: usize, 
-	ev_pointer: *const u8, ev_len: usize
-) {
-	let m = to_u8_vec(mv_pointer, mv_len);
-	let s = to_u8_vec(sv_pointer, sv_len);
-	let e = to_u8_vec(ev_pointer, ev_len);
+pub extern fn get_storage_key_for_value(
+	module_name: *const c_char, 
+	storage_name: *const c_char, 
+) -> *const c_char {
+	let module_name = to_string(module_name);
+	let storage_name = to_string(storage_name);
 
-	let k = [Twox128::hash(&m), Twox128::hash(&s)].concat();
-	assert_eq!(k, e);
+	let storage_key = [Twox128::hash(module_name.as_bytes()), Twox128::hash(storage_name.as_bytes())].concat();
+	v8_vec_to_pointer(storage_key)
 }
 
 #[no_mangle]
-pub extern fn assert_storage_key_for_map_black2128concat(
-	mv_pointer: *const u8, mv_len: usize, 
-	sv_pointer: *const u8, sv_len: usize, 
-	pv_pointer: *const u8, pv_len: usize, 
-	ev_pointer: *const u8, ev_len: usize,
-) {
-	let m = to_u8_vec(mv_pointer, mv_len);
-	let s = to_u8_vec(sv_pointer, sv_len);
-	let p = to_u8_vec(pv_pointer, pv_len);
-	let e = to_u8_vec(ev_pointer, ev_len);
-	let mut k = [Twox128::hash(&m), Twox128::hash(&s)].concat();
-	k.extend(p.using_encoded(Blake2_128Concat::hash));
-	assert_eq!(k, e);
+pub extern fn get_storage_key_for_map(
+	module_name: *const c_char, 
+	storage_name: *const c_char, 
+	param_pointer: *const u8, param_len: usize, param_hasher: *const c_char,
+) -> *const c_char {
+	let module_name = to_string(module_name);
+	let storage_name = to_string(storage_name);
+	let mut storage_key = [Twox128::hash(module_name.as_bytes()), Twox128::hash(storage_name.as_bytes())].concat();
+
+	let param_hash = gen_param_hash(param_pointer, param_len, param_hasher);
+	storage_key.extend(param_hash);
+
+	v8_vec_to_pointer(storage_key)
+}
+
+#[no_mangle]
+pub extern fn get_storage_key_for_double_map(
+	module_name: *const c_char, 
+	storage_name: *const c_char, 
+	param1_pointer: *const u8, param1_len: usize, param1_hasher: *const c_char,
+	param2_pointer: *const u8, param2_len: usize, param2_hasher: *const c_char,
+) -> *const c_char {
+	let module_name = to_string(module_name);
+	let storage_name = to_string(storage_name);
+	let mut storage_key = [Twox128::hash(module_name.as_bytes()), Twox128::hash(storage_name.as_bytes())].concat();
+
+	let param1_hash = gen_param_hash(param1_pointer, param1_len, param1_hasher);
+	storage_key.extend(param1_hash);
+
+	let param2_hash = gen_param_hash(param2_pointer, param2_len, param2_hasher);
+	storage_key.extend(param2_hash);
+
+	v8_vec_to_pointer(storage_key)
 }
 
 #[test]
