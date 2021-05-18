@@ -28,6 +28,7 @@ require "metadata/metadata_v12"
 require "substrate_client"
 require "logger"
 require "helper"
+require "type_builder"
 
 class String
   def upcase_first
@@ -88,8 +89,17 @@ module Scale
     end
 
     def get(type_name)
-      raise "Types not loaded" if @types.nil?
+      all_types = self.all_types
+      type = type_traverse(type_name, all_types)
 
+      Scale::Types.constantize(type)
+    end
+
+    def custom_types=(custom_types)
+      @custom_types = custom_types.stringify_keys if (not custom_types.nil?) && custom_types.class.name == "Hash"
+    end
+
+    def all_types
       all_types = {}.merge(@types)
 
       if @spec_version && @versioning
@@ -102,14 +112,18 @@ module Scale
       end
 
       all_types.merge!(@custom_types) if @custom_types
-
-      type = type_traverse(type_name, all_types)
-
-      Scale::Types.constantize(type)
+      all_types
     end
 
-    def custom_types=(custom_types)
-      @custom_types = custom_types.stringify_keys if (not custom_types.nil?) && custom_types.class.name == "Hash"
+    def check_types
+      self.all_types.keys.each do |key|
+        begin
+          type = self.get(key)
+        rescue => ex
+          puts "[[ERROR]] #{key}: #{ex}"
+        end
+      end
+      ""
     end
 
     private
@@ -272,6 +286,11 @@ module Scale
       end
     end
 
+    # class TestArray
+    #   include Array
+    #   inner_type "Compact"
+    #   length 2
+    # end
     def self.type_of(type_string, values = nil)
       if type_string.end_with?(">")
         type_strs = type_string.scan(/^([^<]*)<(.+)>$/).first
@@ -306,6 +325,22 @@ module Scale
           end
         else
           raise "#{type_str} not support inner type: #{type_string}"
+        end
+      elsif type_string =~ /\[.+;\s*\d+\]/ # array
+        scan_result = type_string.scan /\[(.+);\s*(\d+)\]/
+        inner_type_name = scan_result[0][0]
+        inner_type_len = scan_result[0][1].to_i
+        type_name = "#{inner_type_name}Array"
+
+        if !Scale::Types.const_defined?(type_name)
+          klass = Class.new do
+            include Scale::Types::Array
+            inner_type inner_type_name
+            length inner_type_len
+          end
+          Scale::Types.const_set type_name, klass
+        else
+          Scale::Types.const_get type_name
         end
       elsif type_string.start_with?("(") && type_string.end_with?(")") # tuple
         # TODO: add nested tuple support
@@ -343,14 +378,20 @@ module Scale
             end
           end
           name = values.class == ::Hash ? values.values.map(&:camelize2).join("_") : values.map(&:camelize2).join("_")
-          name = "Enum_Of_#{name}_#{klass.object_id}"
+          name = "Enum_Of_#{rename(name)}_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         elsif type_string == "Struct"
           klass = Class.new do
             include Scale::Types::Struct
             items values
           end
-          name = "Struct_Of_#{values.values.map(&:camelize2).join("_")}_#{klass.object_id}"
+          puts "-----"
+          # values: {"type_name" => "type_string"}
+          inner_type_strings = values.values
+          # inner_types = inner_type_strings.map do |inner_type_string|
+          #   self.constantize(inner_type_string)
+          # end
+          name = "Struct_Of_#{inner_type_strings.map {|s| rename(s) }.join}_#{klass.object_id}"
           Scale::Types.const_set fix(name), klass
         elsif type_string == "Set"
           klass = Class.new do
@@ -404,8 +445,7 @@ def rename(type)
   return "Vec<Address>" if type == "Vec<<Lookup as StaticLookup>::Source>"
   return "Compact" if type == "<Balance as HasCompact>::Type"
   return "Compact" if type == "<BlockNumber as HasCompact>::Type"
-  return "Compact" if type == "Compact<Balance>"
-  return "Compact" if type == "Compact<BlockNumber>"
+  return "Compact" if type =~ /\ACompact<[a-zA-Z0-9\s]*>\z/
   return "CompactMoment" if type == "<Moment as HasCompact>::Type"
   return "CompactMoment" if type == "Compact<Moment>"
   return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
