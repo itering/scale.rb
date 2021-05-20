@@ -83,7 +83,6 @@ describe Scale::Types do
 
     scale_bytes = Scale::Bytes.new("0x15012efb45")
     obj = type.decode(scale_bytes)
-    puts obj.value
     expect(obj.value).to eq([
       Scale::Types::Compact.new(69),
       Scale::Types::U16.new(64302),
@@ -94,4 +93,36 @@ describe Scale::Types do
   end
 
   # Struct
+  it "can build a struct and then use it to decode and encode " do
+    type_def = {
+      "type" => "struct",
+      "type_mapping" => [
+        [
+          "size",
+          "Compact"
+        ],
+        [
+          "balance",
+          "U16"
+        ],
+        [
+          "balance2",
+          "U8"
+        ]
+      ]
+    }
+    type = Scale::Types.build(type_def)
+    expect(type).to eq(Scale::Types::StructCompactU16U8)
+
+    scale_bytes = Scale::Bytes.new("0x15012efb45")
+    obj = type.decode(scale_bytes)
+    expect(obj.value).to eq({
+      "size" => Scale::Types::Compact.new(69),
+      "balance" => Scale::Types::U16.new(64302),
+      "balance2" => Scale::Types::U8.new(69)
+    })
+
+    expect(obj.encode).to eq("15012efb45")
+  end
+
 end

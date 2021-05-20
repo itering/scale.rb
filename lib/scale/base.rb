@@ -161,7 +161,7 @@ module Scale
           item_values = self::ITEMS.map do |item|
             item_name = item[0]
             item_type = item[1]
-            [item_name.to_sym, item_type.decode(scale_bytes)]
+            [item_name, item_type.decode(scale_bytes)]
           end.to_h
 
           # value = {}
