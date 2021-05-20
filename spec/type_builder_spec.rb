@@ -79,15 +79,19 @@ describe Scale::Types do
   end
 
   it "can encode and decode a tuple" do
-    type = Scale::Types.build("(Compact, U16)")
+    type = Scale::Types.build("(Compact, U16, U8)")
 
-    scale_bytes = Scale::Bytes.new("0x15012efb")
+    scale_bytes = Scale::Bytes.new("0x15012efb45")
     obj = type.decode(scale_bytes)
+    puts obj.value
     expect(obj.value).to eq([
       Scale::Types::Compact.new(69),
-      Scale::Types::Compact.new(64302)
+      Scale::Types::U16.new(64302),
+      Scale::Types::U8.new(69)
     ])
 
-    expect(obj.encode).to eq("15012efb")
+    expect(obj.encode).to eq("15012efb45")
   end
+
+  # Struct
 end

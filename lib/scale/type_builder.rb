@@ -166,7 +166,7 @@ module Scale
 
         # [1, "hello"]
         if type_def.has_key?("value_list")
-          type_name = "EnumOf#{type_def["value_list"].map {|value| value.to_s.camelize2}.join}"
+          type_name = "Enum#{type_def["value_list"].map {|value| value.to_s.camelize2}.join}"
 
           if !Scale::Types.const_defined?(type_name)
             klass = Class.new do
@@ -191,7 +191,7 @@ module Scale
         # }
       # }
       def build_set(type_def)
-        type_name = "SetOf#{type_def["value_list"].keys.map(&:camelize2).join("")}"
+        type_name = "Set#{type_def["value_list"].keys.map(&:camelize2).join("")}"
         puts type_name
         if !Scale::Types.const_defined?(type_name)
           bytes_length = type_def["value_type"][1..].to_i / 8

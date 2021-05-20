@@ -9,7 +9,7 @@ module Scale
       end
 
       def ==(other)
-        value == other.value
+        self.class == other.class && self.value == other.value
       end
 
       def to_human
