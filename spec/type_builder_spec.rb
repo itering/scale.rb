@@ -16,7 +16,7 @@ describe Scale::Types do
   # Vec
   it "can create a Vec" do
     type = Scale::Types.build("Vec<Compact>")
-    expect(type).to eq(Scale::Types::VecCompact)
+    expect(type).to eq(Scale::Types::Vec_Compact_)
   end
 
   it "can encode and decode a vec" do
@@ -36,7 +36,7 @@ describe Scale::Types do
   # Option
   it "can create a Option" do
     type = Scale::Types.build("Option<Compact>")
-    expect(type).to eq(Scale::Types::OptionCompact)
+    expect(type).to eq(Scale::Types::Option_Compact_)
   end
 
   it "can encode and decode a option" do
@@ -56,7 +56,8 @@ describe Scale::Types do
   # Fixed array
   it "can create a fixed array" do
     type = Scale::Types.build("[Compact; 2]")
-    expect(type).to eq(Scale::Types::ArrayCompact2)
+    expect(type).to eq(Scale::Types::Array_Compact_2_)
+    expect(type.name).to eq("Scale::Types::Array_Compact_2_")
   end
 
   it "can encode and decode a fixed array" do
@@ -75,7 +76,7 @@ describe Scale::Types do
   # Tuple
   it "can create a tuple" do
     type = Scale::Types.build("(Compact, U32)")
-    expect(type).to eq(Scale::Types::TupleCompactU32)
+    expect(type).to eq(Scale::Types::Tuple_Compact_U32_)
   end
 
   it "can encode and decode a tuple" do
@@ -112,7 +113,7 @@ describe Scale::Types do
       ]
     }
     type = Scale::Types.build(type_def)
-    expect(type).to eq(Scale::Types::StructCompactU16U8)
+    expect(type).to eq(Scale::Types::Struct_SizeCompact_BalanceU16_Balance2U8_)
 
     scale_bytes = Scale::Bytes.new("0x15012efb45")
     obj = type.decode(scale_bytes)
@@ -125,6 +126,89 @@ describe Scale::Types do
     expect(obj.encode).to eq("15012efb45")
   end
 
+  it "should be different of two struct with different labels but same inner types" do
+    type_def = {
+      "type" => "struct",
+      "type_mapping" => [
+        [
+          "size",
+          "Compact"
+        ],
+        [
+          "balance",
+          "U16"
+        ],
+        [
+          "balance2",
+          "U8"
+        ]
+      ]
+    }
+    type1 = Scale::Types.build(type_def)
+
+    type_def = {
+      "type" => "struct",
+      "type_mapping" => [
+        [
+          "abc",
+          "Compact"
+        ],
+        [
+          "balance",
+          "U16"
+        ],
+        [
+          "balance2",
+          "U8"
+        ]
+      ]
+    }
+    type2 = Scale::Types.build(type_def)
+    expect(type1).not_to eq(type2) 
+
+  end
+
+  it "should be equal of two struct with the same structure" do
+    type_def = {
+      "type" => "struct",
+      "type_mapping" => [
+        [
+          "size",
+          "Compact"
+        ],
+        [
+          "balance",
+          "U16"
+        ],
+        [
+          "balance2",
+          "U8"
+        ]
+      ]
+    }
+    type1 = Scale::Types.build(type_def)
+
+    type_def = {
+      "type" => "struct",
+      "type_mapping" => [
+        [
+          "size",
+          "Compact"
+        ],
+        [
+          "balance",
+          "U16"
+        ],
+        [
+          "balance2",
+          "U8"
+        ]
+      ]
+    }
+    type2 = Scale::Types.build(type_def)
+    expect(type1).to eq(type2) 
+
+  end
   # Enum
   it "can build a enum and then use it to decode and encode " do
     type_def = {
@@ -141,7 +225,7 @@ describe Scale::Types do
       ]
     }
     type = Scale::Types.build(type_def)
-    expect(type).to eq(Scale::Types::Enum_RingBalanceBalance_KtonBalanceBalance)
+    expect(type).to eq(Scale::Types::Enum_RingBalanceBalance_KtonBalanceBalance_)
 
     type_def = {
       "type" => "enum",
@@ -157,7 +241,7 @@ describe Scale::Types do
       ]
     }
     type = Scale::Types.build(type_def)
-    expect(type).to eq(Scale::Types::Enum_EthAbcArrayU820_TronArrayU820)
+    expect(type).to eq(Scale::Types::Enum_EthAbcArray_U8_20__TronArray_U8_20__)
   end
 
   it "" do

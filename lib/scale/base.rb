@@ -392,9 +392,11 @@ module Scale
 
       module ClassMethods
         def decode(scale_bytes)
+          puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           items = (0 ... self::LENGTH).map do |_|
             self::INNER_TYPE.decode(scale_bytes)
           end
+          puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           new(items)
         end
 

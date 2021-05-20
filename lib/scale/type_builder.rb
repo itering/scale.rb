@@ -43,7 +43,7 @@ module Scale
         inner_type_str = type_string.scan(/\AVec<(.+)>\z/).first.first
         inner_type = build(inner_type_str)
 
-        type_name = "Vec#{inner_type.name.gsub('Scale::Types::', '')}"
+        type_name = "Vec_#{inner_type.name.gsub('Scale::Types::', '')}_"
 
         if !Scale::Types.const_defined?(type_name)
           klass = Class.new do
@@ -60,7 +60,7 @@ module Scale
         inner_type_str = type_string.scan(/\AOption<(.+)>\z/).first.first
         inner_type = build(inner_type_str)
 
-        type_name = "Option#{inner_type.name.gsub('Scale::Types::', '')}"
+        type_name = "Option_#{inner_type.name.gsub('Scale::Types::', '')}_"
 
         if !Scale::Types.const_defined?(type_name)
           klass = Class.new do
@@ -83,7 +83,7 @@ module Scale
         #
         len = scan_result[0][1].to_i
 
-        type_name = "Array#{inner_type.name.gsub('Scale::Types::', '')}#{len}"
+        type_name = "Array_#{inner_type.name.gsub('Scale::Types::', '')}_#{len}_"
 
         if !Scale::Types.const_defined?(type_name)
           klass = Class.new do
@@ -108,7 +108,7 @@ module Scale
           build(inner_type_str)
         end
 
-        type_name = "Tuple#{inner_types.map {|inner_type| inner_type.name.gsub('Scale::Types::', '')}.join}"
+        type_name = "Tuple_#{inner_types.map {|inner_type| inner_type.name.gsub('Scale::Types::', '')}.join("_")}_"
         if !Scale::Types.const_defined?(type_name)
           klass = Class.new do
             include Scale::Types::Tuple
@@ -127,7 +127,7 @@ module Scale
           [item_name, item_type]
         end
 
-        type_name = "Struct#{items.map {|item| item[1].name.gsub('Scale::Types::', '') }.join}"
+        type_name = "Struct_#{items.map {|item| item[0].camelize2 +  item[1].name.gsub('Scale::Types::', '') }.join('_')}_"
 
         if !Scale::Types.const_defined?(type_name)
           klass = Class.new do
@@ -153,7 +153,7 @@ module Scale
           name = items.map do |item| 
             item[0].camelize2 + item[1].name.gsub('Scale::Types::', '')
           end.join("_")
-          type_name = "Enum_#{name}"
+          type_name = "Enum_#{name}_"
 
           if !Scale::Types.const_defined?(type_name)
             klass = Class.new do
