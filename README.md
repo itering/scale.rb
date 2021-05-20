@@ -1,5 +1,7 @@
 ![grants_badge](./grants_badge.png)
 
+**Warning: After v0.2.19, the develop branch will do a structure refactor and big optimization.**
+
 # scale.rb
 
 **Ruby SCALE Codec Library**
