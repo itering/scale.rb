@@ -80,10 +80,10 @@ module Scale
         inner_type_str = scan_result[0][0]
         inner_type = build(inner_type_str)
 
-        type_name = "Array#{inner_type.name.gsub('Scale::Types::', '')}"
-
         #
         len = scan_result[0][1].to_i
+
+        type_name = "Array#{inner_type.name.gsub('Scale::Types::', '')}#{len}"
 
         if !Scale::Types.const_defined?(type_name)
           klass = Class.new do

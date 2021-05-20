@@ -56,7 +56,7 @@ describe Scale::Types do
   # Fixed array
   it "can create a fixed array" do
     type = Scale::Types.build("[Compact; 2]")
-    expect(type).to eq(Scale::Types::ArrayCompact)
+    expect(type).to eq(Scale::Types::ArrayCompact2)
   end
 
   it "can encode and decode a fixed array" do
@@ -157,7 +157,7 @@ describe Scale::Types do
       ]
     }
     type = Scale::Types.build(type_def)
-    expect(type).to eq(Scale::Types::Enum_EthAbcArrayU8_TronArrayU8)
+    expect(type).to eq(Scale::Types::Enum_EthAbcArrayU820_TronArrayU820)
   end
 
   it "" do
