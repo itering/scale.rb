@@ -125,4 +125,42 @@ describe Scale::Types do
     expect(obj.encode).to eq("15012efb45")
   end
 
+  # Enum
+  it "can build a enum and then use it to decode and encode " do
+    type_def = {
+      "type" => "enum",
+      "type_mapping" => [
+        [
+          "RingBalance",
+          "Balance"
+        ],
+        [
+          "KtonBalance",
+          "Balance"
+        ]
+      ]
+    }
+    type = Scale::Types.build(type_def)
+    expect(type).to eq(Scale::Types::Enum_RingBalanceBalance_KtonBalanceBalance)
+
+    type_def = {
+      "type" => "enum",
+      "type_mapping" => [
+        [
+          "eth_abc",
+          "[U8; 20]"
+        ],
+        [
+          "Tron",
+          "[U8; 20]"
+        ]
+      ]
+    }
+    type = Scale::Types.build(type_def)
+    expect(type).to eq(Scale::Types::Enum_EthAbcArrayU8_TronArrayU8)
+  end
+
+  it "" do
+  end
+  
 end

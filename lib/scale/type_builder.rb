@@ -150,7 +150,10 @@ module Scale
             [item_name, item_type]
           end
 
-          type_name = "Enum#{items.map {|item| item[1].name.gsub('Scale::Types::', '') }.join}"
+          name = items.map do |item| 
+            item[0].camelize2 + item[1].name.gsub('Scale::Types::', '')
+          end.join("_")
+          type_name = "Enum_#{name}"
 
           if !Scale::Types.const_defined?(type_name)
             klass = Class.new do
