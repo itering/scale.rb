@@ -197,15 +197,17 @@ module Scale
       module ClassMethods
         def decode(scale_bytes)
           puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
-          values = self::TYPE_STRS.map do |type_str|
-            Scale::Types.get(type_str).decode(scale_bytes)
+
+          values = self::INNER_TYPES.map do |type|
+            type.decode(scale_bytes)
           end
+
           puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           new(values)
         end
 
-        def inner_types(*type_strs)
-          const_set(:TYPE_STRS, type_strs)
+        def inner_types(inner_types)
+          const_set(:INNER_TYPES, inner_types)
         end
       end
 

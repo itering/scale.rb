@@ -9,6 +9,7 @@ require "scale/base"
 require "scale/types"
 require "scale/block"
 require "scale/trie"
+require "scale/type_builder"
 
 require "metadata/metadata"
 require "metadata/metadata_v0"
@@ -28,7 +29,6 @@ require "metadata/metadata_v12"
 require "substrate_client"
 require "logger"
 require "helper"
-require "type_builder"
 
 class String
   def upcase_first
