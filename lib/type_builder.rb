@@ -3,7 +3,7 @@ module Scale
     class << self
 
       def build(type_def)
-        if type_def.class == ::String # 1. Primitive types, 2. Vec<...>, 3. Option<...>, 4. [xx; x], 5. (x, y)
+        if type_def.class == ::String # 1. hard coded types, 2. Vec<...>, 3. Option<...>, 4. [xx; x], 5. (x, y)
 
           if type_def =~ /\AVec<.+>\z/ 
             build_vec(type_def)
@@ -34,6 +34,8 @@ module Scale
 
       def get_hard_coded_type(type_string)
         type_name = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
+        type_name = rename(type_name)
+
         type_name.constantize2
       rescue NameError => e
         puts "#{type_string} is not defined"
@@ -208,6 +210,31 @@ module Scale
         end
         Scale::Types.const_set fix(name), klass
       end
+
+      private
+        def rename(type)
+          type = type.gsub("T::", "")
+            .gsub("<T>", "")
+            .gsub("<T as Trait>::", "")
+            .delete("\n")
+            .gsub("EventRecord<Event, Hash>", "EventRecord")
+            .gsub(/(u)(\d+)/, 'U\2')
+          return "Bool" if type == "bool"
+          return "Null" if type == "()"
+          return "String" if type == "Vec<u8>"
+          return "Compact" if type == "Compact<u32>" || type == "Compact<U32>"
+          return "Address" if type == "<Lookup as StaticLookup>::Source"
+          return "Vec<Address>" if type == "Vec<<Lookup as StaticLookup>::Source>"
+          return "Compact" if type == "<Balance as HasCompact>::Type"
+          return "Compact" if type == "<BlockNumber as HasCompact>::Type"
+          return "Compact" if type =~ /\ACompact<[a-zA-Z0-9\s]*>\z/
+          return "CompactMoment" if type == "<Moment as HasCompact>::Type"
+          return "CompactMoment" if type == "Compact<Moment>"
+          return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
+          return "AccountData" if type == "AccountData<Balance>"
+
+          type
+        end
 
     end
   end

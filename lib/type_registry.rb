@@ -39,9 +39,7 @@ module Scale
 
     def get(type_name)
       all_types = self.all_types
-      type = type_traverse(type_name, all_types)
-
-      Scale::Types.constantize(type)
+      type_traverse(type_name, all_types)
     end
 
     def custom_types=(custom_types)
@@ -88,12 +86,12 @@ module Scale
       end
 
       def type_traverse(type, types)
-        type = rename(type) if type.class == ::String
-        if types.has_key?(type) && types[type] != type
+        if type.class == ::String && types.has_key?(type) && types[type] != type
           type_traverse(types[type], types)
         else
           type
         end
       end
   end
+
 end
