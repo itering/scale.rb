@@ -43,9 +43,21 @@ module Scale
     end
 
     def self.get(type_name)
-      type_name_or_def = TypeRegistry.instance.get(type_name)
-      Scale::Types.build type_name_or_def
+      type_def = TypeRegistry.instance.get(type_name)
+      Scale::Types.build type_def
     end
+
+    def self.check_types
+      TypeRegistry.instance.all_types.keys.each do |key|
+        begin
+          type = self.get(key)
+        rescue => ex
+          puts "[[ERROR]] #{key}: #{ex}"
+        end
+      end
+      ""
+    end
+
   end
 end
 

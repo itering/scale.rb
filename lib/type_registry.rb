@@ -62,17 +62,6 @@ module Scale
       all_types
     end
 
-    def check_types
-      self.all_types.keys.each do |key|
-        begin
-          type = self.get(key)
-        rescue => ex
-          puts "[[ERROR]] #{key}: #{ex}"
-        end
-      end
-      ""
-    end
-
     private
 
       def load_chain_spec_types(spec_name)

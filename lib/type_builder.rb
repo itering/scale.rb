@@ -2,6 +2,7 @@ module Scale
   module Types
     class << self
 
+      # type_def may be a type_name or a definition of a type
       def build(type_def)
         if type_def.class == ::String # 1. hard coded types, 2. Vec<...>, 3. Option<...>, 4. [xx; x], 5. (x, y)
 
@@ -33,9 +34,8 @@ module Scale
       end
 
       def get_hard_coded_type(type_string)
-        type_name = (type_string.start_with?("Scale::Types::") ? type_string : "Scale::Types::#{type_string}")
-        type_name = rename(type_name)
-
+        type_name = rename(type_string)
+        type_name = (type_name.start_with?("Scale::Types::") ? type_name : "Scale::Types::#{type_name}")
         type_name.constantize2
       rescue NameError => e
         puts "#{type_string} is not defined"
