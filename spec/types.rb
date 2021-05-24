@@ -12,7 +12,7 @@ module Scale
 
     class OptionU32
       include Option
-      INNER_TYPE_STR = "U32".freeze
+      inner_type Scale::Types::U32
     end
 
     class Student
