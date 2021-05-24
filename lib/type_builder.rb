@@ -105,7 +105,7 @@ module Scale
         inner_type_strs = inner_types_str.split(",").map do |inner_type_str| 
           inner_type_str.strip
         end
-        
+
         inner_types = inner_type_strs.map do |inner_type_str|
           build(inner_type_str)
         end
@@ -114,7 +114,7 @@ module Scale
         if !Scale::Types.const_defined?(type_name)
           klass = Class.new do
             include Scale::Types::Tuple
-            inner_types inner_types
+            inner_types(*inner_types)
           end
           Scale::Types.const_set type_name, klass
         else

@@ -199,6 +199,7 @@ module Scale
           puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
 
           values = self::INNER_TYPES.map do |type|
+            puts type.class.name
             type.decode(scale_bytes)
           end
 
@@ -206,7 +207,8 @@ module Scale
           new(values)
         end
 
-        def inner_types(inner_types)
+        # inner_types Scale::Types::U8, Scale::Types::U8
+        def inner_types(*inner_types)
           const_set(:INNER_TYPES, inner_types)
         end
       end
