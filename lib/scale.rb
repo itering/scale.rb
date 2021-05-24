@@ -35,7 +35,8 @@ require "logger"
 require "helper"
 
 module Scale
-  class Error < StandardError; end
+  class ScaleError < StandardError; end
+  class TypeBuildError < ScaleError; end
 
   module Types
     class << self
@@ -55,7 +56,7 @@ module Scale
           puts "[[ERROR]] #{key}: #{ex}"
         end
       end
-      ""
+      true
     end
 
   end

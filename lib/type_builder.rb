@@ -27,7 +27,7 @@ module Scale
           elsif type_def["type"] == "set"
             build_set(type_def)
           else
-            puts "unsupported type"
+            raise Scale::TypeBuildError.new("Failed to build a type from #{type_def}")
           end
 
         end
@@ -37,8 +37,8 @@ module Scale
         type_name = rename(type_string)
         type_name = (type_name.start_with?("Scale::Types::") ? type_name : "Scale::Types::#{type_name}")
         type_name.constantize2
-      rescue NameError => e
-        puts "#{type_string} is not defined"
+      rescue => e
+        raise Scale::TypeBuildError.new("Failed to get the hard coded type named `#{type_string}`")
       end
 
       def build_vec(type_string)
