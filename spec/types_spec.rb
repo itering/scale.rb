@@ -139,26 +139,26 @@ describe Scale::Types do
 
   it "can be constantized from type string" do
     scale_bytes = Scale::Bytes.new("0x01ffffff00")
-    klass = Scale::Types.type_of("Option<U32>")
+    klass = Scale::Types.get("Option<U32>")
     o = klass.decode scale_bytes
     expect(o.value.value).to eql(16_777_215)
     expect(o.encode).to eql("01ffffff00")
 
     scale_bytes = Scale::Bytes.new("0x010c003afe")
-    klass = Scale::Types.type_of("Option<Vec<U8>>")
-    expect(klass.name).to start_with("Scale::Types::OptionVecU8")
+    klass = Scale::Types.get("Option<Vec<U8>>")
+    expect(klass.name).to eq("Scale::Types::Option_Vec_U8__")
     o = klass.decode scale_bytes
     expect(o.value.value.map(&:value)).to eql([0, 58, 254])
     expect(o.encode).to eql("010c003afe")
 
     scale_bytes = Scale::Bytes.new("0x0c0100013a01fe")
-    klass = Scale::Types.type_of("Vec<Option<U8>>")
+    klass = Scale::Types.get("Vec<Option<U8>>")
     o = klass.decode scale_bytes
     expect(o.value.map { |e| e.value.value }).to eql([0, 58, 254])
     expect(o.encode).to eql("0c0100013a01fe")
 
-    klass = Scale::Types.type_of("(U8, U8)")
-    expect(klass.name.start_with?("Scale::Types::Tuple")).to be true
+    klass = Scale::Types.get("(U8, U8)")
+    expect(klass.name).to eq("Scale::Types::Tuple_U8_U8_")
     scale_bytes = Scale::Bytes.new("0x4545")
     o = klass.decode scale_bytes
     expect(o.value.map(&:value)).to eql([69, 69])

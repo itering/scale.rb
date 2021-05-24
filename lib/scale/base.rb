@@ -63,7 +63,7 @@ module Scale
             puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
             new(value)
           else
-            raise "bad data"
+            raise BadDataError.new("Bad scale data for #{self::TYPE_NAME}")
           end
         end
 
@@ -199,7 +199,6 @@ module Scale
           puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
 
           values = self::INNER_TYPES.map do |type|
-            puts type.class.name
             type.decode(scale_bytes)
           end
 
