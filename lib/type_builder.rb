@@ -138,7 +138,7 @@ module Scale
             [item_name, item_type]
           end
 
-          type_name = "Struct_#{items.map {|item| item[0].camelize2 +  item[1].name.gsub('Scale::Types::', '') }.join('_')}_"
+          type_name = "Struct_#{items.map {|item| item[0].camelize2 + 'In' + item[1].name.gsub('Scale::Types::', '') }.join('_')}_"
 
           if !Scale::Types.const_defined?(type_name)
             klass = Class.new do

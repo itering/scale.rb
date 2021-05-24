@@ -113,7 +113,7 @@ describe Scale::Types do
       ]
     }
     type = Scale::Types.get(type_def)
-    expect(type).to eq(Scale::Types::Struct_SizeCompact_BalanceU16_Balance2U8_)
+    expect(type).to eq(Scale::Types::Struct_SizeInCompact_BalanceInU16_Balance2InU8_)
 
     scale_bytes = Scale::Bytes.new("0x15012efb45")
     obj = type.decode(scale_bytes)
