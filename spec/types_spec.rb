@@ -137,7 +137,7 @@ describe Scale::Types do
     expect(o.encode).to eql("01ffffff00")
   end
 
-  it "can be constantized form type string" do
+  it "can be constantized from type string" do
     scale_bytes = Scale::Bytes.new("0x01ffffff00")
     klass = Scale::Types.type_of("Option<U32>")
     o = klass.decode scale_bytes
