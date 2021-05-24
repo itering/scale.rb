@@ -112,14 +112,14 @@ describe Scale::Types do
 
     scale_bytes = Scale::Bytes.new("0x01")
     o = Scale::Types::OptionBool.decode scale_bytes
-    expect(o.value).to eql(false)
+    expect(o.value).to eql(true)
     expect(o.encode).to eql("01")
     # Rust SCALE does not implement Optional Booleans conformant to
     # specification yet, so this is commented for now
 
     scale_bytes = Scale::Bytes.new("0x02")
     o = Scale::Types::OptionBool.decode scale_bytes
-    expect(o.value).to eql(true)
+    expect(o.value).to eql(false)
     expect(o.encode).to eql("02")
     # Rust SCALE does not implement Optional Booleans conformant to
     # specification yet, so this is commented for now

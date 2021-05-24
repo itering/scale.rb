@@ -46,7 +46,7 @@ module Scale
       end
     end
 
-    # value: one of nil, false, true, scale object
+    # if value is bool, see type `OptionBool`
     module Option
       include SingleValue
 

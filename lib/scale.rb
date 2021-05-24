@@ -37,6 +37,7 @@ require "helper"
 module Scale
   class ScaleError < StandardError; end
   class TypeBuildError < ScaleError; end
+  class BadDataError < ScaleError; end
 
   module Types
     class << self

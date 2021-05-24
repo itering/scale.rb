@@ -24,6 +24,35 @@ module Scale
       end
     end
 
+    class OptionBool
+      include SingleValue
+      def self.decode(scale_bytes)
+        byte = scale_bytes.get_next_bytes(1)[0]
+        value = if byte == 0x00
+                  nil
+                elsif byte == 0x01
+                  true
+                elsif byte == 0x02
+                  false
+                else
+                  raise BadDataError.new("Bad scale data for OptionBool #{byte.to_s(16)}")
+                end
+        new(value)
+      end
+
+      def encode
+        if value.nil?
+          "00"
+        elsif value === true
+          "01"
+        elsif value === false
+          "02"
+        else
+          raise WrongValueError.new("OptionBool can not have value other than `nil`, `true`, `false`")
+        end
+      end
+    end
+
     class U8
       include FixedWidthUInt
       BYTE_LENGTH = 1
