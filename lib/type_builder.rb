@@ -7,9 +7,12 @@ module Scale
       #   type_def   : struct, enum, set
       #
       def get(type_info)
-        if type_info.class == ::String # 1. hard coded types, 2. Vec<...>, 3. Option<...>, 4. [xx; x], 5. (x, y)
-          type_string = TypeRegistry.instance.get(type_info)
+        if type_info.class == ::String 
+          type_info = TypeRegistry.instance.get(type_info)
+        end
 
+        if type_info.class == ::String # 1. hard coded types, 2. Vec<...>, 3. Option<...>, 4. [xx; x], 5. (x, y)
+          type_string = type_info
           if type_string =~ /\AVec<.+>\z/ 
             build_vec(type_string)
           elsif type_info =~ /\AOption<.+>\z/
