@@ -6,21 +6,21 @@ describe Scale::Types do
   }
 
   it "can create a hard coded type" do
-    type = Scale::Types.build("Compact")
+    type = Scale::Types.get("Compact")
     expect(type).to eq(Scale::Types::Compact)
 
-    type = Scale::Types.build("Hex")
+    type = Scale::Types.get("Hex")
     expect(type).to eq(Scale::Types::Hex)
   end
 
   # Vec
   it "can create a Vec" do
-    type = Scale::Types.build("Vec<Compact>")
+    type = Scale::Types.get("Vec<Compact>")
     expect(type).to eq(Scale::Types::Vec_Compact_)
   end
 
   it "can encode and decode a vec" do
-    type = Scale::Types.build("Vec<Compact>")
+    type = Scale::Types.get("Vec<Compact>")
 
     scale_bytes = Scale::Bytes.new("0x081501fc")
     obj = type.decode(scale_bytes)
@@ -35,12 +35,12 @@ describe Scale::Types do
 
   # Option
   it "can create a Option" do
-    type = Scale::Types.build("Option<Compact>")
+    type = Scale::Types.get("Option<Compact>")
     expect(type).to eq(Scale::Types::Option_Compact_)
   end
 
   it "can encode and decode a option" do
-    type = Scale::Types.build("Option<Compact>")
+    type = Scale::Types.get("Option<Compact>")
 
     scale_bytes = Scale::Bytes.new("0x00")
     obj = type.decode(scale_bytes)
@@ -55,13 +55,13 @@ describe Scale::Types do
 
   # Fixed array
   it "can create a fixed array" do
-    type = Scale::Types.build("[Compact; 2]")
+    type = Scale::Types.get("[Compact; 2]")
     expect(type).to eq(Scale::Types::Array_Compact_2_)
     expect(type.name).to eq("Scale::Types::Array_Compact_2_")
   end
 
   it "can encode and decode a fixed array" do
-    type = Scale::Types.build("[Compact; 2]")
+    type = Scale::Types.get("[Compact; 2]")
 
     scale_bytes = Scale::Bytes.new("0x1501fc")
     obj = type.decode(scale_bytes)
@@ -75,12 +75,12 @@ describe Scale::Types do
 
   # Tuple
   it "can create a tuple" do
-    type = Scale::Types.build("(Compact, U32)")
+    type = Scale::Types.get("(Compact, U32)")
     expect(type).to eq(Scale::Types::Tuple_Compact_U32_)
   end
 
   it "can encode and decode a tuple" do
-    type = Scale::Types.build("(Compact, U16, U8)")
+    type = Scale::Types.get("(Compact, U16, U8)")
 
     scale_bytes = Scale::Bytes.new("0x15012efb45")
     obj = type.decode(scale_bytes)
@@ -94,7 +94,7 @@ describe Scale::Types do
   end
 
   # Struct
-  it "can build a struct and then use it to decode and encode " do
+  it "can get a struct and then use it to decode and encode " do
     type_def = {
       "type" => "struct",
       "type_mapping" => [
@@ -112,7 +112,7 @@ describe Scale::Types do
         ]
       ]
     }
-    type = Scale::Types.build(type_def)
+    type = Scale::Types.get(type_def)
     expect(type).to eq(Scale::Types::Struct_SizeCompact_BalanceU16_Balance2U8_)
 
     scale_bytes = Scale::Bytes.new("0x15012efb45")
@@ -144,7 +144,7 @@ describe Scale::Types do
         ]
       ]
     }
-    type1 = Scale::Types.build(type_def)
+    type1 = Scale::Types.get(type_def)
 
     type_def = {
       "type" => "struct",
@@ -163,7 +163,7 @@ describe Scale::Types do
         ]
       ]
     }
-    type2 = Scale::Types.build(type_def)
+    type2 = Scale::Types.get(type_def)
     expect(type1).not_to eq(type2) 
 
   end
@@ -186,7 +186,7 @@ describe Scale::Types do
         ]
       ]
     }
-    type1 = Scale::Types.build(type_def)
+    type1 = Scale::Types.get(type_def)
 
     type_def = {
       "type" => "struct",
@@ -205,12 +205,13 @@ describe Scale::Types do
         ]
       ]
     }
-    type2 = Scale::Types.build(type_def)
+    type2 = Scale::Types.get(type_def)
     expect(type1).to eq(type2) 
 
   end
+
   # Enum
-  it "can build a enum and then use it to decode and encode " do
+  it "can get a enum and then use it to decode and encode " do
     type_def = {
       "type" => "enum",
       "type_mapping" => [
@@ -224,8 +225,8 @@ describe Scale::Types do
         ]
       ]
     }
-    type = Scale::Types.build(type_def)
-    expect(type).to eq(Scale::Types::Enum_RingBalanceBalance_KtonBalanceBalance_)
+    type = Scale::Types.get(type_def)
+    expect(type).to eq(Scale::Types::Enum_RingBalanceU128_KtonBalanceU128_)
 
     type_def = {
       "type" => "enum",
@@ -240,7 +241,7 @@ describe Scale::Types do
         ]
       ]
     }
-    type = Scale::Types.build(type_def)
+    type = Scale::Types.get(type_def)
     expect(type).to eq(Scale::Types::Enum_EthAbcArray_U8_20__TronArray_U8_20__)
   end
 

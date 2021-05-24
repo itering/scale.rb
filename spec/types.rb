@@ -5,11 +5,6 @@ module Scale
       items Int: "U8", Bool: "Bool"
     end
 
-    class VecU8
-      include Vec
-      inner_type "U8"
-    end
-
     class OptionU32
       include Option
       inner_type Scale::Types::U32

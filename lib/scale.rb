@@ -44,11 +44,6 @@ module Scale
       attr_accessor :debug
     end
 
-    def self.get(type_name)
-      type_def = TypeRegistry.instance.get(type_name)
-      Scale::Types.build type_def
-    end
-
     def self.check_types
       TypeRegistry.instance.all_types.keys.each do |key|
         begin

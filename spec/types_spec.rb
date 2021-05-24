@@ -165,16 +165,9 @@ describe Scale::Types do
     expect(o.encode).to eql("4545")
   end
 
-  it "can correctly decode and encode VecU8" do
-    scale_bytes = Scale::Bytes.new("0x0c003afe")
-    o = Scale::Types::VecU8.decode scale_bytes
-    expect(o.value.map(&:value)).to eql([0, 58, 254])
-    expect(o.encode).to eql("0c003afe")
-  end
-
   it "can correctly decode and encode Vec<U8>" do
     scale_bytes = Scale::Bytes.new("0x0c003afe")
-    o = Scale::Types.type_of("Vec<U8>").decode scale_bytes
+    o = Scale::Types.get("Vec<U8>").decode scale_bytes
     expect(o.value.map(&:value)).to eql([0, 58, 254])
     expect(o.encode).to eql("0c003afe")
   end
@@ -182,7 +175,7 @@ describe Scale::Types do
   it "can correctly decode and encode Vec<BalanceLock>" do
     # scale_bytes = Scale::Bytes.new("0x0876657374696e67207326160de7075e035823000000000000017374616b696e67208018179741946c6630a039000000000002")
     scale_bytes = Scale::Bytes.new("0x0c7374616b696e6720a18161b5b58201000000000000000000ffffffff1f706872656c6563740030434cc42501000000000000000000ffffffff1e64656d6f63726163ffffffffffffffffffffffffffffffffc0c0150002")
-    klass = Scale::Types.get("Vec<Scale::Types::BalanceLock>")
+    klass = Scale::Types.get("Vec<BalanceLock>")
     o = klass.decode scale_bytes
     expect(o.value.length).to eql(3)
 
