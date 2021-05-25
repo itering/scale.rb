@@ -158,6 +158,10 @@ module Scale
         def decode(scale_bytes)
           puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
 
+          # {
+          #   "id" => ...a,
+          #   ...
+          # }
           item_values = self::ITEMS.map do |item|
             item_name = item[0]
             item_type = item[1]
@@ -171,11 +175,20 @@ module Scale
 
           puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
 
-          new(item_values)
+          result = new(item_values)
+          item_values.each_pair do |item_name, item_value|
+            result.send "#{item_name}=", item_value
+          end
+
+          result
         end
 
         def items(items)
           const_set(:ITEMS, items)
+          item_names = items.map do |item|
+            item[0]
+          end
+          attr_accessor *item_names
         end
       end
 
