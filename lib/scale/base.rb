@@ -46,7 +46,7 @@ module Scale
       end
     end
 
-    # if value is bool, see type `OptionBool`
+    # if value is bool, see type `OptionBool` in types.rb
     module Option
       include SingleValue
 
@@ -59,7 +59,13 @@ module Scale
             new(nil)
           elsif byte == [1]
             # big process
-            value = self::INNER_TYPE.decode(scale_bytes)
+            type = 
+              if self::INNER_TYPE.class == ::String
+                Scale::Types.get(self::INNER_TYPE)
+              else
+                self::INNER_TYPE
+              end
+            value = type.decode(scale_bytes)
             puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
             new(value)
           else
@@ -158,15 +164,18 @@ module Scale
         def decode(scale_bytes)
           puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
 
+          # item_values: 
           # {
-          #   "id" => ...a,
-          #   ...
+          #   a: ...,
+          #   b: ...
           # }
-          item_values = self::ITEMS.map do |item|
-            item_name = item[0]
-            item_type = item[1]
-            [item_name, item_type.decode(scale_bytes)]
-          end.to_h
+          item_values = {}
+          self::ITEMS.each_pair do |item_name, item_type|
+            if item_type.class == ::String
+              item_type = Scale::Types.get(item_type)
+            end
+            item_values[item_name] = item_type.decode(scale_bytes)
+          end
 
           # value = {}
           # self::ITEM_NAMES.zip(item_values) do |attr, val|
@@ -177,17 +186,16 @@ module Scale
 
           result = new(item_values)
           item_values.each_pair do |item_name, item_value|
-            result.send "#{item_name}=", item_value
+            result.send "#{item_name.to_s}=", item_value
           end
 
           result
         end
 
-        def items(items)
+        # items(a: Scale::Types::Type1, b: "Type2")
+        def items(**items)
           const_set(:ITEMS, items)
-          item_names = items.map do |item|
-            item[0]
-          end
+          item_names = items.keys
           attr_accessor *item_names
         end
       end
@@ -244,9 +252,12 @@ module Scale
           puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           index = scale_bytes.get_next_bytes(1)[0]
           if const_defined? "ITEMS"
-            item = self::ITEMS[index]
-            raise "There is no such member with index #{index} for enum #{self}" if item.nil?
-            type = item.class == ::Array ? item[1] : item
+            type = self::ITEMS.values[index]
+            raise "There is no such member with index #{index} for enum #{self}" if type.nil?
+            value = type.decode(scale_bytes)
+          elsif const_defined? "INNER_TYPES"
+            type = self::INNER_TYPES[index]
+            raise "There is no such member with index #{index} for enum #{self}" if type.nil?
             value = type.decode(scale_bytes)
           else # VALUES
             value = self::VALUES[index]
@@ -257,9 +268,13 @@ module Scale
           result
         end
 
-        # ["Compact", "Hex"]
-        # [["Item1", "Compact"], [["Item2", "Hex"]]
-        def items(items)
+        # inner_types(Scale::Types::Compact, "Hex")
+        def inner_types(*inner_types)
+          const_set(:INNER_TYPES, inner_types)
+        end
+
+        # items(Item1: Scale::Types::Compact, Item2: "Hex")
+        def items(**items)
           const_set(:ITEMS, items)
         end
 

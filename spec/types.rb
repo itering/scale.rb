@@ -2,12 +2,15 @@ module Scale
   module Types
     class IntOrBool
       include Enum
-      items Int: "U8", Bool: "Bool"
+      items(
+        Int: Scale::Types::U8, 
+        Bool: Scale::Types::Bool
+      )
     end
 
     class OptionU32
       include Option
-      inner_type Scale::Types::U32
+      inner_type "U32"
     end
 
     class Student

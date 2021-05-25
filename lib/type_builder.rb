@@ -8,6 +8,10 @@ module Scale
       #
       def get(type_info)
         if type_info.class == ::String 
+          type_registry = TypeRegistry.instance
+          if type_registry.types.nil?
+            raise TypeRegistryNotLoadYet
+          end
           type_info = TypeRegistry.instance.get(type_info)
         end
 
@@ -132,18 +136,23 @@ module Scale
         end
 
         def build_struct(type_info)
+          # items: {a: Type}
           items = type_info["type_mapping"].map do |item|
             item_name = item[0]
             item_type = get(item[1])
             [item_name, item_type]
-          end
+          end.to_h
 
-          type_name = "Struct_#{items.map {|item| item[0].camelize2 + 'In' + item[1].name.gsub('Scale::Types::', '') }.join('_')}_"
+          partials = []
+          items.each_pair do |item_name, item_type|
+            partials << item_name.camelize2 + 'In' + item_type.name.gsub('Scale::Types::', '') 
+          end
+          type_name = "Struct_#{partials.join('_')}_"
 
           if !Scale::Types.const_defined?(type_name)
             klass = Class.new do
               include Scale::Types::Struct
-              items items
+              items(**items)
             end
             Scale::Types.const_set type_name, klass
           else

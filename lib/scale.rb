@@ -7,13 +7,13 @@ require "singleton"
 
 require "scale_bytes"
 
+require "type_registry"
+require "type_builder"
+
 require "scale/base"
 require "scale/types"
 require "scale/block"
 require "scale/trie"
-
-require "type_builder"
-require "type_registry"
 
 require "metadata/metadata"
 require "metadata/metadata_v0"
@@ -38,6 +38,7 @@ module Scale
   class ScaleError < StandardError; end
   class TypeBuildError < ScaleError; end
   class BadDataError < ScaleError; end
+  class TypeRegistryNotLoadYet < ScaleError; end
 
   module Types
     class << self
