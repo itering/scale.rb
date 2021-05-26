@@ -5,8 +5,8 @@ describe Scale::TypeRegistry do
   it "can add custom types" do
     # There is no LeasePeriod in the hard coded types
     Scale::TypeRegistry.instance.load
-    expect(Scale::Types.get("Hello")).to be_nil
-    expect(Scale::Types.get("World")).to be_nil
+    expect{Scale::Types.get("Hello")}.to raise_error(Scale::TypeBuildError)
+    expect{Scale::Types.get("World")}.to raise_error(Scale::TypeBuildError)
 
     # but exist if load types from kusama.json
     Scale::TypeRegistry.instance.load(custom_types: {
@@ -20,7 +20,7 @@ describe Scale::TypeRegistry do
       }
     })
     expect(Scale::Types.get("Hello")).to eql(Scale::Types::U8)
-    expect(Scale::Types.get("World").name.start_with?("Scale::Types::Struct_Of_Compact˂Balance˃_U32")).to eql(true)
+    expect(Scale::Types.get("World").name).to eql("Scale::Types::Struct_TotalInCompact_AgeInU32_")
   end
 
   it "can change spec_version on fly if there are more than one spec version of a spec" do
