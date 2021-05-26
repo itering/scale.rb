@@ -256,10 +256,16 @@ module Scale
           index = scale_bytes.get_next_bytes(1)[0]
           if const_defined? "ITEMS"
             type = self::ITEMS.values[index]
+            if type.class == ::String
+              type = Scale::Types.get(type)
+            end
             raise "There is no such member with index #{index} for enum #{self}" if type.nil?
             value = type.decode(scale_bytes)
           elsif const_defined? "INNER_TYPES"
             type = self::INNER_TYPES[index]
+            if type.class == ::String
+              type = Scale::Types.get(type)
+            end
             raise "There is no such member with index #{index} for enum #{self}" if type.nil?
             value = type.decode(scale_bytes)
           else # VALUES
