@@ -6,13 +6,22 @@ module Scale
       #   type_string: Compact, H128, Vec<Compact>, (U32, U128), ...
       #   type_def   : struct, enum, set
       #
+      # if type_string start_with Scale::Types::, it is treat as a hard coded type
       def get(type_info)
         if type_info.class == ::String 
-          type_registry = TypeRegistry.instance
-          if type_registry.types.nil?
-            raise TypeRegistryNotLoadYet
+          if type_info.start_with?('Scale::Types::')
+
+            return get_hard_coded_type(type_info)
+
+          else
+
+            type_registry = TypeRegistry.instance
+            if type_registry.types.nil?
+              raise TypeRegistryNotLoadYet
+            end
+            type_info = TypeRegistry.instance.get(type_info)
+
           end
-          type_info = TypeRegistry.instance.get(type_info)
         end
 
         if type_info.class == ::String # 1. hard coded types, 2. Vec<...>, 3. Option<...>, 4. [xx; x], 5. (x, y)
@@ -217,7 +226,6 @@ module Scale
         # }
         def build_set(type_info)
           type_name = "Set#{type_info["value_list"].keys.map(&:camelize2).join("")}"
-          puts type_name
           if !Scale::Types.const_defined?(type_name)
             bytes_length = type_info["value_type"][1..].to_i / 8
             klass = Class.new do
