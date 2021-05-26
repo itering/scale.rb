@@ -80,7 +80,7 @@ module Scale
 
           return type if real_type.nil? || real_type == type
 
-          type_traverse(true_type, types)
+          type_traverse(real_type, types)
         else
           type
         end
