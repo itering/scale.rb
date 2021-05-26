@@ -697,9 +697,9 @@ module Scale
       include Struct
       items(
         id: "VecU8Length8",
-        amount: "Balance",
+        amount: "Scale::Types::Balance",
         until: "U32",
-        reasons: "WithdrawReasons"
+        reasons: "Scale::Types::WithdrawReasons"
       )
     end
 
