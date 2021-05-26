@@ -136,7 +136,7 @@ module Scale
         end
 
         def build_struct(type_info)
-          # items: {a: Type}
+          # items: {"a" => Type}
           items = type_info["type_mapping"].map do |item|
             item_name = item[0]
             item_type = get(item[1])
@@ -160,25 +160,27 @@ module Scale
           end
         end
 
-        # ["Compact", "Hex"]
+        # not implemented: ["Compact", "Hex"]
         def build_enum(type_info)
-          # [["Item1", "Compact"], [["Item2", "Hex"]]
+          # type_info: [["Item1", "Compact"], [["Item2", "Hex"]]
           if type_info.has_key?("type_mapping")
+            # items: {a: Type}
             items = type_info["type_mapping"].map do |item|
               item_name = item[0]
               item_type = get(item[1])
-              [item_name, item_type]
-            end
+              [item_name.to_sym, item_type]
+            end.to_h
 
-            name = items.map do |item| 
-              item[0].camelize2 + item[1].name.gsub('Scale::Types::', '')
-            end.join("_")
-            type_name = "Enum_#{name}_"
+            partials = []
+            items.each_pair do |item_name, item_type|
+              partials << item_name.to_s.camelize2 + 'In' + item_type.name.gsub('Scale::Types::', '') 
+            end
+            type_name = "Enum_#{partials.join('_')}_"
 
             if !Scale::Types.const_defined?(type_name)
               klass = Class.new do
                 include Scale::Types::Enum
-                items items
+                items(**items)
               end
 
               return Scale::Types.const_set type_name, klass

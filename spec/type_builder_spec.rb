@@ -226,7 +226,7 @@ describe Scale::Types do
       ]
     }
     type = Scale::Types.get(type_def)
-    expect(type).to eq(Scale::Types::Enum_RingBalanceU128_KtonBalanceU128_)
+    expect(type).to eq(Scale::Types::Enum_RingBalanceInU128_KtonBalanceInU128_)
 
     type_def = {
       "type" => "enum",
@@ -242,7 +242,7 @@ describe Scale::Types do
       ]
     }
     type = Scale::Types.get(type_def)
-    expect(type).to eq(Scale::Types::Enum_EthAbcArray_U8_20__TronArray_U8_20__)
+    expect(type).to eq(Scale::Types::Enum_EthAbcInArray_U8_20__TronInArray_U8_20__)
   end
 
   it "" do
