@@ -11,7 +11,7 @@ module Scale
       end
 
       def self.decode(scale_bytes)
-        modules = Scale::Types.type_of("Vec<MetadataV12Module>").decode(scale_bytes).value
+        modules = Scale::Types.get("Vec<MetadataV12Module>").decode(scale_bytes).value
 
         value = {
           magicNumber: 1_635_018_093,
@@ -64,18 +64,18 @@ module Scale
 
         has_calls = Bool.decode(scale_bytes).value
         if has_calls
-          calls = Scale::Types.type_of("Vec<MetadataModuleCall>").decode(scale_bytes).value
+          calls = Scale::Types.get("Vec<MetadataModuleCall>").decode(scale_bytes).value
           result[:calls] = calls.map(&:value)
         end
 
         has_events = Bool.decode(scale_bytes).value
         if has_events
-          events = Scale::Types.type_of("Vec<MetadataModuleEvent>").decode(scale_bytes).value
+          events = Scale::Types.get("Vec<MetadataModuleEvent>").decode(scale_bytes).value
           result[:events] = events.map(&:value)
         end
 
-        result[:constants] = Scale::Types.type_of("Vec<MetadataV7ModuleConstants>").decode(scale_bytes).value.map(&:value)
-        result[:errors] = Scale::Types.type_of("Vec<MetadataModuleError>").decode(scale_bytes).value.map(&:value)
+        result[:constants] = Scale::Types.get("Vec<MetadataV7ModuleConstants>").decode(scale_bytes).value.map(&:value)
+        result[:errors] = Scale::Types.get("Vec<MetadataModuleError>").decode(scale_bytes).value.map(&:value)
 
         result[:index] = U8.decode(scale_bytes).value
         MetadataV12Module.new(result)

@@ -36,6 +36,7 @@ describe Scale::Types::Metadata do
   # The data copy from polkadot-js/api about type and hasher has some errors,
   # so I did not test these.
   [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12].each do |v|
+  # [9].each do |v|
     it "can decode v#{v} hex data" do
       hex = get_metadata_hex(v)
       scale_bytes = Scale::Bytes.new(hex)

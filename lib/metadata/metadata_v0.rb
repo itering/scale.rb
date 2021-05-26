@@ -26,12 +26,12 @@ module Scale
           }
         }
 
-        events_modules = Scale::Types.type_of("Vec<MetadataV0EventModule>").decode(scale_bytes).value.map(&:value)
-        modules = Scale::Types.type_of("Vec<MetadataV0Module>").decode(scale_bytes).value.map(&:value)
+        events_modules = Scale::Types.get("Vec<MetadataV0EventModule>").decode(scale_bytes).value.map(&:value)
+        modules = Scale::Types.get("Vec<MetadataV0Module>").decode(scale_bytes).value.map(&:value)
 
         Bytes.decode(scale_bytes).value
 
-        sections = Scale::Types.type_of("Vec<MetadataV0Section>").decode(scale_bytes).value.map(&:value)
+        sections = Scale::Types.get("Vec<MetadataV0Section>").decode(scale_bytes).value.map(&:value)
 
         value[:metadata][:outerEvent][:events] = events_modules
         value[:metadata][:modules] = modules
@@ -69,7 +69,7 @@ module Scale
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
-        events = Scale::Types.type_of('Vec<MetadataV0Event>').decode(scale_bytes).value.map(&:value)
+        events = Scale::Types.get('Vec<MetadataV0Event>').decode(scale_bytes).value.map(&:value)
         MetadataV0EventModule.new([
           name, 
           events
@@ -82,8 +82,8 @@ module Scale
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
-        args = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
-        documentation = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
+        args = Scale::Types.get("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
+        documentation = Scale::Types.get("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
         MetadataV0Event.new({name: name, args: args.map {|arg| arg }, documentation: documentation})
       end
     end
@@ -96,7 +96,7 @@ module Scale
         name = Bytes.decode(scale_bytes).value
         call_name = Bytes.decode(scale_bytes).value
 
-        functions = Scale::Types.type_of("Vec<MetadataV0ModuleFunction>").decode(scale_bytes).value.map(&:value)
+        functions = Scale::Types.get("Vec<MetadataV0ModuleFunction>").decode(scale_bytes).value.map(&:value)
 
         result = {
             prefix: prefix,
@@ -112,7 +112,7 @@ module Scale
         has_storage = Bool.decode(scale_bytes).value
         if has_storage
           storage_prefix = Bytes.decode(scale_bytes).value
-          storage = Scale::Types.type_of("Vec<MetadataV0ModuleStorage>").decode(scale_bytes).value.map(&:value)
+          storage = Scale::Types.get("Vec<MetadataV0ModuleStorage>").decode(scale_bytes).value.map(&:value)
           result[:storage] = {
             prefix: storage_prefix,
             functions: storage
@@ -129,8 +129,8 @@ module Scale
       def self.decode(scale_bytes)
         id = U16.decode(scale_bytes).value
         name = Bytes.decode(scale_bytes).value
-        args = Scale::Types.type_of("Vec<MetadataV0ModuleCallArgument>").decode(scale_bytes).value.map(&:value)
-        documentation = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
+        args = Scale::Types.get("Vec<MetadataV0ModuleCallArgument>").decode(scale_bytes).value.map(&:value)
+        documentation = Scale::Types.get("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
         MetadataV0ModuleFunction.new({
           id: id,
           name: name,
@@ -156,7 +156,11 @@ module Scale
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
-        modifier = Scale::Types.type_of("Enum", ["Optional", "Default"]).decode(scale_bytes).value
+        enum = {
+          "type" => "enum",
+          "value_list" => ["Optional", "Default"]
+        }
+        modifier = Scale::Types.get(enum).decode(scale_bytes).value
 
         is_key_value = Bool.decode(scale_bytes).value
 
@@ -174,7 +178,7 @@ module Scale
         end
 
         fallback = Hex.decode(scale_bytes).value
-        documentation = Scale::Types.type_of("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
+        documentation = Scale::Types.get("Vec<Bytes>").decode(scale_bytes).value.map(&:value)
 
         MetadataV0ModuleStorage.new({
           name: name,
