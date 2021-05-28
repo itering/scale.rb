@@ -75,9 +75,23 @@ p o.encode # "080001"
 3. client
 ```ruby
 require "scale"
+client = SubstrateClient.new "wss://rpc.darwinia.network"
 
-client = SubstrateClient.new "wss://pangolin-rpc.darwinia.network"
-client.get_storage("EthereumRelay", "ConfirmedHeaderParcels", [0])
+v = Scale::Types.get("EthereumTransactionIndex")
+  .new(
+    [
+      Scale::Types::H256.new("0x803054c2beacabc36e15c3147bb87d8320a02e9b601be28820a622dedd1c7717"),
+      Scale::Types::U64.new(266)
+    ]
+  )
+
+storage = client.get_storage("EthereumBacking", "VerifiedProof", [v])
+puts storage.to_human
+
+# get the raw data
+key = client.generate_storage_key("EthereumBacking", "VerifiedProof", [v])[0]
+storage_raw = client.state_getStorageAt(key)
+puts storage_raw
 
 ```
 Please go to `spec` dir for more examples.
