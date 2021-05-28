@@ -39,6 +39,7 @@ class SubstrateClient
     @url = url
     @request_id = 1
     @metadata_cache = {}
+    init_types_and_metadata
   end
 
   def request(method, params)
