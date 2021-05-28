@@ -83,6 +83,11 @@ module Scale
       BYTE_LENGTH = 32
     end
 
+    class U512
+      include FixedWidthUInt
+      BYTE_LENGTH = 64
+    end
+
     class I8
       include FixedWidthInt
       BYTE_LENGTH = 1
