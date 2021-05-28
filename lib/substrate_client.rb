@@ -137,16 +137,16 @@ class SubstrateClient
     [events_data, decoded]
   end
 
-  # Plain: client.get_storage("Sudo", "Key")
-  # Plain: client.get_storage("Balances", "TotalIssuance")
-  # Map: client.get_storage("System", "Account", ["0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"])
-  # DoubleMap: client.get_storage("ImOnline", "AuthoredBlocks", [2818, "0x749ddc93a65dfec3af27cc7478212cb7d4b0c0357fef35a0163966ab5333b757"])
   def get_storage(module_name, storage_name, params = nil, block_hash = nil)
     self.init_types_and_metadata(block_hash)
 
-    storage_key, return_type = SubstrateClient::Helper.generate_storage_key_from_metadata(@metadata, module_name, storage_name, params)
+    storage_key, return_type, storage_item = SubstrateClient::Helper.generate_storage_key_from_metadata(@metadata, module_name, storage_name, params)
+
     data = self.state_getStorage(storage_key, block_hash)
-    return unless data
+
+    if data.nil? && storage_item[:modifier] == "Default" && (not storage_item[:fallback].nil?)
+      data = storage_item[:fallback]
+    end
 
     bytes = Scale::Bytes.new(data)
     type = Scale::Types.get(return_type)

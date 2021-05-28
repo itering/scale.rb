@@ -55,7 +55,8 @@ class SubstrateClient::Helper
         hasher2,
         metadata.value.value[:metadata][:version]
       )
-      [storage_key, return_type]
+      storage_modifier = storage_item[:modifier]
+      [storage_key, return_type, storage_item]
     end
 
     def generate_storage_key(module_name, storage_name, params = nil, hasher = nil, hasher2 = nil, metadata_version = nil)
