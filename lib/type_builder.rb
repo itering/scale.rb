@@ -19,6 +19,8 @@ module Scale
             if type_registry.types.nil?
               raise TypeRegistryNotLoadYet
             end
+
+            type_info = rename(type_info)
             type_info = TypeRegistry.instance.get(type_info)
 
           end
