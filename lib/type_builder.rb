@@ -82,6 +82,11 @@ module Scale
 
         def build_option(type_string)
           inner_type_str = type_string.scan(/\AOption<(.+)>\z/).first.first
+
+          # an exception
+          # https://substrate.dev/docs/en/knowledgebase/advanced/codec#options
+          return get("Scale::Types::OptionBool") if inner_type_str.camelize2 == "Bool"
+
           inner_type = get(inner_type_str)
 
           type_name = "Option_#{inner_type.name.gsub('Scale::Types::', '')}_"
