@@ -114,13 +114,14 @@ RSpec.describe SubstrateClient do
     expect(size).to be_instance_of Integer
   end
 
-  it "can call state_getKeys" do
-    keys = @client.state_getKeys("0x26aa394eea5630e07c48ae0c9558cef7") # System
-    expect(keys).to be_instance_of Array
+  # Too time consuming
+  # it "can call state_getKeys" do
+  #   keys = @client.state_getKeys("0x26aa394eea5630e07c48ae0c9558cef7") # System
+  #   expect(keys).to be_instance_of Array
 
-    keys = @client.state_getKeys("0x26aa394eea5630e07c48ae0c9558cef7", "0x860e0ed04bd1b2a1efa70c9db13cc73f830d7e14204680316db52f05fd91ba37") # System
-    expect(keys.length).to eq(24860)
-  end
+  #   keys = @client.state_getKeys("0x26aa394eea5630e07c48ae0c9558cef7", "0x860e0ed04bd1b2a1efa70c9db13cc73f830d7e14204680316db52f05fd91ba37") # System
+  #   expect(keys.length).to eq(24860)
+  # end
 
   it "can call state_getReadProof" do
     read_proof = @client.state_getReadProof(["0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7"], "0x860e0ed04bd1b2a1efa70c9db13cc73f830d7e14204680316db52f05fd91ba37")
@@ -170,7 +171,8 @@ RSpec.describe SubstrateClient do
   end
 
   it "can get decoded storage" do 
-    account = @client.get_storage "System", "Account", ["0x50be873393f9e3f5705d8b573729cd35b080e5f9029534e8b848371a9cdecc1e"], "0xedf6ff93fb6dd1c00b96dafb576e01975e85710ff3b0eea7244e576579f28388"
+    account_id = Scale::Types::AccountId.new("0x50be873393f9e3f5705d8b573729cd35b080e5f9029534e8b848371a9cdecc1e")
+    account = @client.get_storage "System", "Account", [account_id], "0xedf6ff93fb6dd1c00b96dafb576e01975e85710ff3b0eea7244e576579f28388"
 
     expect_result = {"c"=>2, "data"=>{"feeFrozen"=>499192308000, "free"=>378566339746251, "miscFrozen"=>499192308000, "reserved"=>0}, "nonce"=>0}
     expect(account.to_human).to eq(expect_result)

@@ -18,16 +18,30 @@ class SubstrateClient::Helper
         return_type = map[:value]
         # TODO: decode to account id if param is address
         # params[0] = decode(params[0]) if map[:key] == "AccountId"
+
         type = Scale::Types.get(map[:key])
-        params[0] = type.new(params[0]).encode
+        if params[0].class != type
+          raise Scale::StorageInputTypeError.new("The type of first param is not equal to the type from metadata: #{map[:key]} => #{type}")
+        end
+        params[0] = params[0].encode
       elsif map = storage_item[:type][:DoubleMap]
         raise "Storage call of type \"DoubleMapType\" requires 2 parameters" if params.nil? || params.length != 2
 
         hasher = map[:hasher]
         hasher2 = map[:key2Hasher]
         return_type = map[:value]
-        params[0] = Scale::Types.get(map[:key1]).new(params[0]).encode
-        params[1] = Scale::Types.get(map[:key2]).new(params[1]).encode
+
+        type1 = Scale::Types.get(map[:key1])
+        if params[0].class != type1
+          raise Scale::StorageInputTypeError.new("The type of 1st param is not equal to the type from metadata: #{map[:key1]} => #{type1.class.name}")
+        end
+        params[0] = params[0].encode
+
+        type2 = Scale::Types.get(map[:key2])
+        if params[1].class != type2
+          raise Scale::StorageInputTypeError.new("The type of 2nd param is not equal to the type from metadata: #{map[:key2]} => #{type2.class.name}")
+        end
+        params[1] = params[1].encode
       else
         raise NotImplementedError
       end

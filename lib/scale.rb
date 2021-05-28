@@ -39,6 +39,7 @@ module Scale
   class TypeBuildError < ScaleError; end
   class BadDataError < ScaleError; end
   class TypeRegistryNotLoadYet < ScaleError; end
+  class StorageInputTypeError < ScaleError; end
 
   module Types
     class << self
