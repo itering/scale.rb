@@ -144,7 +144,9 @@ class SubstrateClient
 
     data = self.state_getStorage(storage_key, block_hash)
 
-    if data.nil? && storage_item[:modifier] == "Default" && (not storage_item[:fallback].nil?)
+    if data.nil?
+      return if storage_item[:modifier] == "Optional"
+
       data = storage_item[:fallback]
     end
 

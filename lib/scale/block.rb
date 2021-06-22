@@ -211,7 +211,7 @@ module Scale
 
     class LogDigest
       include Enum
-      inner_types %w[Other AuthoritiesChange ChangesTrieRoot SealV0 Consensus Seal PreRuntime]
+      inner_types *%w[Other AuthoritiesChange ChangesTrieRoot SealV0 Consensus Seal PreRuntime]
     end
 
   end
