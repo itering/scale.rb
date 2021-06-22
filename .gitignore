@@ -10,3 +10,4 @@
 /.idea
 /target
 .DS_Store
+/scripts/tmp.rb
