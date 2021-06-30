@@ -30,7 +30,7 @@ module Scale
             end
           end
         else
-          @value
+          @value.to_human
         end
       end
 
