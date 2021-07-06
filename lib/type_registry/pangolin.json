@@ -1,59 +1,123 @@
 {
   "types": {
+    "BlockNumberFor": "u32",
     "BalanceLock": {
       "type": "struct",
       "type_mapping": [
-        ["id", "LockIdentifier"],
-        ["lock_for", "LockFor"],
-        ["lock_reasons", "LockReasons"],
-        ["amount", "Balance"],
-        ["reasons", "Reasons"]
+        [
+          "id",
+          "LockIdentifier"
+        ],
+        [
+          "lock_for",
+          "LockFor"
+        ],
+        [
+          "lock_reasons",
+          "LockReasons"
+        ],
+        [
+          "amount",
+          "Balance"
+        ],
+        [
+          "reasons",
+          "Reasons"
+        ]
       ]
     },
     "LockFor": {
       "type": "enum",
       "type_mapping": [
-        ["Common", "Common"],
-        ["Staking", "StakingLock"]
+        [
+          "Common",
+          "Common"
+        ],
+        [
+          "Staking",
+          "StakingLock"
+        ]
       ]
     },
     "Common": {
       "type": "struct",
       "type_mapping": [
-        ["amount", "Balance"]
+        [
+          "amount",
+          "Balance"
+        ]
       ]
     },
     "StakingLock": {
       "type": "struct",
       "type_mapping": [
-        ["staking_amount", "Balance"],
-        ["unbondings", "Vec<Unbonding>"]
+        [
+          "staking_amount",
+          "Balance"
+        ],
+        [
+          "unbondings",
+          "Vec<Unbonding>"
+        ]
       ]
     },
     "LockReasons": {
       "type": "enum",
       "type_mapping": [
-        ["Fee", "Null"],
-        ["Misc", "Null"],
-        ["All", "Null"]
+        [
+          "Fee",
+          "Null"
+        ],
+        [
+          "Misc",
+          "Null"
+        ],
+        [
+          "All",
+          "Null"
+        ]
       ]
     },
     "Unbonding": {
       "type": "struct",
       "type_mapping": [
-        ["amount", "Balance"],
-        ["until", "BlockNumber"]
+        [
+          "amount",
+          "Balance"
+        ],
+        [
+          "until",
+          "BlockNumber"
+        ]
       ]
     },
     "AccountData": {
       "type": "struct",
       "type_mapping": [
-        ["free", "Balance"],
-        ["reserved", "Balance"],
-        ["free_kton", "Balance"],
-        ["reserved_kton", "Balance"],
-        ["misc_frozen", "Balance"],
-        ["fee_frozen", "Balance"]
+        [
+          "free",
+          "Balance"
+        ],
+        [
+          "reserved",
+          "Balance"
+        ],
+        [
+          "free_kton",
+          "Balance"
+        ],
+        [
+          "reserved_kton",
+          "Balance"
+        ],
+        [
+          "misc_frozen",
+          "Balance"
+        ],
+        [
+          "fee_frozen",
+          "Balance"
+        ]
       ]
     },
     "RingBalance": "Balance",
@@ -64,95 +128,210 @@
     "StakingBalanceT": {
       "type": "enum",
       "type_mapping": [
-        ["RingBalance", "Balance"],
-        ["KtonBalance", "Balance"]
+        [
+          "RingBalance",
+          "Balance"
+        ],
+        [
+          "KtonBalance",
+          "Balance"
+        ]
       ]
     },
     "StakingLedgerT": {
       "type": "struct",
       "type_mapping": [
-        ["stash", "AccountId"],
-        ["active_ring", "Compact<Balance>"],
-        ["active_deposit_ring", "Compact<Balance>"],
-        ["active_kton", "Compact<Balance>"],
-        ["deposit_items", "Vec<TimeDepositItem>"],
-        ["ring_staking_lock", "StakingLock"],
-        ["kton_staking_lock", "StakingLock"],
-        ["claimed_rewards", "Vec<EraIndex>"],
-        ["total", "Compact<Balance>"],
-        ["active", "Compact<Balance>"],
-        ["unlocking", "Vec<UnlockChunk>"]
+        [
+          "stash",
+          "AccountId"
+        ],
+        [
+          "active_ring",
+          "Compact<Balance>"
+        ],
+        [
+          "active_deposit_ring",
+          "Compact<Balance>"
+        ],
+        [
+          "active_kton",
+          "Compact<Balance>"
+        ],
+        [
+          "deposit_items",
+          "Vec<TimeDepositItem>"
+        ],
+        [
+          "ring_staking_lock",
+          "StakingLock"
+        ],
+        [
+          "kton_staking_lock",
+          "StakingLock"
+        ],
+        [
+          "claimed_rewards",
+          "Vec<EraIndex>"
+        ],
+        [
+          "total",
+          "Compact<Balance>"
+        ],
+        [
+          "active",
+          "Compact<Balance>"
+        ],
+        [
+          "unlocking",
+          "Vec<UnlockChunk>"
+        ]
       ]
     },
     "TimeDepositItem": {
       "type": "struct",
       "type_mapping": [
-        ["value", "Compact<Balance>"],
-        ["start_time", "Compact<TsInMs>"],
-        ["expire_time", "Compact<TsInMs>"]
+        [
+          "value",
+          "Compact<Balance>"
+        ],
+        [
+          "start_time",
+          "Compact<TsInMs>"
+        ],
+        [
+          "expire_time",
+          "Compact<TsInMs>"
+        ]
       ]
     },
     "ExposureT": {
       "type": "struct",
       "type_mapping": [
-        ["own_ring_balance", "Compact<Balance>"],
-        ["own_kton_balance", "Compact<Balance>"],
-        ["own_power", "Power"],
-        ["total_power", "Power"],
-        ["others", "Vec<IndividualExposure>"]
+        [
+          "own_ring_balance",
+          "Compact<Balance>"
+        ],
+        [
+          "own_kton_balance",
+          "Compact<Balance>"
+        ],
+        [
+          "own_power",
+          "Power"
+        ],
+        [
+          "total_power",
+          "Power"
+        ],
+        [
+          "others",
+          "Vec<IndividualExposure>"
+        ]
       ]
     },
     "IndividualExposure": {
       "type": "struct",
       "type_mapping": [
-        ["who", "AccountId"],
-        ["ring_balance", "Compact<Balance>"],
-        ["kton_balance", "Compact<Balance>"],
-        ["power", "Power"],
-        ["value", "Compact<Balance>"]
-      ]
-    },
-    "ElectionResultT": {
-      "type": "struct",
-      "type_mapping": [
-        ["elected_stashes", "Vec<AccountId>"],
-        ["exposures", "Vec<(AccountId, ExposureT)>"],
-        ["compute", "ElectionCompute"]
+        [
+          "who",
+          "AccountId"
+        ],
+        [
+          "ring_balance",
+          "Compact<Balance>"
+        ],
+        [
+          "kton_balance",
+          "Compact<Balance>"
+        ],
+        [
+          "power",
+          "Power"
+        ],
+        [
+          "value",
+          "Compact<Balance>"
+        ]
       ]
     },
     "RKT": {
       "type": "struct",
       "type_mapping": [
-        ["r", "Balance"],
-        ["k", "Balance"]
+        [
+          "r",
+          "Balance"
+        ],
+        [
+          "k",
+          "Balance"
+        ]
       ]
     },
     "SpanRecord": {
       "type": "struct",
       "type_mapping": [
-        ["slashed", "RKT"],
-        ["paid_out", "RKT"]
+        [
+          "slashed",
+          "RKT"
+        ],
+        [
+          "paid_out",
+          "RKT"
+        ]
       ]
     },
     "UnappliedSlash": {
       "type": "struct",
       "type_mapping": [
-        ["validator", "AccountId"],
-        ["own", "RKT"],
-        ["others", "Vec<(AccountId, RKT)>"],
-        ["reporters", "Vec<AccountId>"],
-        ["payout", "RKT"]
+        [
+          "validator",
+          "AccountId"
+        ],
+        [
+          "own",
+          "RKT"
+        ],
+        [
+          "others",
+          "Vec<(AccountId, RKT)>"
+        ],
+        [
+          "reporters",
+          "Vec<AccountId>"
+        ],
+        [
+          "payout",
+          "RKT"
+        ]
       ]
     },
     "TreasuryProposal": {
       "type": "struct",
       "type_mapping": [
-        ["proposer", "AccountId"],
-        ["beneficiary", "AccountId"],
-        ["ring_value", "Balance"],
-        ["kton_value", "Balance"],
-        ["ring_bond", "Balance"],
-        ["kton_bond", "Balance"]
+        [
+          "proposer",
+          "AccountId"
+        ],
+        [
+          "beneficiary",
+          "AccountId"
+        ],
+        [
+          "ring_value",
+          "Balance"
+        ],
+        [
+          "kton_value",
+          "Balance"
+        ],
+        [
+          "ring_bond",
+          "Balance"
+        ],
+        [
+          "kton_bond",
+          "Balance"
+        ]
       ]
     },
     "MappedRing": "u128",
@@ -161,21 +340,66 @@
     "EthereumHeader": {
       "type": "struct",
       "type_mapping": [
-        ["parent_hash", "H256"],
-        ["timestamp", "u64"],
-        ["number", "EthereumBlockNumber"],
-        ["author", "EthereumAddress"],
-        ["transactions_root", "H256"],
-        ["uncles_hash", "H256"],
-        ["extra_data", "Bytes"],
-        ["state_root", "H256"],
-        ["receipts_root", "H256"],
-        ["log_bloom", "Bloom"],
-        ["gas_used", "U256"],
-        ["gas_limit", "U256"],
-        ["difficulty", "U256"],
-        ["seal", "Vec<Bytes>"],
-        ["hash", "Option<H256>"]
+        [
+          "parent_hash",
+          "H256"
+        ],
+        [
+          "timestamp",
+          "u64"
+        ],
+        [
+          "number",
+          "EthereumBlockNumber"
+        ],
+        [
+          "author",
+          "EthereumAddress"
+        ],
+        [
+          "transactions_root",
+          "H256"
+        ],
+        [
+          "uncles_hash",
+          "H256"
+        ],
+        [
+          "extra_data",
+          "Bytes"
+        ],
+        [
+          "state_root",
+          "H256"
+        ],
+        [
+          "receipts_root",
+          "H256"
+        ],
+        [
+          "log_bloom",
+          "Bloom"
+        ],
+        [
+          "gas_used",
+          "U256"
+        ],
+        [
+          "gas_limit",
+          "U256"
+        ],
+        [
+          "difficulty",
+          "U256"
+        ],
+        [
+          "seal",
+          "Vec<Bytes>"
+        ],
+        [
+          "hash",
+          "Option<H256>"
+        ]
       ]
     },
     "EthereumAddress": "H160",
@@ -185,62 +409,122 @@
     "EthashProof": {
       "type": "struct",
       "type_mapping": [
-        ["dag_nodes", "(H512, H512)"],
-        ["proof", "Vec<H128>"]
+        [
+          "dag_nodes",
+          "(H512, H512)"
+        ],
+        [
+          "proof",
+          "Vec<H128>"
+        ]
       ]
     },
     "EthereumReceipt": {
       "type": "struct",
       "type_mapping": [
-        ["gas_used", "U256"],
-        ["log_bloom", "Bloom"],
-        ["logs", "Vec<LogEntry>"],
-        ["outcome", "TransactionOutcome"]
+        [
+          "gas_used",
+          "U256"
+        ],
+        [
+          "log_bloom",
+          "Bloom"
+        ],
+        [
+          "logs",
+          "Vec<LogEntry>"
+        ],
+        [
+          "outcome",
+          "TransactionOutcome"
+        ]
       ]
     },
     "EthereumNetworkType": {
       "type": "enum",
       "type_mapping": [
-        ["Mainnet", "Null"],
-        ["Ropsten", "Null"]
+        [
+          "Mainnet",
+          "Null"
+        ],
+        [
+          "Ropsten",
+          "Null"
+        ]
       ]
     },
     "RedeemFor": {
       "type": "enum",
       "type_mapping": [
-        ["Token", "Null"],
-        ["Deposit", "Null"]
+        [
+          "Token",
+          "Null"
+        ],
+        [
+          "Deposit",
+          "Null"
+        ]
       ]
     },
     "EthereumReceiptProof": {
       "type": "struct",
       "type_mapping": [
-        ["index", "u64"],
-        ["proof", "Bytes"],
-        ["header_hash", "H256"]
+        [
+          "index",
+          "u64"
+        ],
+        [
+          "proof",
+          "Bytes"
+        ],
+        [
+          "header_hash",
+          "H256"
+        ]
       ]
     },
     "EthereumReceiptProofThing": "(EthereumHeader, EthereumReceiptProof, MMRProof)",
     "MMRProof": {
       "type": "struct",
       "type_mapping": [
-        ["member_leaf_index", "u64"],
-        ["last_leaf_index", "u64"],
-        ["proof", "Vec<H256>"]
+        [
+          "member_leaf_index",
+          "u64"
+        ],
+        [
+          "last_leaf_index",
+          "u64"
+        ],
+        [
+          "proof",
+          "Vec<H256>"
+        ]
       ]
     },
     "EthereumRelayHeaderParcel": {
       "type": "struct",
       "type_mapping": [
-        ["header", "EthereumHeader"],
-        ["parent_mmr_root", "H256"]
+        [
+          "header",
+          "EthereumHeader"
+        ],
+        [
+          "parent_mmr_root",
+          "H256"
+        ]
       ]
     },
     "EthereumRelayProofs": {
       "type": "struct",
       "type_mapping": [
-        ["ethash_proof", "Vec<EthashProof>"],
-        ["mmr_proof", "Vec<H256>"]
+        [
+          "ethash_proof",
+          "Vec<EthashProof>"
+        ],
+        [
+          "mmr_proof",
+          "Vec<H256>"
+        ]
       ]
     },
     "RelayAuthoritySigner": "EthereumAddress",
@@ -249,24 +533,60 @@
     "OtherSignature": {
       "type": "enum",
       "type_mapping": [
-        ["Eth", "EcdsaSignature"],
-        ["Tron", "EcdsaSignature"]
+        [
+          "Eth",
+          "EcdsaSignature"
+        ],
+        [
+          "Tron",
+          "EcdsaSignature"
+        ]
       ]
     },
     "EcdsaSignature": "[u8; 65]",
     "OtherAddress": {
       "type": "enum",
       "type_mapping": [
-        ["Eth", "[u8; 20]"],
-        ["Tron", "[u8; 20]"]
+        [
+          "Eth",
+          "[u8; 20]"
+        ],
+        [
+          "Tron",
+          "[u8; 20]"
+        ]
       ]
     },
     "AddressT": "[u8; 20]",
+    "NodeIndex": "u64",
     "MerkleMountainRangeRootLog": {
       "type": "struct",
       "type_mapping": [
-        ["prefix", "[u8; 4]"],
-        ["parent_mmr_root", "Hash"]
+        [
+          "prefix",
+          "[u8; 4]"
+        ],
+        [
+          "parent_mmr_root",
+          "Hash"
+        ]
+      ]
+    },
+    "MmrNodesPruningConfiguration": {
+      "type": "struct",
+      "type_mapping": [
+        [
+          "step",
+          "NodeIndex"
+        ],
+        [
+          "progress",
+          "NodeIndex"
+        ],
+        [
+          "last_position",
+          "NodeIndex"
+        ]
       ]
     },
     "OpCode": "[u8; 4]",
@@ -277,55 +597,187 @@
     "RelayAffirmationId": {
       "type": "struct",
       "type_mapping": [
-        ["game_id", "EthereumBlockNumber"],
-        ["round", "u32"],
-        ["index", "u32"]
+        [
+          "game_id",
+          "EthereumBlockNumber"
+        ],
+        [
+          "round",
+          "u32"
+        ],
+        [
+          "index",
+          "u32"
+        ]
       ]
     },
     "RelayAffirmationT": {
       "type": "struct",
       "type_mapping": [
-        ["relayer", "AccountId"],
-        ["relay_header_parcels", "EthereumRelayHeaderParcel"],
-        ["bond", "Balance"],
-        ["maybe_extended_relay_affirmation_id", "Option<RelayAffirmationId>"],
-        ["verified", "bool"]
+        [
+          "relayer",
+          "AccountId"
+        ],
+        [
+          "relay_header_parcels",
+          "EthereumRelayHeaderParcel"
+        ],
+        [
+          "bond",
+          "Balance"
+        ],
+        [
+          "maybe_extended_relay_affirmation_id",
+          "Option<RelayAffirmationId>"
+        ],
+        [
+          "verified",
+          "bool"
+        ]
       ]
     },
     "RelayVotingState": {
       "type": "struct",
       "type_mapping": [
-        ["ayes", "Vec<AccountId>"],
-        ["nays", "Vec<AccountId>"]
+        [
+          "ayes",
+          "Vec<AccountId>"
+        ],
+        [
+          "nays",
+          "Vec<AccountId>"
+        ]
       ]
     },
     "RelayAuthorityT": {
       "type": "struct",
       "type_mapping": [
-        ["account_id", "AccountId"],
-        ["signer", "Signer"],
-        ["stake", "Balance"],
-        ["term", "BlockNumber"]
+        [
+          "account_id",
+          "AccountId"
+        ],
+        [
+          "signer",
+          "EthereumAddress"
+        ],
+        [
+          "stake",
+          "Balance"
+        ],
+        [
+          "term",
+          "BlockNumber"
+        ]
       ]
     },
     "ScheduledAuthoritiesChangeT": {
       "type": "struct",
       "type_mapping": [
-        ["next_authorities", "Vec<RelayAuthorityT>"],
-        ["deadline", "BlockNumber"]
+        [
+          "next_authorities",
+          "Vec<RelayAuthorityT>"
+        ],
+        [
+          "deadline",
+          "BlockNumber"
+        ]
+      ]
+    },
+    "MmrRootToSign": {
+      "type": "struct",
+      "type_mapping": [
+        [
+          "mmr_root",
+          "Hash"
+        ],
+        [
+          "signatures",
+          "Vec<(EthereumAddress, EcdsaSignature)>"
+        ]
       ]
     },
     "MMRRoot": "Hash",
+    "BSCHeader": {
+      "type": "struct",
+      "type_mapping": [
+        [
+          "parent_hash",
+          "H256"
+        ],
+        [
+          "uncle_hash",
+          "H256"
+        ],
+        [
+          "coinbase",
+          "EthereumAddress"
+        ],
+        [
+          "state_root",
+          "H256"
+        ],
+        [
+          "transactions_root",
+          "H256"
+        ],
+        [
+          "receipts_root",
+          "H256"
+        ],
+        [
+          "log_bloom",
+          "Bloom"
+        ],
+        [
+          "difficulty",
+          "U256"
+        ],
+        [
+          "number",
+          "u64"
+        ],
+        [
+          "gas_limit",
+          "U256"
+        ],
+        [
+          "gas_used",
+          "U256"
+        ],
+        [
+          "timestamp",
+          "u64"
+        ],
+        [
+          "extra_data",
+          "Bytes"
+        ],
+        [
+          "mix_digest",
+          "H256"
+        ],
+        [
+          "nonce",
+          "Bytes"
+        ]
+      ]
+    },
     "BalancesRuntimeDispatchInfo": {
       "type": "struct",
       "type_mapping": [
-        ["usable_balance", "Balance"]
+        [
+          "usable_balance",
+          "Balance"
+        ]
       ]
     },
     "StakingRuntimeDispatchInfo": {
       "type": "struct",
       "type_mapping": [
-        ["power", "Power"]
+        [
+          "power",
+          "Power"
+        ]
       ]
     }
   }
