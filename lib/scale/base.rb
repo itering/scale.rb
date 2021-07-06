@@ -29,6 +29,8 @@ module Scale
               v
             end
           end
+        elsif @value.class == ::String
+          @value
         else
           @value.to_human
         end
