@@ -2,67 +2,74 @@ module Scale
   module Types
     class << self
 
-      # type_info: type_string or type_info
-      #   type_string: Compact, H128, Vec<Compact>, (U32, U128), ...
+      # type_info: type_string or type_def
+      #   type_string: hard coded type name, Compact, H128, Vec<Compact>, (U32, U128), ...
       #   type_def   : struct, enum, set
       #
       # if type_string start_with Scale::Types::, it is treat as a hard coded type
       def get(type_info)
         if type_info.class == ::String 
           if type_info.start_with?('Scale::Types::')
-
             return get_hard_coded_type(type_info)
-
-          else
-
-            type_registry = TypeRegistry.instance
-            if type_registry.types.nil?
-              raise TypeRegistryNotLoadYet
-            end
-
-            type_info = rename(type_info)
-            type_info = TypeRegistry.instance.get(type_info)
-
           end
+
+          # find the final type from registry
+          type_info = fix_name(type_info)
+          type_info = get_final_type_from_registry(type_info)
+          type_info = fix_name(type_info)
         end
 
-        if type_info.class == ::String # 1. hard coded types, 2. Vec<...>, 3. Option<...>, 4. [xx; x], 5. (x, y)
-          type_string = type_info
-          if type_string =~ /\AVec<.+>\z/ 
-            build_vec(type_string)
-          elsif type_info =~ /\AOption<.+>\z/
-            build_option(type_string)
-          elsif type_info =~ /\A\[.+;\s*\d+\]\z/
-            build_array(type_string)
-          elsif type_info =~ /\A\(.+\)\z/
-            build_tuple(type_string)
-          else
-            get_hard_coded_type(type_string)
-          end
-
-        else # 5. Struct, 6. Enum, 7. Set
-
-          if type_info["type"] == "struct"
-            build_struct(type_info)
-          elsif type_info["type"] == "enum"
-            build_enum(type_info)
-          elsif type_info["type"] == "set"
-            build_set(type_info)
-          else
-            raise Scale::TypeBuildError.new("Failed to build a type from #{type_info}")
-          end
-
-        end
+        build_type(type_info)
       end
 
       private
+        def build_type(type_info)
+          # 1. hard coded types, 2. Vec<...>, 3. Option<...>, 4. [xx; x], 5. (x, y)
+          if type_info.class == ::String 
 
-        def get_hard_coded_type(type_string)
-          type_name = rename(type_string)
+            type_string = type_info
+            if type_string =~ /\AVec<.+>\z/ 
+              build_vec(type_string)
+            elsif type_info =~ /\AOption<.+>\z/
+              build_option(type_string)
+            elsif type_info =~ /\A\[.+;\s*\d+\]\z/
+              build_array(type_string)
+            elsif type_info =~ /\A\(.+\)\z/
+              build_tuple(type_string)
+            else
+              get_hard_coded_type(type_string)
+            end
+
+          # 5. Struct, 6. Enum, 7. Set
+          else 
+
+            if type_info["type"] == "struct"
+              build_struct(type_info)
+            elsif type_info["type"] == "enum"
+              build_enum(type_info)
+            elsif type_info["type"] == "set"
+              build_set(type_info)
+            else
+              raise Scale::TypeBuildError.new("Failed to build a type from #{type_info}")
+            end
+
+          end
+        end
+
+        def get_final_type_from_registry(type_info)
+          type_registry = TypeRegistry.instance
+          if type_registry.types.nil?
+            raise TypeRegistryNotLoadYet
+          end
+          TypeRegistry.instance.get(type_info)
+        end
+
+        def get_hard_coded_type(type_name)
+          # type_name = rename(type_name)
           type_name = (type_name.start_with?("Scale::Types::") ? type_name : "Scale::Types::#{type_name}")
           type_name.constantize2
         rescue => e
-          raise Scale::TypeBuildError.new("Failed to get the hard coded type named `#{type_string}`")
+          raise Scale::TypeBuildError.new("Failed to get the hard coded type named `#{type_name}`")
         end
 
         def build_vec(type_string)
@@ -246,19 +253,17 @@ module Scale
           Scale::Types.const_set fix(name), klass
         end
 
-        def rename(type)
+        def fix_name(type)
           type = type.gsub("T::", "")
             .gsub("<T>", "")
             .gsub("<T as Trait>::", "")
             .delete("\n")
-            .gsub("EventRecord<Event, Hash>", "EventRecord")
             .gsub(/(u)(\d+)/, 'U\2')
           return "Bool" if type == "bool"
           return "Null" if type == "()"
           return "String" if type == "Vec<u8>"
           return "Compact" if type == "Compact<u32>" || type == "Compact<U32>"
           return "Address" if type == "<Lookup as StaticLookup>::Source"
-          return "Vec<Address>" if type == "Vec<<Lookup as StaticLookup>::Source>"
           return "Compact" if type == "<Balance as HasCompact>::Type"
           return "Compact" if type == "<BlockNumber as HasCompact>::Type"
           return "Compact" if type =~ /\ACompact<[a-zA-Z0-9\s]*>\z/
@@ -266,6 +271,7 @@ module Scale
           return "CompactMoment" if type == "Compact<Moment>"
           return "InherentOfflineReport" if type == "<InherentOfflineReport as InherentOfflineReport>::Inherent"
           return "AccountData" if type == "AccountData<Balance>"
+          return "EventRecord" if type == "EventRecord<Event, Hash>"
 
           type
         end
