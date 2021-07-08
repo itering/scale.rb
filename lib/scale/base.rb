@@ -29,10 +29,10 @@ module Scale
               v
             end
           end
-        elsif @value.class == ::String
-          @value
-        else
+        elsif @value.class.include?(SingleValue)
           @value.to_human
+        else
+          @value
         end
       end
 
