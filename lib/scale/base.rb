@@ -257,18 +257,16 @@ module Scale
           puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           index = scale_bytes.get_next_bytes(1)[0]
           if const_defined? "ITEMS"
-            type_name = self::ITEMS.values[index]
-            if type_name.class == ::String
-              type = Scale::Types.get(type_name)
+            type = self::ITEMS.values[index]
+            if type.class == ::String
+              type = Scale::Types.get(type)
             end
-            raise "There is no type '#{type_name}' of index #{index} for enum #{self}" if type.nil?
             value = type.decode(scale_bytes)
           elsif const_defined? "INNER_TYPES"
-            type_name = self::INNER_TYPES[index]
-            if type_name.class == ::String
-              type = Scale::Types.get(type_name)
+            type = self::INNER_TYPES[index]
+            if type.class == ::String
+              type = Scale::Types.get(type)
             end
-            raise "There is no type '#{type_name}' of index #{index} for enum #{self}" if type.nil?
             value = type.decode(scale_bytes)
           else # VALUES
             value = self::VALUES[index]
