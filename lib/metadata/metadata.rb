@@ -1,7 +1,7 @@
 module Scale
   module Types
     class Metadata
-      include SingleValue
+      include Base
       attr_accessor :version
       def self.decode(scale_bytes)
         bytes = scale_bytes.get_next_bytes(4)
@@ -52,7 +52,7 @@ module Scale
     end
 
     class MetadataModule
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         name = String.decode(scale_bytes).value
         prefix = String.decode(scale_bytes).value
@@ -89,7 +89,7 @@ module Scale
     end
 
     class MetadataModuleStorage
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         name = String.decode(scale_bytes).value
         enum = {
@@ -125,7 +125,7 @@ module Scale
     end
 
     class MetadataModuleCall
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         result = {}
         result[:name] = String.decode(scale_bytes).value
@@ -136,7 +136,7 @@ module Scale
     end
 
     class MetadataModuleCallArgument
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         result = {}
         result[:name] = String.decode(scale_bytes).value
@@ -147,7 +147,7 @@ module Scale
     end
 
     class MetadataModuleEvent
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         result = {}
         result[:name] = String.decode(scale_bytes).value

@@ -1,7 +1,7 @@
 module Scale
   module Types
     class MetadataV6
-      include SingleValue
+      include Base
       attr_accessor :call_index, :event_index
 
       def initialize(value)
@@ -49,7 +49,7 @@ module Scale
     end
 
     class MetadataV6Module
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         name = String.decode(scale_bytes).value
         prefix = String.decode(scale_bytes).value
@@ -86,7 +86,7 @@ module Scale
     class MetadataV6ModuleStorage < MetadataV5ModuleStorage; end
 
     class MetadataV6ModuleConstants
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         result = {
           name: String.decode(scale_bytes).value,

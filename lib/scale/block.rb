@@ -2,7 +2,7 @@ module Scale
   module Types
 
     class Extrinsic
-      include SingleValue
+      include Base
       # attr_accessor :address, :signature, :nonce, :era, :extrinsic_hash, :call_index, :params_raw, :params
 
       def self.generate_hash(bytes)
@@ -116,7 +116,7 @@ module Scale
     end
 
     class EventRecords
-      include SingleValue
+      include Base
       
       def self.decode(scale_bytes)
 
@@ -129,7 +129,7 @@ module Scale
     end
 
     class EventRecord
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         metadata = Scale::TypeRegistry.instance.metadata.value

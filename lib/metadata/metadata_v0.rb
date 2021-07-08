@@ -1,7 +1,7 @@
 module Scale
   module Types
     class MetadataV0
-      include SingleValue
+      include Base
       attr_accessor :call_index, :event_index
 
       def initialize(value)
@@ -65,7 +65,7 @@ module Scale
     end
 
     class MetadataV0EventModule
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
@@ -78,7 +78,7 @@ module Scale
     end
 
     class MetadataV0Event
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
@@ -89,7 +89,7 @@ module Scale
     end
 
     class MetadataV0Module
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         prefix = Bytes.decode(scale_bytes).value
@@ -124,7 +124,7 @@ module Scale
     end
 
     class MetadataV0ModuleFunction
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         id = U16.decode(scale_bytes).value
@@ -141,7 +141,7 @@ module Scale
     end
 
     class MetadataV0ModuleCallArgument
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
@@ -152,7 +152,7 @@ module Scale
     end
 
     class MetadataV0ModuleStorage
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value
@@ -191,7 +191,7 @@ module Scale
     end
 
     class MetadataV0Section
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         name = Bytes.decode(scale_bytes).value

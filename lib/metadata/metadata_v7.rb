@@ -1,7 +1,7 @@
 module Scale
   module Types
     class MetadataV7
-      include SingleValue
+      include Base
       attr_accessor :call_index, :event_index
 
       def initialize(value)
@@ -49,7 +49,7 @@ module Scale
     end
 
     class MetadataV7Module
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         name = String.decode(scale_bytes).value
 
@@ -83,7 +83,7 @@ module Scale
     end
 
     class MetadataV7ModuleStorage
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         prefix = String.decode(scale_bytes).value
         items = Scale::Types.get("Vec<MetadataV7ModuleStorageEntry>").decode(scale_bytes).value.map(&:value)
@@ -97,7 +97,7 @@ module Scale
     end
 
     class MetadataV7ModuleStorageEntry
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         name = String.decode(scale_bytes).value
         modifier_enum = {
@@ -148,7 +148,7 @@ module Scale
     end
 
     class MetadataV7ModuleConstants
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         result = {
           name: String.decode(scale_bytes).value,

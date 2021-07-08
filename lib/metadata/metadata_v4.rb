@@ -1,7 +1,7 @@
 module Scale
   module Types
     class MetadataV4
-      include SingleValue
+      include Base
       attr_accessor :call_index, :event_index
 
       def initialize(value)
@@ -49,7 +49,7 @@ module Scale
     end
 
     class MetadataV4Module
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         name = String.decode(scale_bytes).value
         prefix = String.decode(scale_bytes).value
@@ -82,7 +82,7 @@ module Scale
     end
 
     class MetadataV4ModuleStorage
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         name = String.decode(scale_bytes).value
         modifier_enum = {

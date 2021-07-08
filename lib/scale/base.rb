@@ -1,7 +1,7 @@
 module Scale
   module Types
 
-    module SingleValue
+    module Base
       attr_reader :value
 
       def initialize(value)
@@ -15,7 +15,7 @@ module Scale
       def to_human
         if @value.class == ::Hash
           @value.transform_values do |v|
-            if v.class.included_modules.include?(SingleValue)
+            if v.class.included_modules.include?(Base)
               v.to_human
             else
               v
@@ -23,13 +23,13 @@ module Scale
           end
         elsif @value.class == ::Array
           @value.map do |v|
-            if v.class.included_modules.include?(SingleValue)
+            if v.class.included_modules.include?(Base)
               v.to_human
             else
               v
             end
           end
-        elsif @value.class.include?(SingleValue)
+        elsif @value.class.include?(Base)
           @value.to_human
         else
           @value
@@ -50,7 +50,7 @@ module Scale
 
     # if value is bool, see type `OptionBool` in types.rb
     module Option
-      include SingleValue
+      include Base
 
       module ClassMethods
         def decode(scale_bytes)
@@ -95,7 +95,7 @@ module Scale
     end
 
     module FixedWidthInt
-      include SingleValue
+      include Base
 
       module ClassMethods
         def decode(scale_bytes)
@@ -123,7 +123,7 @@ module Scale
     end
 
     module FixedWidthUInt
-      include SingleValue
+      include Base
 
       module ClassMethods
         attr_accessor :byte_length
@@ -156,7 +156,7 @@ module Scale
     end
 
     module Struct
-      include SingleValue
+      include Base
       # new(1.to_u32, U32(69))
       module ClassMethods
         def inherited(child)
@@ -215,7 +215,7 @@ module Scale
     end
 
     module Tuple
-      include SingleValue
+      include Base
 
       module ClassMethods
         def decode(scale_bytes)
@@ -248,7 +248,7 @@ module Scale
     end
 
     module Enum
-      include SingleValue
+      include Base
 
       attr_accessor :index
 
@@ -317,7 +317,7 @@ module Scale
     end
 
     module Vec
-      include SingleValue # value is an array
+      include Base # value is an array
 
       module ClassMethods
         def decode(scale_bytes, raw = false)
@@ -352,7 +352,7 @@ module Scale
     end
 
     module Set
-      include SingleValue
+      include Base
 
       module ClassMethods
         def decode(scale_bytes)
@@ -390,7 +390,7 @@ module Scale
     end
 
     module VecU8FixedLength
-      include SingleValue
+      include Base
 
       module ClassMethods
         def decode(scale_bytes)
@@ -428,7 +428,7 @@ module Scale
     end
 
     module Array
-      include SingleValue
+      include Base
 
       module ClassMethods
         def decode(scale_bytes)

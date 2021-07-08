@@ -1,7 +1,7 @@
 module Scale
   module Types
     class MetadataV9
-      include SingleValue
+      include Base
       attr_accessor :call_index, :event_index
 
       def initialize(value)

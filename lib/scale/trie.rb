@@ -2,7 +2,7 @@ module Scale
   module Types
     
     class TrieNode
-      include SingleValue
+      include Base
       EMPTY = 0
       NIBBLE_PER_BYTE = 2
       BITMAP_LENGTH = 2

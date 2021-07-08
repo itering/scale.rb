@@ -2,7 +2,7 @@ module Scale
   module Types
 
     class Bool
-      include SingleValue
+      include Base
       BYTES_LENGTH = 1
 
       def self.decode(scale_bytes)
@@ -25,7 +25,7 @@ module Scale
     end
 
     class OptionBool
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         byte = scale_bytes.get_next_bytes(1)[0]
         value = if byte == 0x00
@@ -114,7 +114,7 @@ module Scale
     end
 
     class Compact
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
@@ -177,7 +177,7 @@ module Scale
     end
 
     class Bytes
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
@@ -210,7 +210,7 @@ module Scale
     end
 
     class Hex
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
@@ -227,7 +227,7 @@ module Scale
     end
 
     class String
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         length = Scale::Types::Compact.decode(scale_bytes).value
@@ -238,7 +238,7 @@ module Scale
     end
 
     class H160
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         bytes = scale_bytes.get_next_bytes(20)
@@ -253,7 +253,7 @@ module Scale
     end
 
     class H256
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         bytes = scale_bytes.get_next_bytes(32)
@@ -268,7 +268,7 @@ module Scale
     end
 
     class H512
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         bytes = scale_bytes.get_next_bytes(64)
@@ -283,7 +283,7 @@ module Scale
     end
 
     class GenericAddress
-      include SingleValue
+      include Base
 
       # https://github.com/paritytech/substrate/wiki/External-Address-Format-(SS58)
       # base58encode ( concat ( <address-type>, <address>, <checksum> ) )
@@ -377,7 +377,7 @@ module Scale
     class AccountIndex < U32; end
 
     class Era
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         byte = scale_bytes.get_next_bytes(1).bytes_to_hex
@@ -396,7 +396,7 @@ module Scale
     class Moment < U64; end
 
     class CompactMoment
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         value = Compact.decode(scale_bytes).value
@@ -509,7 +509,7 @@ module Scale
     end
 
     class Null
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         new nil
       end
@@ -709,7 +709,7 @@ module Scale
     end
 
     class EthereumAddress
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
@@ -728,7 +728,7 @@ module Scale
     end
 
     class EcdsaSignature
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
@@ -840,7 +840,7 @@ module Scale
     end
 
     class VoteOutcome
-      include SingleValue
+      include Base
       def self.decode(scale_bytes)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         result = new(scale_bytes.get_next_bytes(32))
@@ -884,7 +884,7 @@ module Scale
     end
 
     class BoxProposal
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes, metadata, chain_spec)
         puts "BEGIN " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
@@ -922,7 +922,7 @@ module Scale
     end
 
     class VecH512Length2
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
       end
@@ -935,7 +935,7 @@ module Scale
     end
 
     class GenericBlock
-      include SingleValue
+      include Base
 
       def self.decode(scale_bytes)
       end
