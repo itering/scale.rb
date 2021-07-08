@@ -16,7 +16,6 @@ module Scale
           # find the final type from registry
           type_info = fix_name(type_info)
           type_info = get_final_type_from_registry(type_info)
-          type_info = fix_name(type_info)
         end
 
         build_type(type_info)
@@ -26,8 +25,7 @@ module Scale
         def build_type(type_info)
           # 1. hard coded types, 2. Vec<...>, 3. Option<...>, 4. [xx; x], 5. (x, y)
           if type_info.class == ::String 
-
-            type_string = type_info
+            type_string = fix_name(type_info)
             if type_string =~ /\AVec<.+>\z/ 
               build_vec(type_string)
             elsif type_info =~ /\AOption<.+>\z/
