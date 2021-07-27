@@ -26,7 +26,8 @@ module Scale
         call_module_index = 0
         event_module_index = 0
 
-        modules.map(&:value).each_with_index do |m, module_index|
+        modules.map(&:value).each do |m|
+          module_index = m[:index]
           if m[:calls]
             m[:calls].each_with_index do |call, index|
               call[:lookup] = "%02x%02x" % [module_index, index]
