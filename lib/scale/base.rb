@@ -20,7 +20,7 @@ module Scale
             else
               v
             end
-          end
+          end.transform_keys(&:to_sym)
         elsif @value.class == ::Array
           @value.map do |v|
             if v.class.included_modules.include?(Base)
