@@ -8,7 +8,7 @@ module Scale
         if bytes.bytes_to_utf8 == "meta"
           version_enum = {
             "type" => "enum",
-            "value_list" => %w[MetadataV0 MetadataV1 MetadataV2 MetadataV3 MetadataV4 MetadataV5 MetadataV6 MetadataV7 MetadataV8 MetadataV9 MetadataV10 MetadataV11 MetadataV12]
+            "value_list" => %w[MetadataV0 MetadataV1 MetadataV2 MetadataV3 MetadataV4 MetadataV5 MetadataV6 MetadataV7 MetadataV8 MetadataV9 MetadataV10 MetadataV11 MetadataV12 MetadataV13]
           }
           metadata_version = Scale::Types.get(version_enum).decode(scale_bytes).value
           metadata = Metadata.new "Scale::Types::#{metadata_version}".constantize2.decode(scale_bytes)
