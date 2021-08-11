@@ -1,6 +1,5 @@
 {
   "types": {
-    "BlockNumberFor": "u32",
     "BalanceLock": {
       "type": "struct",
       "type_mapping": [
@@ -397,6 +396,10 @@
           "Vec<Bytes>"
         ],
         [
+          "base_fee_per_gas",
+          "Option<U256>"
+        ],
+        [
           "hash",
           "Option<H256>"
         ]
@@ -440,7 +443,7 @@
         ]
       ]
     },
-    "EthereumNetworkType": {
+    "EthereumNetwork": {
       "type": "enum",
       "type_mapping": [
         [
@@ -569,23 +572,6 @@
         [
           "parent_mmr_root",
           "Hash"
-        ]
-      ]
-    },
-    "MmrNodesPruningConfiguration": {
-      "type": "struct",
-      "type_mapping": [
-        [
-          "step",
-          "NodeIndex"
-        ],
-        [
-          "progress",
-          "NodeIndex"
-        ],
-        [
-          "last_position",
-          "NodeIndex"
         ]
       ]
     },
@@ -781,4 +767,5 @@
       ]
     }
   }
+
 }
