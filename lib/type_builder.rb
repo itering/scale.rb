@@ -41,11 +41,12 @@ module Scale
           # 5. Struct, 6. Enum, 7. Set
           else 
 
-            if type_info["type"] == "struct"
+            type_info.transform_keys!(&:to_sym)
+            if type_info[:type] == "struct"
               build_struct(type_info)
-            elsif type_info["type"] == "enum"
+            elsif type_info[:type] == "enum"
               build_enum(type_info)
-            elsif type_info["type"] == "set"
+            elsif type_info[:type] == "set"
               build_set(type_info)
             else
               raise Scale::TypeBuildError.new("Failed to build a type from #{type_info}")
@@ -158,7 +159,7 @@ module Scale
 
         def build_struct(type_info)
           # items: {"a" => Type}
-          items = type_info["type_mapping"].map do |item|
+          items = type_info[:type_mapping].map do |item|
             item_name = item[0]
             item_type = get(item[1])
             [item_name, item_type]
@@ -183,10 +184,10 @@ module Scale
 
         # not implemented: ["Compact", "Hex"]
         def build_enum(type_info)
-          # type_info: [["Item1", "Compact"], [["Item2", "Hex"]]
-          if type_info.has_key?("type_mapping")
+          # type_mapping: [["Item1", "Compact"], [["Item2", "Hex"]]
+          if type_info.has_key?(:type_mapping)
             # items: {a: Type}
-            items = type_info["type_mapping"].map do |item|
+            items = type_info[:type_mapping].map do |item|
               item_name = item[0]
               item_type = get(item[1])
               [item_name.to_sym, item_type]
@@ -210,14 +211,14 @@ module Scale
             end
           end
 
-          # [1, "hello"]
-          if type_info.has_key?("value_list")
-            type_name = "Enum#{type_info["value_list"].map {|value| value.to_s.camelize2}.join}"
+          # value_list: [1, "hello"]
+          if type_info.has_key?(:value_list)
+            type_name = "Enum#{type_info[:value_list].map {|value| value.to_s.camelize2}.join}"
 
             if !Scale::Types.const_defined?(type_name)
               klass = Class.new do
                 include Scale::Types::Enum
-                values *type_info["value_list"]
+                values *type_info[:value_list]
               end
               return Scale::Types.const_set type_name, klass
             else
@@ -237,12 +238,12 @@ module Scale
           # }
         # }
         def build_set(type_info)
-          type_name = "Set#{type_info["value_list"].keys.map(&:camelize2).join("")}"
+          type_name = "Set#{type_info[:value_list].keys.map(&:camelize2).join("")}"
           if !Scale::Types.const_defined?(type_name)
-            bytes_length = type_info["value_type"][1..].to_i / 8
+            bytes_length = type_info[:value_type][1..].to_i / 8
             klass = Class.new do
               include Scale::Types::Set
-              items type_info["value_list"], bytes_length
+              items type_info[:value_list], bytes_length
             end
             return Scale::Types.const_set type_name, klass
           else

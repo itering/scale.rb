@@ -44,7 +44,7 @@ module Scale
 
   module Types
     class << self
-      attr_accessor :debug
+      attr_accessor :debug, :logger
     end
 
     def self.check_types
@@ -126,3 +126,4 @@ class ::Hash
 end
 
 Scale::Types.debug = false
+Scale::Types.logger = Logger.new(STDOUT)

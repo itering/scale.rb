@@ -122,8 +122,8 @@ class SubstrateClient
     block = self.chain_getBlock(block_hash)
     SubstrateClient::Helper.decode_block(block)
   rescue => ex
-    puts ex.message
-    puts ex.backtrace.join("\n\t")
+    Scale::Types.logger.error ex
+    Scale::Types.logger.error ex.backtrace.join("\n\t")
   end
 
   def get_block_events(block_hash=nil)

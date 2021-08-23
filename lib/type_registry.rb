@@ -26,7 +26,7 @@ module Scale
           @types = default_types.merge(spec_types)
         rescue => ex
           # TODO: check different errors
-          puts "There is no types json file named #{spec_name}"
+          Scale::Types.logger.error "There is no types json file named #{spec_name}"
           @types = default_types
         end
       else
