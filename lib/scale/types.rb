@@ -187,7 +187,8 @@ module Scale
         # [67, 97, 102, 195, 169].pack('C*').force_encoding('utf-8')
         # => "Café"
         str = bytes.pack("C*").force_encoding("utf-8")
-        if str.valid_encoding?
+        # TODO: ?
+        if (not str.include?("\u0000")) && str.valid_encoding?
           puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
           new str
         else
