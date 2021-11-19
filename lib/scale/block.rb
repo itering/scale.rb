@@ -96,13 +96,28 @@ module Scale
       end
 
       def encode
-        result = "04" + self.value[:call_index]
+        version_info = '84'
+        if value.has_key?(:account_id) && !value.has_key?(:address)
+          value[:address] = value[:account_id]
+        end
+        if value.has_key?(:address)
+          contains_transaction = true
+        end
 
-        result += self.value[:params].map do |param|
-          Scale::Types.get(param[:type]).new(param[:value]).encode
-        end.join
+        if contains_transaction
+          data = '84'
+          data += Scale::Types.get("Address").new(value[:account_id]).encode()
+          data += Scale::Types.get("MultiSignature").new(value[:signature]).encode()
+          data += value[:era]
+          data += Scale::Types.get("Compact<U32>").new(value[:nonce]).encode()
+          data += Scale::Types.get("Compact<Index>").new(value[:tip]).encode()
+        else
+          data = "04"
+        end
+        data += value[:call_data]
 
-        "0x" + Compact.new(result.length / 2).encode + result
+        length_obj = Scale::Types.get('Compact<U32>').new(data.length / 2)
+        length_obj.encode + data
       end
 
       def to_human
