@@ -114,7 +114,7 @@ module Scale
         else
           data = "04"
         end
-        data += value[:call_data]
+        data += value[:call].encode
 
         length_obj = Scale::Types.get('Compact<U32>').new(data.length / 2)
         length_obj.encode + data
