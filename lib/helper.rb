@@ -117,7 +117,7 @@ class SubstrateClient::Helper
         }
       end
 
-      Scale::Types::Extrinsic.new(value).encode
+      Scale::Types::GenericCall.new(value).encode
     end
 
     def decode_block(block)

@@ -34,24 +34,17 @@ module Scale::Types
 
     it "can encode transfer payload" do
       value = {
-        call_index: "0600",
         call_module: "balances",
         call_function: "transfer",
-        params: [
-          {
-            name: "dest",
-            type: "<T::Lookup as StaticLookup>::Source",
-            value: { account_id: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409", account_length: "0xff" }
-          },
-          {
-            name: "value",
-            type: "Compact<T::Balance>",
+        call_args: {
+            dest: "0x586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409",
             value: 1_000_000_000_000
-          }
-        ]
+        }
       }
-      extrinsic = Extrinsic.new(value)
-      expect(extrinsic.encode).to eql("0xa8040600ff586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409070010a5d4e8")
+      call = GenericCall.new(value)
+      extrinsic = Extrinsic.new({call: call})
+      expect(call.encode).to eql("0600ff586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409070010a5d4e8")
+      expect(extrinsic.encode).to eql("a8040600ff586cb27c291c813ce74e86a60dad270609abf2fc8bee107e44a80ac00225c409070010a5d4e8")
     end
 
     # it "can encode to transfer payload 2" do

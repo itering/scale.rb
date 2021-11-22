@@ -283,6 +283,27 @@ module Scale
       end
     end
 
+    class GenericCall
+      include Base
+      attr_accessor :call_index
+      def encode(metadata=nil)
+        metadata = metadata || Scale::TypeRegistry.instance.metadata
+        call = metadata.get_module_call(self.value[:call_module], self.value[:call_function])
+        self.call_index = call[:lookup]
+        params_encode = ""
+        call_args = call[:args]
+        call_args.each do |ag|
+          _type = ag[:type]
+          if self.value[:call_args][(ag[:name].to_s + "_alias_define_type").to_sym]
+            _type = self.value[:call_args][(ag[:name].to_s + "_alias_define_type").to_sym]
+          end
+          params_encode = params_encode + Scale::Types.get(_type).new(self.value[:call_args][ag[:name].to_sym]).encode()
+        end
+         
+        return self.call_index + params_encode
+      end
+    end
+
     class GenericAddress
       include Base
 
@@ -327,7 +348,13 @@ module Scale
       end
 
       def encode
-        if self.value[:account_id]
+        if self.value.class == ::String
+          if ::Address.is_ss58_address?(self.value)
+            "ff" + ::Address.decode(self.value)
+          else
+            "ff" + (self.value.start_with?('0x') ? self.value[2..] : self.value)
+          end
+        elsif self.value[:account_id]
           "#{self.value[:account_length][2..]}#{self.value[:account_id][2..]}"
         else
           "#{self.value[:account_length][2..]}#{self.value[:account_index][2..]}"
@@ -365,6 +392,28 @@ module Scale
         Address32: "H256",
         Address20: "H160"
       )
+
+      def encode
+        if value.class == Integer
+          self.index = 1
+          index.to_s(16).rjust(2, "0") + Scale::Types.get("Compact").new(value).encode
+        elsif value.class != String
+          index.to_s(16).rjust(2, "0") + value.encode
+        elsif ::Address.is_ss58_address? value
+          account_id = Address.decode(value)
+          index = 0
+          index.to_s(16).rjust(2, "0") + Scale::Types.get("AccountId").new(account_id).encode
+        elsif value.length == 66 and value[0...2] == '0x'
+          index = 0
+          index.to_s(16).rjust(2, "0") + Scale::Types.get("AccountId").new(value).encode
+        elsif value.length == 42
+          index = 4
+          index.to_s(16).rjust(2, "0") + Scale::Types.get("Address20").new(value).encode
+        else
+          index = self.class::ITEMS.to_a.index { |x| x.first == value.first }
+          index.to_s(16).rjust(2, "0") + Scale::Types.get(self.class::ITEMS[value.first]).new(value.last).encode
+        end
+      end
     end
 
     class AccountId < H256; end

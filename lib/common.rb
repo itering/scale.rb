@@ -156,7 +156,16 @@ class Address
     end
 
     def make_hash(body)
-      Blake2b.bytes("#{SS58_PREFIX}#{body}", Blake2b::Key.none, 64)
+      Blake2b.hex("#{SS58_PREFIX}#{body}".bytes, 64)
+    end
+
+    def is_ss58_address?(address)
+      begin
+        decode(address)
+      rescue
+        return false
+      end
+      return true
     end
 
   end
