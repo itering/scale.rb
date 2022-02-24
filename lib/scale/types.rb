@@ -236,6 +236,13 @@ module Scale
         puts "  END " + self::TYPE_NAME + ": #{scale_bytes}" if Scale::Types.debug == true
         new bytes.pack("C*").force_encoding("utf-8")
       end
+
+      def encode
+        bytes = value.unpack("C*")
+        hex_string = bytes.bytes_to_hex[2..]
+        length = Compact.new(bytes.length).encode
+        "#{length}#{hex_string}"
+      end
     end
 
     class H160
