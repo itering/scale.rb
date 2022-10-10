@@ -1,5 +1,7 @@
 ![grants_badge](./grants_badge.png)
 
+scale.rb has many problems in design and development because of being unfamiliar with scale codec and substrate before, so it will not continue. I'm already working on a new implementation: https://github.com/wuminzhe/scale_rb.
+
 **Warning: After v0.2.19, the develop branch will do a structure refactor and big optimization.**
 
 # scale.rb
